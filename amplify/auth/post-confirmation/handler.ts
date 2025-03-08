@@ -50,7 +50,8 @@ export const handler: PostConfirmationTriggerHandler = async event => {
         createdAt,
         role,
         userName,
-        phoneNumber
+        phoneNumber,
+        allowedForms: []
     };
 
     try {

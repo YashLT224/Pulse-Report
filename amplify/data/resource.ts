@@ -16,10 +16,7 @@ const schema = a
                 role: a.enum(["admin", "staff"]),
                 userName: a.string().required(),
                 phoneNumber: a.string().required(),
-                allowedForms: a
-                    .string()
-                    .array()
-                    .default([])
+                allowedForms: a.string().array()
             })
             .identifier(["userId", "createdAt"])
             .secondaryIndexes(index => [
