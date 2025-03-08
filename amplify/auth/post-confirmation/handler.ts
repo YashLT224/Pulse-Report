@@ -1,19 +1,25 @@
 import { PostConfirmationTriggerHandler } from "aws-lambda";
-import { Amplify } from "aws-amplify";
-import { generateClient } from "aws-amplify/api";
 import { Schema } from "../../data/resource";
+import { Amplify } from "aws-amplify";
+import { generateClient } from "aws-amplify/data";
+import { getAmplifyDataClientConfig } from "@aws-amplify/backend/function/runtime";
 
-// Configure Amplify
-const amplifyConfig = {
-    aws_project_region: process.env.REGION,
-    aws_cognito_identity_pool_id: process.env.IDENTITY_POOL_ID,
-    aws_user_pools_id: process.env.USER_POOL_ID,
-    aws_user_pools_web_client_id: process.env.USER_POOL_CLIENT_ID,
-  };
+type DataClientEnv = {
+    AWS_ACCESS_KEY_ID: string;
+    AWS_SECRET_ACCESS_KEY: string;
+    AWS_SESSION_TOKEN: string;
+    AWS_REGION: string;
+    AMPLIFY_DATA_DEFAULT_NAME: string;
+} & Record<string, unknown>;
 
-  
-Amplify.configure(amplifyConfig);
+const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(
+    process.env as DataClientEnv
+);
+
+Amplify.configure(resourceConfig, libraryOptions);
+
 const client = generateClient<Schema>();
+
 export const handler: PostConfirmationTriggerHandler = async event => {
     console.log(
         "Amplify environment variables:",
@@ -29,19 +35,19 @@ export const handler: PostConfirmationTriggerHandler = async event => {
         const userId = event.request.userAttributes.sub; // Cognito user ID
         const createdAt = new Date().toISOString(); // Current date and time
         const role = "staff" as const; // Default role
-    
+
         // Create the user profile
         const userProfileInput = {
-          userId,
-          createdAt,
-          role,
+            userId,
+            createdAt,
+            role
         };
         // Use the Amplify Client to save the user profile
         await client.models.UserProfile.create(userProfileInput);
-    
+
         console.log("User profile created successfully");
-      } catch (error) {
+    } catch (error) {
         console.error("Error creating user profile:", error);
-      }
+    }
     return event;
 };
