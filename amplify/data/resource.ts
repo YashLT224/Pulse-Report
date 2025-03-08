@@ -9,28 +9,30 @@ specifies that any user authenticated via an API key can "create", "read",
 =========================================================================*/
 const schema = a
     .schema({
-        Todo: a
-            .model({
-                content: a.string()
-            })
-            .authorization(allow => [allow.publicApiKey()]),
-
         UserProfile: a
             .model({
-                userId: a.string().required(),
+                userId: a.id(),
                 createdAt: a.datetime().required(),
-                role: a.enum(["admin", "staff"])
+                role: a.enum(["admin", "staff"]),
+                userName: a.string().required(),
+                phoneNumber: a.string().required(),
+                allowedForms: a
+                    .string()
+                    .array()
+                    .default([])
             })
+            .identifier(["userId", "createdAt"])
+            .secondaryIndexes(index => [
+                index("role")
+                    .sortKeys(["createdAt"])
+                    .queryField("listByRole")
+                    .name("RoleIndex")
+            ])
             .authorization(allow => [
-                // Allow admins to perform all actions
-                allow
-                    .groups(["admin"])
-                    .to(["read", "create", "update", "delete"]),
-                // Allow staff to read and update their own profile only
-                allow
-                    .owner()
-                    .identityClaim("sub")
-                    .to(["read", "update"])
+                // Allow admin to perform read and update operations
+                allow.groups(["ADMINS"]).to(["read", "update"]),
+                // Allow staff to read their own profile only
+                allow.ownerDefinedIn("userId").to(["read"])
             ])
     })
     .authorization(allow => [allow.resource(postConfirmation)]);
