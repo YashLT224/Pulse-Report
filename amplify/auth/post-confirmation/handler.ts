@@ -12,9 +12,13 @@ type DataClientEnv = {
     AMPLIFY_DATA_DEFAULT_NAME: string;
 } & Record<string, unknown>;
 
-const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(
-    process.env as DataClientEnv
-);
+const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(({
+    ...process.env,
+    AMPLIFY_DATA_DEFAULT_NAME: "",
+    _MODEL_INTROSPECTION_SCHEMA_BUCKET_NAME: "",
+    _MODEL_INTROSPECTION_SCHEMA_KEY: "",
+    _GRAPHQL_ENDPOINT: ""
+} as unknown) as DataClientEnv);
 
 Amplify.configure(resourceConfig, libraryOptions);
 
