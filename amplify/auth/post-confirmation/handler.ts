@@ -3,22 +3,11 @@ import { Schema } from "../../data/resource";
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import { getAmplifyDataClientConfig } from "@aws-amplify/backend/function/runtime";
+import { env } from "$amplify/env/post-confirmation";
 
-type DataClientEnv = {
-    AWS_ACCESS_KEY_ID: string;
-    AWS_SECRET_ACCESS_KEY: string;
-    AWS_SESSION_TOKEN: string;
-    AWS_REGION: string;
-    AMPLIFY_DATA_DEFAULT_NAME: string;
-} & Record<string, unknown>;
-
-const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(({
-    ...process.env,
-    AMPLIFY_DATA_DEFAULT_NAME: "",
-    _MODEL_INTROSPECTION_SCHEMA_BUCKET_NAME: "",
-    _MODEL_INTROSPECTION_SCHEMA_KEY: "",
-    _GRAPHQL_ENDPOINT: ""
-} as unknown) as DataClientEnv);
+const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(
+    env
+);
 
 Amplify.configure(resourceConfig, libraryOptions);
 
