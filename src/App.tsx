@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Authenticator } from "@aws-amplify/ui-react";
 import Home from "./Screens/Home";
+import Staff from "./Screens/Staff";
 import "@aws-amplify/ui-react/styles.css";
 
 const formFields = {
@@ -32,6 +33,7 @@ function App() {
         >
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/staff" element={<Staff />} />
                 <Route path="*" element={<Navigate to="/" />} />
             </Routes>
         </Authenticator>
