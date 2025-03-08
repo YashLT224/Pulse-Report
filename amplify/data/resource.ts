@@ -17,7 +17,7 @@ const schema = a.schema({
     .model({
       userId: a.string().required(),
       createdAt: a.datetime().required(),
-      role: a.enum(["admin", "staff"]).default("staff"),
+      role: a.enum(["admin", "staff"]),
     })
     .authorization((allow) => [
       // Allow admins to perform all actions
