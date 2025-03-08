@@ -5,6 +5,11 @@ import { generateClient } from "aws-amplify/data";
 import { getAmplifyDataClientConfig } from "@aws-amplify/backend/function/runtime";
 import { env } from "$amplify/env/post-confirmation";
 
+console.log(
+    "Amplify post-confirmation variables:",
+    JSON.stringify(env, null, 2)
+);
+
 const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(
     env
 );
@@ -23,24 +28,29 @@ export const handler: PostConfirmationTriggerHandler = async event => {
 
     // Create User Profile
     console.log("Creating user profile...");
-    try {
-        // Extract user details from the event
-        const userId = event.request.userAttributes.sub; // Cognito user ID
-        const createdAt = new Date().toISOString(); // Current date and time
-        const role = "staff" as const; // Default role
 
-        // Create the user profile
-        const userProfileInput = {
-            userId,
-            createdAt,
-            role
-        };
+    // Extract user details from the event
+    const userId = event.request.userAttributes.sub; // Cognito user ID
+    const createdAt = new Date().toISOString(); // Current date and time
+    const role = "staff" as const; // Default role
+
+    // Create the user profile
+    const userProfileInput = {
+        userId,
+        createdAt,
+        role
+    };
+
+    try {
         // Use the Amplify Client to save the user profile
         await client.models.UserProfile.create(userProfileInput);
 
         console.log("User profile created successfully");
     } catch (error) {
-        console.error("Error creating user profile:", error);
+        console.error(
+            `Error creating user profile for userId ${userId}:`,
+            error
+        );
     }
     return event;
 };
