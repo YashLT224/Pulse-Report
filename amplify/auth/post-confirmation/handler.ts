@@ -12,8 +12,8 @@ const amplifyConfig = {
   };
 
   
-  Amplify.configure(amplifyConfig);
-
+Amplify.configure(amplifyConfig);
+const client = new Client();
 export const handler: PostConfirmationTriggerHandler = async event => {
     console.log(
         "Amplify environment variables:",
