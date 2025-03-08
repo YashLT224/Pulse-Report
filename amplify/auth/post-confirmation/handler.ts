@@ -5,13 +5,21 @@ import { generateClient } from "aws-amplify/data";
 import { getAmplifyDataClientConfig } from "@aws-amplify/backend/function/runtime";
 import { env } from "$amplify/env/post-confirmation";
 
+type DataClientEnv = {
+    AWS_ACCESS_KEY_ID: string;
+    AWS_SECRET_ACCESS_KEY: string;
+    AWS_SESSION_TOKEN: string;
+    AWS_REGION: string;
+    AMPLIFY_DATA_DEFAULT_NAME: string;
+} & Record<string, unknown>;
+
 console.log(
     "Amplify post-confirmation variables:",
     JSON.stringify(env, null, 2)
 );
 
 const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(
-    env
+    (env as unknown) as DataClientEnv
 );
 
 Amplify.configure(resourceConfig, libraryOptions);
