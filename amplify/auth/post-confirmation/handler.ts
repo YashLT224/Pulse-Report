@@ -28,7 +28,7 @@ export const handler: PostConfirmationTriggerHandler = async event => {
         // Extract user details from the event
         const userId = event.request.userAttributes.sub; // Cognito user ID
         const createdAt = new Date().toISOString(); // Current date and time
-        const role = "staff"; // Default role
+        const role = "staff" as const; // Default role
     
         // Create the user profile
         const userProfileInput = {
