@@ -12,6 +12,19 @@ const schema = a.schema({
       content: a.string(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
+
+    UserProfile: a
+    .model({
+      userId: a.string().required(),
+      createdAt: a.datetime().required(),
+      role: a.enum(["admin", "staff"]).default("staff"),
+    })
+    .authorization((allow) => [
+      // Allow admins to perform all actions
+      allow.groups(["admin"]).to(["read", "create", "update", "delete"]),
+      // Allow staff to read and update their own profile only
+      allow.owner().identityClaim("sub").to(["read", "update"]),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
