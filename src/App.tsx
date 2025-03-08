@@ -22,6 +22,13 @@ function App() {
             loginMechanisms={["phone_number"]}
             signUpAttributes={["name"]}
             formFields={formFields}
+            components={{
+                SignIn: {
+                    Footer() {
+                        return null;
+                    }
+                }
+            }}
         >
             <Routes>
                 <Route path="/" element={<Home />} />
