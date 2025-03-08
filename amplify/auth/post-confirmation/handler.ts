@@ -1,6 +1,6 @@
 import { PostConfirmationTriggerHandler } from "aws-lambda";
 import { Amplify } from "aws-amplify";
-import { Client } from "@aws-amplify/backend";
+import { generateClient } from "aws-amplify/api";
 
 
 // Configure Amplify
@@ -13,7 +13,7 @@ const amplifyConfig = {
 
   
 Amplify.configure(amplifyConfig);
-const client = new Client();
+const client = generateClient();
 export const handler: PostConfirmationTriggerHandler = async event => {
     console.log(
         "Amplify environment variables:",
