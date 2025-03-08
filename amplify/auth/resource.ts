@@ -8,6 +8,7 @@ export const auth = defineAuth({
     loginWith: {
         phone: true
     },
+    multifactor: { mode: "OFF" },
     accountRecovery: "NONE",
     userAttributes: {
         fullname: {

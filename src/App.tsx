@@ -25,7 +25,7 @@ function App() {
             components={{
                 SignIn: {
                     Footer() {
-                        return null;
+                        return null; // This removes the Forgot Password link
                     }
                 }
             }}
