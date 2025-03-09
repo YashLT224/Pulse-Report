@@ -6,7 +6,7 @@
 
 // const client = generateClient<Schema>();
 
-const UserList = () => {
+const AddUser = () => {
     // const { user } = useAuthenticator();
     // const [currentUser, setCurrentUser] = useState<any>(null);
     // const [staffMembers, setStaffMembers] = useState<any>([]);
@@ -23,7 +23,7 @@ const UserList = () => {
 
     return (
         <div>
-            <h1>UserList</h1>
+            <h1>AddUser</h1>
             {/* <pre>{JSON.stringify(currentUser, null, 2)}</pre>
             <pre>{JSON.stringify(user, null, 2)}</pre>
             <pre>{JSON.stringify(staffMembers, null, 2)}</pre> */}
@@ -31,4 +31,4 @@ const UserList = () => {
     );
 };
 
-export default UserList;
+export default AddUser;

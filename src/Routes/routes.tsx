@@ -5,6 +5,8 @@ import { generateClient } from 'aws-amplify/data';
 import { useDispatch } from 'react-redux';
 import Home from '../Screens/Home';
 import UserList from '../Screens/UserList';
+import PendingApprovals from '../Screens/PendingApprovals';
+import AddUser from '../Screens/AddUser';
 import ProtectedRoute from './protectedRoute';
 import { setUserProfile } from '../Redux/slices/userSlice';
 import { Schema } from '../../amplify/data/resource';
@@ -42,7 +44,7 @@ const AppRoutes = () => {
                 path="/pending-approvals"
                 element={
                     <ProtectedRoute
-                        element={<UserList />}
+                        element={<PendingApprovals />}
                         requiredRole="admin"
                     />
                 }
@@ -50,14 +52,17 @@ const AppRoutes = () => {
             <Route
                 path="/user-list"
                 element={
-                    <ProtectedRoute element={<Home />} requiredRole="admin" />
+                    <ProtectedRoute
+                        element={<UserList />}
+                        requiredRole="admin"
+                    />
                 }
             />
             <Route
                 path="/add-user"
                 element={
                     <ProtectedRoute
-                        element={<UserList />}
+                        element={<AddUser />}
                         requiredRole="admin"
                     />
                 }
