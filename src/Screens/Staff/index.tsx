@@ -12,7 +12,7 @@ const Staff = () => {
     const [staffMembers, setStaffMembers] = useState<any>([]);
 
     useEffect(() => {
-        client.models.UserProfile.list({ userId: user.userId! }).then(user => {
+        client.models.UserProfile.list({ userId: user.userId }).then(user => {
             setCurrentUser(user);
         });
 
@@ -23,9 +23,9 @@ const Staff = () => {
 
     return (
         <div>
-            <h1>Staff</h1>
+            <h1>Current user:</h1>
             <pre>{JSON.stringify(currentUser, null, 2)}</pre>
-            <pre>{JSON.stringify(user, null, 2)}</pre>
+            <h1>Staff Members:</h1>
             <pre>{JSON.stringify(staffMembers, null, 2)}</pre>
         </div>
     );
