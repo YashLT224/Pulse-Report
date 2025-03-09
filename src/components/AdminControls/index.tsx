@@ -20,8 +20,11 @@ const tiles = [
 
 const Tile = ({ data, isActive, onClick }) => {
     return (
-        <MenuItem onClick={() => onClick(data.id, data.link)} active={isActive}>
-            <Icon src={data.icon} alt={data.name} active={isActive} />
+        <MenuItem
+            onClick={() => onClick(data.id, data.link)}
+            $active={isActive}
+        >
+            <Icon src={data.icon} alt={data.name} $active={isActive} />
             <Text>{data.name}</Text>
         </MenuItem>
     );
