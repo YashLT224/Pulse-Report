@@ -3,11 +3,11 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { generateClient } from "aws-amplify/data";
 import { useDispatch } from "react-redux";
-import Home from '../src/Screens/Home'
-import Staff from '../src/Screens/Staff'
+import Home from '../Screens/Home'
+import Staff from '../Screens/Staff'
 import ProtectedRoute from './protectedRoute'
-import { setUserProfile } from "../src/Redux/slices/userSlice";
-
+import { setUserProfile } from "../Redux/slices/userSlice";
+import { Schema } from "../../amplify/data/resource"
 
  const client = generateClient<Schema>();
 
