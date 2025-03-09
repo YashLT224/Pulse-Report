@@ -1,5 +1,5 @@
-import { ClientSchema, a, defineData } from "@aws-amplify/backend";
-import { postConfirmation } from "../auth/post-confirmation/resource";
+import { ClientSchema, a, defineData } from '@aws-amplify/backend';
+import { postConfirmation } from '../auth/post-confirmation/resource';
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -13,23 +13,23 @@ const schema = a
             .model({
                 userId: a.id(),
                 createdAt: a.datetime().required(),
-                role: a.enum(["admin", "staff"]),
+                role: a.enum(['admin', 'staff']),
                 userName: a.string().required(),
                 phoneNumber: a.string().required(),
                 allowedForms: a.string().array()
             })
-            .identifier(["userId", "createdAt"])
+            .identifier(['userId'])
             .secondaryIndexes(index => [
-                index("role")
-                    .sortKeys(["createdAt"])
-                    .queryField("listByRole")
-                    .name("RoleIndex")
+                index('role')
+                    .sortKeys(['createdAt'])
+                    .queryField('listByRole')
+                    .name('RoleIndex')
             ])
             .authorization(allow => [
                 // Allow admin to perform read and update operations
-                allow.groups(["ADMINS"]).to(["read", "update"]),
+                allow.groups(['ADMINS']).to(['read', 'update']),
                 // Allow staff to read their own profile only
-                allow.ownerDefinedIn("userId").to(["read"])
+                allow.ownerDefinedIn('userId').to(['read'])
             ])
     })
     .authorization(allow => [allow.resource(postConfirmation)]);
@@ -39,7 +39,7 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
     schema,
     authorizationModes: {
-        defaultAuthorizationMode: "userPool",
+        defaultAuthorizationMode: 'userPool',
         // API Key is used for a.allow.public() rules
         apiKeyAuthorizationMode: {
             expiresInDays: 30
