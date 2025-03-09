@@ -4,7 +4,9 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from 'aws-amplify/data';
 import { useDispatch } from 'react-redux';
 import Home from '../Screens/Home';
-import Staff from '../Screens/Staff';
+import UserList from '../Screens/UserList';
+import PendingApprovals from '../Screens/PendingApprovals';
+import AddUser from '../Screens/AddUser';
 import ProtectedRoute from './protectedRoute';
 import { setUserProfile } from '../Redux/slices/userSlice';
 import { Schema } from '../../amplify/data/resource';
@@ -36,21 +38,37 @@ const AppRoutes = () => {
     }, [user?.userId, dispatch]);
 
     return (
-        <>
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route
-                    path="/staff"
-                    element={
-                        <ProtectedRoute
-                            element={<Staff />}
-                            requiredRole="admin"
-                        />
-                    }
-                />
-                <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-        </>
+        <Routes>
+            <Route path="/" element={<Home />} />
+            <Route
+                path="/pending-approvals"
+                element={
+                    <ProtectedRoute
+                        element={<PendingApprovals />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+            <Route
+                path="/user-list"
+                element={
+                    <ProtectedRoute
+                        element={<UserList />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+            <Route
+                path="/add-user"
+                element={
+                    <ProtectedRoute
+                        element={<AddUser />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+            <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
     );
 };
 
