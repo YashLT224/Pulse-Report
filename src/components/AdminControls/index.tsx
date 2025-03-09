@@ -37,7 +37,7 @@ const AdminControls = () => {
     // Set initial active item based on the current URL
     const getInitialActiveItem = () => {
         const activeTile = tiles.find(tile => tile.link === location.pathname);
-        return activeTile ? activeTile.id : tiles[0].id;
+        return activeTile ? activeTile.id : -1;
     };
 
     const [activeItem, setActiveItem] = useState(getInitialActiveItem); // Default active item

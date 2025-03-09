@@ -14,6 +14,13 @@ const Header = () => {
     const userProfile = useSelector(
         (state: any) => state.authReducer.userProfile
     );
+
+    const handleLogout = () => {
+        signOut();
+        dispatch(clearUserProfile());
+        navigate('/');
+    };
+
     return (
         <Container>
             <Link to="/">
@@ -41,10 +48,7 @@ const Header = () => {
                         variation="primary"
                         colorTheme="warning"
                         loadingText=""
-                        onClick={() => {
-                            signOut();
-                            dispatch(clearUserProfile());
-                        }}
+                        onClick={handleLogout}
                         style={{
                             backgroundColor: '#FBC226',
                             color: '#101010',

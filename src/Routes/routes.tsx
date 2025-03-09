@@ -7,6 +7,7 @@ import Home from '../Screens/Home';
 import UserList from '../Screens/UserList';
 import PendingApprovals from '../Screens/PendingApprovals';
 import AddUser from '../Screens/AddUser';
+import Alerts from '../Screens/Alerts';
 import ProtectedRoute from './protectedRoute';
 import { setUserProfile } from '../Redux/slices/userSlice';
 import { Schema } from '../../amplify/data/resource';
@@ -40,6 +41,7 @@ const AppRoutes = () => {
     return (
         <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/alerts" element={<Alerts />} />
             <Route
                 path="/pending-approvals"
                 element={
