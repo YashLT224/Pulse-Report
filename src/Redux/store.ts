@@ -1,10 +1,10 @@
 import { thunk } from "redux-thunk"
 import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from './slices/counterslice';
+import authReducer from './slices/userSlice';
 
 const store = configureStore({
   reducer: {
-    counter: counterReducer,
+    authReducer: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
   getDefaultMiddleware().concat(thunk), // Add Thunk middleware
