@@ -9,6 +9,7 @@ export const CardContainer = styled.div`
 `;
 
 export const CardWrapper = styled.div`
+    cursor: pointer;
     background: #ffffff;
     border: 1px solid #e0e0e0;
     border-radius: 10px;

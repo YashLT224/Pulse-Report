@@ -28,7 +28,11 @@ const Header = () => {
                             <Separator />
                         </>
                     )}
-                    <img src={BellIcon} alt="alert" />
+                    <img
+                        src={BellIcon}
+                        alt="alert"
+                        style={{ cursor: 'pointer' }}
+                    />
                     <Separator />
                     <Button
                         variation="primary"
