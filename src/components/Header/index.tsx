@@ -22,7 +22,7 @@ const Header = () => {
             </Link>
             {user && (
                 <FlexBox>
-                    {userProfile && userProfile.userName && (
+                    {userProfile?.userName && (
                         <>
                             <Text>{userProfile.userName}</Text>
                             <Separator />
