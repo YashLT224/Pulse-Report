@@ -12,7 +12,8 @@ export const formTypes = [
     { id: '3', name: 'Building Insurance', icon: buidingInsurance },
     { id: '4', name: 'Building Mcl Tax', icon: buildingTax },
     { id: '5', name: 'Document File Status', icon: docStatus },
-    { id: '6', name: 'Requirement', icon: docStatus },
-    { id: '7', name: 'Display Instructions', icon: docStatus },
-    { id: '8', name: 'Sales Man Performance', icon: docStatus }
+    { id: '6', name: 'To Do List', icon: docStatus },
+    { id: '7', name: 'Requirement', icon: docStatus },
+    { id: '8', name: 'Display Instructions', icon: docStatus },
+    { id: '9', name: 'Sales Man Performance', icon: docStatus }
 ];
