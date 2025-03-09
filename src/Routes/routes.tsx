@@ -20,11 +20,11 @@ const AppRoutes = () => {
         if (user?.userId) {
             const fetchUserProfile = async () => {
                 try {
-                    const result = await client.models.UserProfile.list({
-                        filter: { userId: { eq: user.userId } }
+                    const result = await client.models.UserProfile.get({
+                        userId: user.userId
                     });
-                    if (result.data && result.data.length > 0) {
-                        dispatch(setUserProfile(result.data[0]));
+                    if (result.data) {
+                        dispatch(setUserProfile(result.data));
                     }
                 } catch (error) {
                     console.error('Error fetching user profile:', error);
