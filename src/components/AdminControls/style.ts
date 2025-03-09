@@ -24,7 +24,6 @@ padding:0px 12px;
 box-sizing: border-box;
 cursor:pointer;
 &:hover {
-    background-color: #dddddd;
     border-bottom:2px solid #ED5F00;
   }
 `

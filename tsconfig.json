@@ -25,7 +25,7 @@
             "$amplify/*": ["../.amplify/generated/*"]
         }
     },
-    "include": ["src", "Routes/routes.tsx"],
+    "include": ["src", "src/Routes/routes.tsx"],
     "exclude": ["amplify/**/*"],
     "references": [{ "path": "./tsconfig.node.json" }]
 }

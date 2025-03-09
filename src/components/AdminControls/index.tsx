@@ -1,4 +1,3 @@
-import React,{useState} from 'react'
 import {Bar,Icon,Text,MenuItem} from './style.ts'
 import FormSvg from '../../assets/form.svg'
 import addUser from '../../assets/adduser.svg'

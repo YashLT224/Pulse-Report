@@ -1,8 +1,8 @@
 import {Navigate } from 'react-router-dom'
 import { useSelector } from "react-redux";
 const ProtectedRoute = ({ element, requiredRole }) => {
-    const userProfile = useSelector((state) => state.authReducer.userProfile);
-    const isLoading = useSelector((state) => state.authReducer.isLoading);
+    const userProfile = useSelector((state:any) => state.authReducer.userProfile);
+    const isLoading = useSelector((state:any) => state.authReducer.isLoading);
     const Role= userProfile?.role
     
     // Show loading indicator while checking permissions

@@ -1,8 +1,10 @@
 import { Authenticator } from "@aws-amplify/ui-react";
-import Routes from '../Routes/routes'
+import Routes from './Routes/routes'
+import styled from 'styled-components';
 import Header from "./components/Header/index";
 import AdminControls from "./components/AdminControls/index";
 import "@aws-amplify/ui-react/styles.css";
+import Footer from "./components/Footer/index";
 
 const formFields = {
     signIn: {
@@ -17,9 +19,26 @@ const formFields = {
     }
 };
 
+const AppContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure the container takes at least the full viewport height */
+`;
+
+const MainContent = styled.main`
+  flex: 1; /* This makes the main content grow to fill available space */
+  padding: 20px; /* Optional: Add padding for spacing */
+`;
+
+const AuthenticatorWrapper = styled.div`
+  flex: 1; /* Ensure the Authenticator fills the remaining space */
+  display: flex;
+  flex-direction: column;
+`;
+
 function App() {
     return (
-        <>
+        <AppContainer>
         <Header/>
         <AdminControls/>
         <Authenticator
@@ -34,9 +53,14 @@ function App() {
                 }
             }}
         >
-           <Routes/>
+          <AuthenticatorWrapper>
+          <MainContent>
+            <Routes />
+          </MainContent>
+          <Footer />
+        </AuthenticatorWrapper>
         </Authenticator>
-        </>
+        </AppContainer>
          
     );
 }
