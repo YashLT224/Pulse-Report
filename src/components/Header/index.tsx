@@ -1,4 +1,5 @@
 import { Button } from '@aws-amplify/ui-react';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { Link } from 'react-router-dom';
@@ -7,6 +8,7 @@ import { clearUserProfile } from '../../Redux/slices/userSlice';
 import { Container, Logo, FlexBox, Text, Separator } from './style';
 
 const Header = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { user, signOut } = useAuthenticator();
     const userProfile = useSelector(
@@ -32,6 +34,7 @@ const Header = () => {
                         src={BellIcon}
                         alt="alert"
                         style={{ cursor: 'pointer' }}
+                        onClick={() => navigate('/alerts')}
                     />
                     <Separator />
                     <Button

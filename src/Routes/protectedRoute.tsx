@@ -1,22 +1,25 @@
-import {Navigate } from 'react-router-dom'
-import { useSelector } from "react-redux";
+import { Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
 const ProtectedRoute = ({ element, requiredRole }) => {
-    const userProfile = useSelector((state:any) => state.authReducer.userProfile);
-    const isLoading = useSelector((state:any) => state.authReducer.isLoading);
-    const Role= userProfile?.role
-    
+    const userProfile = useSelector(
+        (state: any) => state.authReducer.userProfile
+    );
+    const isLoading = useSelector((state: any) => state.authReducer.isLoading);
+    const Role = userProfile?.role;
+
     // Show loading indicator while checking permissions
     if (isLoading) {
-      return <div>Loading...</div>;
+        return <div>Loading...</div>;
     }
-    
+
     // Allow access if role matches
     if (userProfile && Role === requiredRole) {
-      return element;
+        return element;
     }
-    
+
     // Redirect if not authorized
     return <Navigate to="/" replace />;
-  };
+};
 
-  export default ProtectedRoute
+export default ProtectedRoute;
