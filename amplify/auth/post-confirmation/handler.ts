@@ -27,11 +27,6 @@ Amplify.configure(resourceConfig, libraryOptions);
 const client = generateClient<Schema>();
 
 export const handler: PostConfirmationTriggerHandler = async event => {
-    console.log(
-        "Amplify environment variables:",
-        JSON.stringify(process.env, null, 2)
-    );
-
     console.log("Post Confirmation event:", JSON.stringify(event, null, 2));
 
     // Create User Profile
@@ -58,7 +53,7 @@ export const handler: PostConfirmationTriggerHandler = async event => {
         // Use the Amplify Client to save the user profile
         await client.models.UserProfile.create(userProfileInput);
 
-        console.log("User profile created successfully");
+        console.log(`User profile created successfully for userId ${userId}`);
     } catch (error) {
         console.error(
             `Error creating user profile for userId ${userId}:`,
