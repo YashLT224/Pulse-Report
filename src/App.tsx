@@ -1,7 +1,7 @@
-import { Routes, Route, Navigate } from "react-router-dom";
 import { Authenticator } from "@aws-amplify/ui-react";
-import Home from "./Screens/Home";
-import Staff from "./Screens/Staff";
+import Routes from '../Routes/routes'
+import Header from "./components/Header/index";
+import AdminControls from "./components/AdminControls/index";
 import "@aws-amplify/ui-react/styles.css";
 
 const formFields = {
@@ -19,6 +19,9 @@ const formFields = {
 
 function App() {
     return (
+        <>
+        <Header/>
+        <AdminControls/>
         <Authenticator
             loginMechanisms={["phone_number"]}
             signUpAttributes={["name"]}
@@ -31,12 +34,10 @@ function App() {
                 }
             }}
         >
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/staff" element={<Staff />} />
-                <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
+           <Routes/>
         </Authenticator>
+        </>
+         
     );
 }
 
