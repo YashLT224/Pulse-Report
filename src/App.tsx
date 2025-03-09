@@ -1,4 +1,6 @@
 import { Authenticator } from '@aws-amplify/ui-react';
+import { useSelector } from 'react-redux';
+import { useAuthenticator } from '@aws-amplify/ui-react';
 import Routes from './Routes/routes';
 import styled from 'styled-components';
 import Header from './components/Header/index';
@@ -37,32 +39,37 @@ const AuthenticatorWrapper = styled.div`
 `;
 
 function App() {
+    const { user } = useAuthenticator();
+    const userProfile = useSelector(
+        (state: any) => state.authReducer.userProfile
+    );
+
+    const isAdmin = user && userProfile?.role === 'admin';
+
     return (
-        <Authenticator.Provider>
-            <AppContainer>
-                <Header />
-                <AdminControls />
-                <Authenticator
-                    loginMechanisms={['phone_number']}
-                    signUpAttributes={['name']}
-                    formFields={formFields}
-                    components={{
-                        SignIn: {
-                            Footer() {
-                                return null; // This removes the Forgot Password link
-                            }
+        <AppContainer>
+            <Header />
+            {isAdmin && <AdminControls />}
+            <Authenticator
+                loginMechanisms={['phone_number']}
+                signUpAttributes={['name']}
+                formFields={formFields}
+                components={{
+                    SignIn: {
+                        Footer() {
+                            return null; // This removes the Forgot Password link
                         }
-                    }}
-                >
-                    <AuthenticatorWrapper>
-                        <MainContent>
-                            <Routes />
-                        </MainContent>
-                        <Footer />
-                    </AuthenticatorWrapper>
-                </Authenticator>
-            </AppContainer>
-        </Authenticator.Provider>
+                    }
+                }}
+            >
+                <AuthenticatorWrapper>
+                    <MainContent>
+                        <Routes />
+                    </MainContent>
+                    <Footer />
+                </AuthenticatorWrapper>
+            </Authenticator>
+        </AppContainer>
     );
 }
 

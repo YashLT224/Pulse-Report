@@ -1,4 +1,5 @@
 import { Button } from '@aws-amplify/ui-react';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { Link } from 'react-router-dom';
@@ -7,11 +8,19 @@ import { clearUserProfile } from '../../Redux/slices/userSlice';
 import { Container, Logo, FlexBox, Text, Separator } from './style';
 
 const Header = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { user, signOut } = useAuthenticator();
     const userProfile = useSelector(
         (state: any) => state.authReducer.userProfile
     );
+
+    const handleLogout = () => {
+        signOut();
+        dispatch(clearUserProfile());
+        navigate('/');
+    };
+
     return (
         <Container>
             <Link to="/">
@@ -32,16 +41,14 @@ const Header = () => {
                         src={BellIcon}
                         alt="alert"
                         style={{ cursor: 'pointer' }}
+                        onClick={() => navigate('/alerts')}
                     />
                     <Separator />
                     <Button
                         variation="primary"
                         colorTheme="warning"
                         loadingText=""
-                        onClick={() => {
-                            signOut();
-                            dispatch(clearUserProfile());
-                        }}
+                        onClick={handleLogout}
                         style={{
                             backgroundColor: '#FBC226',
                             color: '#101010',
