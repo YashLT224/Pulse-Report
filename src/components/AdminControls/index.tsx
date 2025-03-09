@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { Bar, Icon, Text, MenuItem } from './style.ts';
@@ -9,9 +10,9 @@ import List from '../../assets/list.svg';
 
 const tiles = [
     { id: 0, name: 'Form Access', icon: FormSvg },
-    { id: 1, name: 'Approval Requests', icon: Approval },
-    { id: 2, name: 'Add User', icon: addUser },
-    { id: 3, name: 'User List', icon: List }
+    { id: 1, name: 'Pending Approvals', icon: Approval },
+    { id: 2, name: 'User List', icon: List },
+    { id: 3, name: 'Add User', icon: addUser }
 ];
 
 const Tile = ({ data, isActive, onClick }) => {
@@ -24,6 +25,7 @@ const Tile = ({ data, isActive, onClick }) => {
 };
 
 const AdminControls = () => {
+    const navigate = useNavigate();
     const { user } = useAuthenticator();
     const userProfile = useSelector(
         (state: any) => state.authReducer.userProfile
@@ -34,6 +36,26 @@ const AdminControls = () => {
         return null;
     }
 
+    const handleNavigation = (id: number) => {
+        setActiveItem(id);
+        switch (id) {
+            case 0:
+                navigate('/');
+                break;
+            case 1:
+                navigate('/pending-approvals');
+                break;
+            case 2:
+                navigate('/user-list');
+                break;
+            case 3:
+                navigate('/add-user');
+                break;
+            default:
+                break;
+        }
+    };
+
     return (
         <div>
             <Bar>
@@ -42,7 +64,7 @@ const AdminControls = () => {
                         key={tile.id}
                         data={tile}
                         isActive={tile.id === activeItem}
-                        onClick={setActiveItem}
+                        onClick={handleNavigation}
                     />
                 ))}
             </Bar>
