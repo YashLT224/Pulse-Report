@@ -23,10 +23,10 @@ const Header = () => {
             if (!user) {
                 dispatch(clearUserProfile());
             }
-        }, 10);
+        }, 0);
 
         return () => clearTimeout(timer);
-    }, [user, userProfile, dispatch, navigate]);
+    }, [user, dispatch]);
 
     const handleAlerts = () => {
         dispatch(resetActiveTile());
