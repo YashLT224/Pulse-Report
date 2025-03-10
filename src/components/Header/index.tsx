@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Button } from '@aws-amplify/ui-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -17,6 +18,17 @@ const Header = () => {
         (state: any) => state.authReducer.userProfile
     );
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (!user) {
+                dispatch(clearUserProfile());
+                navigate('/');
+            }
+        }, 10);
+
+        return () => clearTimeout(timer);
+    }, [user, userProfile, dispatch, navigate]);
+
     const handleAlerts = () => {
         dispatch(resetActiveTile());
         navigate('/alerts');
@@ -24,7 +36,6 @@ const Header = () => {
 
     const handleLogout = () => {
         signOut();
-        dispatch(clearUserProfile());
         navigate('/');
     };
 
