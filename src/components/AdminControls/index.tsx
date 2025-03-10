@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Bar, Icon, Text, MenuItem } from './style.ts';
 import FormSvg from '../../assets/form.svg';
 import addUser from '../../assets/adduser.svg';
 import Approval from '../../assets/approval.svg';
 import List from '../../assets/list.svg';
+import { setActiveTile } from '../../Redux/slices/adminControlSlice.ts';
 
 const tiles = [
     { id: 0, name: 'Form Access', link: '/', icon: FormSvg },
@@ -31,19 +33,23 @@ const Tile = ({ data, isActive, onClick }) => {
 };
 
 const AdminControls = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Set initial active item based on the current URL
-    const getInitialActiveItem = () => {
-        const activeTile = tiles.find(tile => tile.link === location.pathname);
-        return activeTile ? activeTile.id : -1;
-    };
+    const activeTileId = useSelector(
+        (state: any) => state.adminControlReducer.activeTileId
+    );
 
-    const [activeItem, setActiveItem] = useState(getInitialActiveItem); // Default active item
+    useEffect(() => {
+        const activeTile = tiles.find(tile => tile.link === location.pathname);
+        if (activeTile) {
+            dispatch(setActiveTile(activeTile.id));
+        }
+    }, [location.pathname, dispatch]);
 
     const handleNavigation = (id: number, link: string) => {
-        setActiveItem(id);
+        dispatch(setActiveTile(id));
         navigate(link);
     };
 
@@ -54,7 +60,7 @@ const AdminControls = () => {
                     <Tile
                         key={tile.id}
                         data={tile}
-                        isActive={tile.id === activeItem}
+                        isActive={tile.id === activeTileId}
                         onClick={handleNavigation}
                     />
                 ))}

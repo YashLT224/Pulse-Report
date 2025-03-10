@@ -5,6 +5,7 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 import { Link } from 'react-router-dom';
 import BellIcon from '../../assets/bell.svg';
 import { clearUserProfile } from '../../Redux/slices/userSlice';
+import { resetActiveTile } from '../../Redux/slices/adminControlSlice.ts';
 import { Container, Logo, FlexBox, Text, Separator } from './style';
 
 const Header = () => {
@@ -14,6 +15,11 @@ const Header = () => {
     const userProfile = useSelector(
         (state: any) => state.authReducer.userProfile
     );
+
+    const handleAlerts = () => {
+        dispatch(resetActiveTile());
+        navigate('/alerts');
+    };
 
     const handleLogout = () => {
         signOut();
@@ -41,7 +47,7 @@ const Header = () => {
                         src={BellIcon}
                         alt="alert"
                         style={{ cursor: 'pointer' }}
-                        onClick={() => navigate('/alerts')}
+                        onClick={handleAlerts}
                     />
                     <Separator />
                     <Button
