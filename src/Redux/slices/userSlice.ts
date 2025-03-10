@@ -9,8 +9,10 @@ const loadUserProfile = () => {
     }
 };
 
+const initialUserProfile = loadUserProfile(); // Load from localStorage
+
 const initialState = {
-    userProfile: loadUserProfile(), // Load from localStorage
+    userProfile: initialUserProfile,
     isLoading: false,
     error: null
 };
