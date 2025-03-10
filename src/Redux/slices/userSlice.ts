@@ -1,19 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const loadUserProfile = () => {
-    try {
-        const serializedState = localStorage.getItem('userProfile');
-        return serializedState ? JSON.parse(serializedState) : null;
-    } catch (_err) {
-        return null;
-    }
-};
-
-const initialUserProfile = loadUserProfile(); // Load from localStorage
-
 const initialState = {
-    userProfile: initialUserProfile,
-    isLoading: false,
+    userProfile: {},
+    isLoading: true,
     error: null
 };
 
@@ -23,14 +12,19 @@ const authSlice = createSlice({
     reducers: {
         setUserProfile: (state, action) => {
             state.userProfile = action.payload;
+            state.isLoading=false;
             localStorage.setItem('userProfile', JSON.stringify(action.payload)); // Save to localStorage
         },
+        stopLoader: state => {
+            state.isLoading=false; // Stop loader when we have data
+        },
         clearUserProfile: state => {
+            state.isLoading=false;
             state.userProfile = null;
             localStorage.removeItem('userProfile'); // Remove from localStorage
         }
     }
 });
 
-export const { setUserProfile, clearUserProfile } = authSlice.actions;
+export const { setUserProfile, clearUserProfile ,stopLoader} = authSlice.actions;
 export default authSlice.reducer;

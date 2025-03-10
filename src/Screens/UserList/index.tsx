@@ -1,16 +1,20 @@
-const UserList = () => {
-    // const [staffMembers, setStaffMembers] = useState<any>([]);
+import { useState ,useEffect} from 'react';
+import UserListItems from '../../components/UserList'
 
-    // useEffect(() => {
-    //     client.models.UserProfile.listByRole({ role: "staff" }).then(members =>
-    //         setStaffMembers(members)
-    //     );
-    // }, [user.userId]);
+import useAuth from '../../Hooks/useAuth'
+const UserList = () => {
+    const {user,client}=useAuth()
+    const [staffMembers, setStaffMembers] = useState<any>([]);
+
+    useEffect(() => {
+        client.models.UserProfile.listByRole({ role: "staff" }).then(members =>
+            setStaffMembers(members.data)
+        );
+    }, [user.userId]);
 
     return (
         <div>
-            <h1>UserList</h1>
-            {/* <pre>{JSON.stringify(staffMembers, null, 2)}</pre> */}
+            <UserListItems staffMembers={staffMembers} Heading={'Staff Members'}/>
         </div>
     );
 };

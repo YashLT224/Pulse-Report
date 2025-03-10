@@ -38,6 +38,17 @@ const Header = () => {
         navigate('/');
     };
 
+ const loadLocalUserProfile = () => {
+        try {
+            const serializedState = localStorage.getItem('userProfile');
+            return serializedState ? JSON.parse(serializedState) : null;
+        } catch (_err) {
+            return null;
+        }
+    };
+
+let userName= userProfile?.userName||loadLocalUserProfile()?.userName
+
     return (
         <Container>
             <Link to="/">
@@ -48,9 +59,9 @@ const Header = () => {
             </Link>
             {user && (
                 <FlexBox>
-                    {userProfile?.userName && (
+                    {userName && (
                         <>
-                            <Text>{userProfile.userName}</Text>
+                            <Text>{userName}</Text>
                             <Separator />
                         </>
                     )}
