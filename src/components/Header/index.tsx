@@ -26,7 +26,7 @@ const Header = () => {
         }, 0);
 
         return () => clearTimeout(timer);
-    }, [user, userProfile, dispatch, navigate]);
+    }, [user, dispatch]);
 
     const handleAlerts = () => {
         dispatch(resetActiveTile());
