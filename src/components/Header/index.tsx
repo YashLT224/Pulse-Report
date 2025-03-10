@@ -22,7 +22,6 @@ const Header = () => {
         const timer = setTimeout(() => {
             if (!user) {
                 dispatch(clearUserProfile());
-                navigate('/');
             }
         }, 10);
 
