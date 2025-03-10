@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from 'aws-amplify/data';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Home from '../Screens/Home';
 import UserList from '../Screens/UserList';
 import PendingApprovals from '../Screens/PendingApprovals';
@@ -15,28 +15,30 @@ import { Schema } from '../../amplify/data/resource';
 const client = generateClient<Schema>();
 
 const AppRoutes = () => {
-    const { user } = useAuthenticator();
     const dispatch = useDispatch();
+    const { user } = useAuthenticator();
+    const userProfile = useSelector(
+        (state: any) => state.authReducer.userProfile
+    );
 
     useEffect(() => {
-        // Only run the effect if userId exists
-        if (user?.userId) {
-            const fetchUserProfile = async () => {
-                try {
-                    const result = await client.models.UserProfile.get({
-                        userId: user.userId
-                    });
-                    if (result.data) {
-                        dispatch(setUserProfile(result.data));
-                    }
-                } catch (error) {
-                    console.error('Error fetching user profile:', error);
-                }
-            };
+        if (!user?.userId || userProfile) return;
 
-            fetchUserProfile();
-        }
-    }, [user?.userId, dispatch]);
+        const fetchUserProfile = async () => {
+            try {
+                const result = await client.models.UserProfile.get({
+                    userId: user.userId
+                });
+                if (result.data) {
+                    dispatch(setUserProfile(result.data));
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        fetchUserProfile();
+    }, [user.userId, userProfile, dispatch]);
 
     return (
         <Routes>
