@@ -22,7 +22,7 @@ const FooterLink = styled.a`
 const Footer = () => {
   return (
     <FooterContainer>
-      <p>© 2024 Pulse Report Project. All rights reserved.</p>
+      <p>© 2025 Pulse Report. All rights reserved.</p>
       <div>
         <FooterLink href="#privacy-policy">Privacy Policy</FooterLink>
         <FooterLink href="#terms-of-use">Terms of Use</FooterLink>

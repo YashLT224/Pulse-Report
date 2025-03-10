@@ -9,7 +9,7 @@ import PendingApprovals from '../Screens/PendingApprovals';
 import AddUser from '../Screens/AddUser';
 import Alerts from '../Screens/Alerts';
 import ProtectedRoute from './protectedRoute';
-import { setUserProfile } from '../Redux/slices/userSlice';
+import { setUserProfile ,stopLoader} from '../Redux/slices/userSlice';
 import { Schema } from '../../amplify/data/resource';
 
 const client = generateClient<Schema>();
@@ -22,7 +22,10 @@ const AppRoutes = () => {
     );
 
     useEffect(() => {
-        if (!user?.userId || userProfile) return;
+        // if (!user?.userId || userProfile){
+        //     dispatch(stopLoader( ));
+        //     return;
+        // } 
 
         const fetchUserProfile = async () => {
             try {
@@ -34,11 +37,12 @@ const AppRoutes = () => {
                 }
             } catch (error) {
                 console.error('Error fetching user profile:', error);
+                dispatch(stopLoader( ));
             }
         };
 
         fetchUserProfile();
-    }, [user.userId, userProfile, dispatch]);
+    }, [user.userId, dispatch]);
 
     return (
         <Routes>

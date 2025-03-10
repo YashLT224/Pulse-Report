@@ -58,3 +58,9 @@ a {
 [data-amplify-authenticator] {
     margin-top: 40px;
 }
+
+.flexCenter{
+    display:flex;
+    align-items:center;
+    justify-content: center;
+}
