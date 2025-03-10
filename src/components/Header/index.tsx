@@ -1,5 +1,5 @@
 import { Button } from '@aws-amplify/ui-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { Link } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { Container, Logo, FlexBox, Text, Separator } from './style';
 
 const Header = () => {
     const navigate = useNavigate();
+    const location = useLocation(); // Get the current route
     const dispatch = useDispatch();
     const { user, signOut } = useAuthenticator();
     const userProfile = useSelector(
@@ -46,7 +47,13 @@ const Header = () => {
                     <img
                         src={BellIcon}
                         alt="alert"
-                        style={{ cursor: 'pointer' }}
+                        style={{
+                            cursor: 'pointer',
+                            filter:
+                                location.pathname === '/alerts'
+                                    ? 'drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.8))'
+                                    : 'none'
+                        }}
                         onClick={handleAlerts}
                     />
                     <Separator />
