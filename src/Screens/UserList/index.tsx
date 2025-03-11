@@ -13,11 +13,12 @@ const UserList = () => {
     // fetch function for usePagination
     const fetchStaffMembers = useCallback(
         async (limit: number, token?: string) => {
-            const response = await client.models.UserProfile.listByRole({
+            const params: any = {
                 role: 'staff',
                 nextToken: token,
                 limit
-            });
+            };
+            const response = await client.models.UserProfile.listByRole(params);
 
             return {
                 data: response.data,

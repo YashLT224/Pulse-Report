@@ -104,16 +104,16 @@ export function usePagination<T>({
     const goToPrevious = useCallback(async () => {
         if (!pageTokens.length) return;
 
-        // Update the previous tokens list
+        // Update the page tokens list
         setPageTokens(pageTokens.slice(0, -1));
 
-        // Get the previous token
+        // Get the previous page tokens
         const prevPage = pageTokens.at(-2);
 
         const { nextToken: prevToken = null, extraItem: prevExtraItem = null } =
             prevPage || {};
 
-        // Restore the extra item for the previous page and Fetch with the previous token
+        // Reinclude the extra item from the previous fetch and retrieve data using the previous token
         await fetchItems(prevToken, prevExtraItem);
     }, [pageTokens, fetchItems]);
 
