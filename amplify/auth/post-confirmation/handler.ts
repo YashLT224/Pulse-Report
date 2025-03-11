@@ -1,9 +1,9 @@
-import { PostConfirmationTriggerHandler } from "aws-lambda";
-import { Schema } from "../../data/resource";
-import { Amplify } from "aws-amplify";
-import { generateClient } from "aws-amplify/data";
-import { getAmplifyDataClientConfig } from "@aws-amplify/backend/function/runtime";
-import { env } from "$amplify/env/post-confirmation";
+import { PostConfirmationTriggerHandler } from 'aws-lambda';
+import { Schema } from '../../data/resource';
+import { Amplify } from 'aws-amplify';
+import { generateClient } from 'aws-amplify/data';
+import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime';
+import { env } from '$amplify/env/post-confirmation';
 
 type DataClientEnv = {
     AWS_ACCESS_KEY_ID: string;
@@ -14,7 +14,7 @@ type DataClientEnv = {
 } & Record<string, unknown>;
 
 console.log(
-    "Amplify post-confirmation variables:",
+    'Amplify post-confirmation variables:',
     JSON.stringify(env, null, 2)
 );
 
@@ -27,17 +27,17 @@ Amplify.configure(resourceConfig, libraryOptions);
 const client = generateClient<Schema>();
 
 export const handler: PostConfirmationTriggerHandler = async event => {
-    console.log("Post Confirmation event:", JSON.stringify(event, null, 2));
+    console.log('Post Confirmation event:', JSON.stringify(event, null, 2));
 
     // Create User Profile
-    console.log("Creating user profile...");
+    console.log('Creating user profile...');
 
     // Extract user details from the event
     const userId = event.request.userAttributes.sub; // Cognito user ID
     const userName = event.request.userAttributes.name;
     const phoneNumber = event.request.userAttributes.phone_number;
     const createdAt = new Date().toISOString(); // Current date and time
-    const role = "staff" as const; // Default role
+    const role = 'staff' as const; // Default role
 
     // Create the user profile
     const userProfileInput = {
@@ -46,7 +46,8 @@ export const handler: PostConfirmationTriggerHandler = async event => {
         role,
         userName,
         phoneNumber,
-        allowedForms: []
+        allowedForms: [],
+        access: 'none'
     };
 
     try {

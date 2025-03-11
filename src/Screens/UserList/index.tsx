@@ -38,7 +38,7 @@ const UserList = () => {
         hasPrevious,
         goToNext,
         goToPrevious,
-        updateItem
+        deleteItem
     } = usePagination({
         limit: LIMIT,
         fetchFn: fetchStaffMembers,
@@ -48,7 +48,7 @@ const UserList = () => {
     const onEdit = (editedUser: any) => {
         const { userId, allowedForms = [] } = editedUser;
 
-        updateItem(editedUser);
+        deleteItem(editedUser);
 
         client.models.UserProfile.update({ userId, allowedForms }).catch(
             error => {

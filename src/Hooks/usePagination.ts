@@ -20,6 +20,7 @@ interface PaginationState<T> {
     goToNext: () => Promise<void>;
     goToPrevious: () => Promise<void>;
     updateItem: (updatedItem: T) => void; // New function to update a specific item
+    deleteItem: (deletedItem: T) => void; // New function to delete a specific item
 }
 
 export function usePagination<T>({
@@ -79,11 +80,28 @@ export function usePagination<T>({
 
     // Add method to update a specific item in the list
     const updateItem = useCallback(
-        (updatedItem: T) => {
+        (updatedItem: T & { allowedForms?: string[] }) => {
             setItems(prevItems =>
                 prevItems.map(item =>
-                    item[idField] === updatedItem[idField] ? updatedItem : item
+                    item[idField] === updatedItem[idField]
+                        ? {
+                              ...updatedItem,
+                              ...(!updatedItem.allowedForms?.length && {
+                                  access: 'none'
+                              })
+                          }
+                        : item
                 )
+            );
+        },
+        [idField]
+    );
+
+    // Add method to delete a specific item in the list
+    const deleteItem = useCallback(
+        (deletedItem: T & { allowedForms?: string[] }) => {
+            setItems(prevItems =>
+                prevItems.filter(item => item[idField] !== deletedItem[idField])
             );
         },
         [idField]
@@ -124,6 +142,7 @@ export function usePagination<T>({
         hasPrevious: !!pageTokens.length,
         goToNext,
         goToPrevious,
-        updateItem
+        updateItem,
+        deleteItem
     };
 }
