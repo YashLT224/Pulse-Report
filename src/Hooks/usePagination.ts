@@ -87,7 +87,7 @@ export function usePagination<T>({
                         ? {
                               ...updatedItem,
                               ...(!updatedItem.allowedForms?.length && {
-                                  access: 'none'
+                                  access: null
                               })
                           }
                         : item

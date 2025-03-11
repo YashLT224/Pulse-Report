@@ -40,7 +40,7 @@ const PendingApprovals = () => {
         hasPrevious,
         goToNext,
         goToPrevious,
-        updateItem
+        deleteItem
     } = usePagination({
         limit: LIMIT,
         fetchFn: fetchStaffMembers,
@@ -50,13 +50,19 @@ const PendingApprovals = () => {
     const onEdit = (editedUser: any) => {
         const { userId, allowedForms = [] } = editedUser;
 
-        updateItem(editedUser);
+        deleteItem(editedUser);
 
-        client.models.UserProfile.update({ userId, allowedForms }).catch(
-            error => {
-                console.error('Failed to update user profile:', error);
-            }
-        );
+        const params: any = {
+            userId,
+            allowedForms,
+            ...(!editedUser.allowedForms?.length && {
+                access: null
+            })
+        };
+
+        client.models.UserProfile.update(params).catch(error => {
+            console.error('Failed to update user profile:', error);
+        });
     };
 
     return (

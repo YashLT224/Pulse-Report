@@ -38,7 +38,7 @@ const UserList = () => {
         hasPrevious,
         goToNext,
         goToPrevious,
-        deleteItem
+        updateItem
     } = usePagination({
         limit: LIMIT,
         fetchFn: fetchStaffMembers,
@@ -48,13 +48,19 @@ const UserList = () => {
     const onEdit = (editedUser: any) => {
         const { userId, allowedForms = [] } = editedUser;
 
-        deleteItem(editedUser);
+        updateItem(editedUser);
 
-        client.models.UserProfile.update({ userId, allowedForms }).catch(
-            error => {
-                console.error('Failed to update user profile:', error);
-            }
-        );
+        const params: any = {
+            userId,
+            allowedForms,
+            ...(!editedUser.allowedForms?.length && {
+                access: null
+            })
+        };
+
+        client.models.UserProfile.update(params).catch(error => {
+            console.error('Failed to update user profile:', error);
+        });
     };
 
     return (
