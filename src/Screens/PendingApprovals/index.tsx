@@ -94,10 +94,7 @@ const PendingApprovals = () => {
                 {/* User List Items */}
                 <UserListItems
                     heading={'Pending Approvals'}
-                    staffMembers={staffMembers.map(item => ({
-                        ...item,
-                        hasAccess: !!item.allowedForms?.length
-                    }))}
+                    staffMembers={staffMembers}
                     onEdit={onEdit}
                 />
             </div>
