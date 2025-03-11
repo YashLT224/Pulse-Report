@@ -72,11 +72,11 @@ const UserList = ({ heading, staffMembers = [], onEdit }) => {
                     <tbody>
                         {staffMembers.map((member, index) => (
                             <TableRow key={index}>
-                                <TableCell>{member.userName}</TableCell>
                                 <TableCell>
-                                    {member.phoneNumber}
+                                    {member.userName}
                                     {member.hasAccess ? ' ✅' : ''}
                                 </TableCell>
+                                <TableCell>{member.phoneNumber}</TableCell>
                                 <TableCell>
                                     {member.allowedForms
                                         .map(
