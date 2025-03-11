@@ -74,7 +74,7 @@ const UserList = ({ heading, staffMembers = [], onEdit }) => {
                             <TableRow key={index}>
                                 <TableCell>
                                     {member.userName}
-                                    {member.hasAccess ? ' ✅' : ''}
+                                    {member.allowedForms?.length ? ' ✅' : ''}
                                 </TableCell>
                                 <TableCell>{member.phoneNumber}</TableCell>
                                 <TableCell>
@@ -83,7 +83,7 @@ const UserList = ({ heading, staffMembers = [], onEdit }) => {
                                             (label: string) =>
                                                 formLabelMap[label] || label
                                         )
-                                        .join(', ') || 'None'}
+                                        .join(', ') || 'None 🚫'}
                                 </TableCell>
                                 <TableCell>
                                     {new Date(
