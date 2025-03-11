@@ -73,8 +73,8 @@ const UserList = ({ heading, staffMembers = [], onEdit }) => {
                         {staffMembers.map((member, index) => (
                             <TableRow key={index}>
                                 <TableCell>
-                                    {member.userName}
-                                    {member.hasAccess ? ' ✅' : ''}
+                                    {member.userName}{' '}
+                                    {member.allowedForms?.length ? '✅' : '🚫'}
                                 </TableCell>
                                 <TableCell>{member.phoneNumber}</TableCell>
                                 <TableCell>
