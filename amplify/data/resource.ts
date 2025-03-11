@@ -16,14 +16,19 @@ const schema = a
                 role: a.enum(['admin', 'staff']),
                 userName: a.string().required(),
                 phoneNumber: a.string().required(),
-                allowedForms: a.string().array()
+                allowedForms: a.string().array(),
+                access: a.string() // undefined or 'none'
             })
             .identifier(['userId'])
             .secondaryIndexes(index => [
                 index('role')
                     .sortKeys(['createdAt'])
                     .queryField('listByRole')
-                    .name('RoleIndex')
+                    .name('RoleIndex'),
+                index('access')
+                    .sortKeys(['createdAt'])
+                    .queryField('listByAccess')
+                    .name('AccessIndex')
             ])
             .authorization(allow => [
                 // Allow admin to perform read and update operations
