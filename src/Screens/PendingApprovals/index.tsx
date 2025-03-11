@@ -40,7 +40,7 @@ const PendingApprovals = () => {
         hasPrevious,
         goToNext,
         goToPrevious,
-        deleteItem
+        updateItem
     } = usePagination({
         limit: LIMIT,
         fetchFn: fetchStaffMembers,
@@ -50,14 +50,12 @@ const PendingApprovals = () => {
     const onEdit = (editedUser: any) => {
         const { userId, allowedForms = [] } = editedUser;
 
-        deleteItem(editedUser);
+        updateItem(editedUser);
 
         const params: any = {
             userId,
             allowedForms,
-            ...(!editedUser.allowedForms?.length && {
-                access: null
-            })
+            access: !editedUser.allowedForms?.length ? 'none' : null
         };
 
         client.models.UserProfile.update(params).catch(error => {
@@ -96,7 +94,10 @@ const PendingApprovals = () => {
                 {/* User List Items */}
                 <UserListItems
                     heading={'Pending Approvals'}
-                    staffMembers={staffMembers}
+                    staffMembers={staffMembers.map(item => ({
+                        ...item,
+                        hasAccess: !!item.allowedForms?.length
+                    }))}
                     onEdit={onEdit}
                 />
             </div>

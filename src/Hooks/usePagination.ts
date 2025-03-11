@@ -86,9 +86,9 @@ export function usePagination<T>({
                     item[idField] === updatedItem[idField]
                         ? {
                               ...updatedItem,
-                              ...(!updatedItem.allowedForms?.length && {
-                                  access: null
-                              })
+                              access: !updatedItem.allowedForms?.length
+                                  ? 'none'
+                                  : null
                           }
                         : item
                 )

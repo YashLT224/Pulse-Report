@@ -53,9 +53,7 @@ const UserList = () => {
         const params: any = {
             userId,
             allowedForms,
-            ...(!editedUser.allowedForms?.length && {
-                access: null
-            })
+            access: !editedUser.allowedForms?.length ? 'none' : null
         };
 
         client.models.UserProfile.update(params).catch(error => {
