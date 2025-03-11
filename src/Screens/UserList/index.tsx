@@ -1,20 +1,40 @@
-import { useState ,useEffect} from 'react';
-import UserListItems from '../../components/UserList'
+import { useState, useEffect } from 'react';
+import UserListItems from '../../components/UserList';
+import useAuth from '../../Hooks/useAuth';
 
-import useAuth from '../../Hooks/useAuth'
 const UserList = () => {
-    const {user,client}=useAuth()
+    const { client } = useAuth();
     const [staffMembers, setStaffMembers] = useState<any>([]);
 
     useEffect(() => {
-        client.models.UserProfile.listByRole({ role: "staff" }).then(members =>
+        client.models.UserProfile.listByRole({ role: 'staff' }).then(members =>
             setStaffMembers(members.data)
         );
-    }, [user.userId]);
+    }, [client.models.UserProfile]);
+
+    const onEdit = (editedUser: any) => {
+        const { userId, allowedForms = [] } = editedUser;
+
+        client.models.UserProfile.update({ userId, allowedForms }).catch(
+            error => {
+                console.error('Failed to update user profile:', error);
+            }
+        );
+
+        setStaffMembers((prevMembers: any[]) =>
+            prevMembers.map(member =>
+                member.userId === userId ? editedUser : member
+            )
+        );
+    };
 
     return (
         <div>
-            <UserListItems staffMembers={staffMembers} Heading={'Staff Members'}/>
+            <UserListItems
+                heading={'Staff Members'}
+                staffMembers={staffMembers}
+                onEdit={onEdit}
+            />
         </div>
     );
 };

@@ -50,7 +50,7 @@ const AppRoutes = () => {
                 }
             />
             <Route
-                path="/user-list"
+                path="/staff-members"
                 element={
                     <ProtectedRoute
                         element={<UserList />}
@@ -59,7 +59,7 @@ const AppRoutes = () => {
                 }
             />
             <Route
-                path="/add-user"
+                path="/add-worker"
                 element={
                     <ProtectedRoute
                         element={<AddUser />}
