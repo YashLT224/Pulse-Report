@@ -30,7 +30,7 @@ export function usePagination<T>({
     const [items, setItems] = useState<T[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [nextToken, setNextToken] = useState<string | null>(null);
-    const [previousPages, setPreviousPages] = useState<
+    const [pageTokens, setPageTokens] = useState<
         { nextToken?: string; extraItem?: T | null }[]
     >([]);
     const [hasNext, setHasNext] = useState(false);
@@ -40,26 +40,18 @@ export function usePagination<T>({
         async (token?: string, prevExtraItem?: T) => {
             setIsLoading(true);
             try {
-                const response = await fetchFn(
-                    prevExtraItem ? limit : limit + 1,
-                    token
-                );
+                const fetchLimit = prevExtraItem ? limit : limit + 1;
+                const lastItemIndex = prevExtraItem ? limit - 1 : limit;
+                const response = await fetchFn(fetchLimit, token);
 
                 // Check if there are more items
-                if (
-                    response.data.length > (prevExtraItem ? limit - 1 : limit)
-                ) {
+                if (response.data.length > lastItemIndex) {
                     setHasNext(true);
                     setItems([
                         ...(prevExtraItem ? [prevExtraItem] : []),
-                        ...response.data.slice(
-                            0,
-                            prevExtraItem ? limit - 1 : limit
-                        )
+                        ...response.data.slice(0, lastItemIndex)
                     ]);
-                    setExtraItem(
-                        response.data[prevExtraItem ? limit - 1 : limit]
-                    ); // Store the extra item
+                    setExtraItem(response.data[lastItemIndex]); // Store the extra item
                 } else {
                     setHasNext(false);
                     setItems([
@@ -101,7 +93,7 @@ export function usePagination<T>({
         if (!hasNext) return;
 
         // Save current token and extra item to history before navigating
-        setPreviousPages(prev => [
+        setPageTokens(prev => [
             ...prev,
             { nextToken, extraItem: extraItem || null }
         ]);
@@ -110,27 +102,26 @@ export function usePagination<T>({
     }, [hasNext, nextToken, fetchItems, extraItem]);
 
     const goToPrevious = useCallback(async () => {
-        if (!previousPages.length) return;
-
-        // Get the previous token
-        const prevPagesCopy = [...previousPages];
-
-        const prevPage = prevPagesCopy.pop();
+        if (!pageTokens.length) return;
 
         // Update the previous tokens list
-        setPreviousPages(prevPagesCopy);
+        setPageTokens(pageTokens.slice(0, -1));
 
-        const { nextToken: prevToken, extraItem: prevExtraItem } = prevPage;
+        // Get the previous token
+        const prevPage = pageTokens.at(-2);
+
+        const { nextToken: prevToken = null, extraItem: prevExtraItem = null } =
+            prevPage || {};
 
         // Restore the extra item for the previous page and Fetch with the previous token
         await fetchItems(prevToken, prevExtraItem);
-    }, [previousPages, fetchItems]);
+    }, [pageTokens, fetchItems]);
 
     return {
         items,
         isLoading,
         hasNext,
-        hasPrevious: !!previousPages.length,
+        hasPrevious: !!pageTokens.length,
         goToNext,
         goToPrevious,
         updateItem
