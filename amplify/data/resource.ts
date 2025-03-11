@@ -32,7 +32,7 @@ const schema = a
             ])
             .authorization(allow => [
                 // Allow admin to perform read and update operations
-                allow.groups(['ADMINS']).to(['read', 'update']),
+                allow.groups(['ADMINS']).to(['read', 'update', 'delete']),
                 // Allow staff to read their own profile only
                 allow.ownerDefinedIn('userId').to(['read'])
             ])
