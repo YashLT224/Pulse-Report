@@ -15,7 +15,7 @@ import {
     CheckboxLabel,
     TableContainer
 } from './style';
-import { formTypes } from '../../data/forms';
+import { formTypes, formLabelMap } from '../../data/forms';
 
 const UserList = ({ heading, staffMembers = [], onEdit }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -75,7 +75,12 @@ const UserList = ({ heading, staffMembers = [], onEdit }) => {
                                 <TableCell>{member.userName}</TableCell>
                                 <TableCell>{member.phoneNumber}</TableCell>
                                 <TableCell>
-                                    {member.allowedForms.join(', ') || 'None'}
+                                    {member.allowedForms
+                                        .map(
+                                            (label: string) =>
+                                                formLabelMap[label] || label
+                                        )
+                                        .join(', ') || 'None'}
                                 </TableCell>
                                 <TableCell>
                                     {new Date(
