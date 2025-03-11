@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Loader } from '@aws-amplify/ui-react'
+import { Loader } from '@aws-amplify/ui-react';
 
 const ProtectedRoute = ({ element, requiredRole }) => {
     const userProfile = useSelector(
@@ -11,14 +11,16 @@ const ProtectedRoute = ({ element, requiredRole }) => {
 
     // Show loading indicator while checking permissions
     if (isLoading) {
-        return <div className='flexCenter'>
-        <Loader
-        height={'80px'}
-        size="large"
-        emptyColor="#007aff"
-        filledColor="white"
-      />
-      </div>
+        return (
+            <div className="flexCenter">
+                <Loader
+                    height={'80px'}
+                    size="large"
+                    emptyColor="#007aff"
+                    filledColor="white"
+                />
+            </div>
+        );
     }
 
     // Allow access if role matches

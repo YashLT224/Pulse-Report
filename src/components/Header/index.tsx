@@ -38,16 +38,7 @@ const Header = () => {
         navigate('/');
     };
 
- const loadLocalUserProfile = () => {
-        try {
-            const serializedState = localStorage.getItem('userProfile');
-            return serializedState ? JSON.parse(serializedState) : null;
-        } catch (_err) {
-            return null;
-        }
-    };
-
-let userName= userProfile?.userName||loadLocalUserProfile()?.userName
+    const userName = userProfile?.userName;
 
     return (
         <Container>

@@ -2,14 +2,14 @@ import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from 'aws-amplify/data';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Home from '../Screens/Home';
 import UserList from '../Screens/UserList';
 import PendingApprovals from '../Screens/PendingApprovals';
 import AddUser from '../Screens/AddUser';
 import Alerts from '../Screens/Alerts';
 import ProtectedRoute from './protectedRoute';
-import { setUserProfile ,stopLoader} from '../Redux/slices/userSlice';
+import { setUserProfile, stopLoader } from '../Redux/slices/userSlice';
 import { Schema } from '../../amplify/data/resource';
 
 const client = generateClient<Schema>();
@@ -17,16 +17,8 @@ const client = generateClient<Schema>();
 const AppRoutes = () => {
     const dispatch = useDispatch();
     const { user } = useAuthenticator();
-    const userProfile = useSelector(
-        (state: any) => state.authReducer.userProfile
-    );
 
     useEffect(() => {
-        // if (!user?.userId || userProfile){
-        //     dispatch(stopLoader( ));
-        //     return;
-        // } 
-
         const fetchUserProfile = async () => {
             try {
                 const result = await client.models.UserProfile.get({
@@ -37,7 +29,7 @@ const AppRoutes = () => {
                 }
             } catch (error) {
                 console.error('Error fetching user profile:', error);
-                dispatch(stopLoader( ));
+                dispatch(stopLoader());
             }
         };
 
