@@ -16,8 +16,8 @@ const tiles = [
         link: '/pending-approvals',
         icon: Approval
     },
-    { id: 2, name: 'Staff Members', link: '/user-list', icon: List },
-    { id: 3, name: 'Add Worker', link: '/add-user', icon: addUser }
+    { id: 2, name: 'Staff Members', link: '/staff-members', icon: List },
+    { id: 3, name: 'Add Worker', link: '/add-worker', icon: addUser }
 ];
 
 const Tile = ({ data, isActive, onClick }) => {
