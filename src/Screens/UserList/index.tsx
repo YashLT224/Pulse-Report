@@ -16,7 +16,9 @@ const UserList = () => {
             const params: any = {
                 role: 'staff',
                 nextToken: token,
-                limit
+                limit,
+                // filter: { allowedForms: { size: { eq: 0 } } },
+                sortDirection: 'DESC'
             };
             const response = await client.models.UserProfile.listByRole(params);
 
