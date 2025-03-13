@@ -142,7 +142,7 @@ function UserList<T extends EditableItem>({
                                 style={{
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    gap: '6px'
+                                    gap: '10px'
                                 }}
                             >
                                 <label style={{ fontWeight: 'bold' }}>
