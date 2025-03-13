@@ -51,14 +51,7 @@ const AddPeople = () => {
     const peopleColumns = [
         { key: 'personName', header: 'Name' },
         { key: 'phoneNumber', header: 'Phone Number' },
-        { key: 'email', header: 'Email' },
-        {
-            key: 'dob',
-            header: 'Date of Birth',
-            render: (item: Person) => new Date(item.dob).toLocaleDateString()
-        },
-        { key: 'sex', header: 'Sex' },
-        { key: 'address', header: 'Address' },
+        { key: 'designation', header: 'Designation' },
         { key: 'status', header: 'Status' },
         {
             key: 'createdAt',
@@ -68,14 +61,12 @@ const AddPeople = () => {
     ];
 
     const onEdit = (editedPerson: Person) => {
-        const { personId, allowedForms = [] } = editedPerson;
+        const { personId } = editedPerson;
 
         updateItem(editedPerson);
 
         const params: any = {
-            personId,
-            allowedForms,
-            access: !allowedForms.length ? 'none' : null
+            personId
         };
 
         client.models.People.update(params).catch(error => {
