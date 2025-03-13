@@ -64,6 +64,35 @@ const schema = a
                 allow.groups(['ADMINS']).to(['read', 'update', 'delete']),
                 // Allow authenticated users to just read people records
                 allow.authenticated().to(['read'])
+            ]),
+        Party: a
+            .model({
+                partyId: a.id(),
+                partyName: a.string().required(),
+                phoneNumber: a.phone().required(), // Enforce uniqueness using the PhoneIndex
+                designation: a.string().required(),
+                status: a.enum(['active', 'inactive']),
+                entityType: a.string().default('PARTY') // Constant attribute, e.g., "PARTY"
+            })
+            .identifier(['partyId'])
+            .secondaryIndexes(index => [
+                index('entityType')
+                    .sortKeys(['partyName'])
+                    .queryField('listAllByName')
+                    .name('PartyNameIndex'),
+                index('status')
+                    .sortKeys(['partyName'])
+                    .queryField('listByStatus')
+                    .name('StatusIndex'),
+                index('phoneNumber')
+                    .queryField('findByPhoneNumber')
+                    .name('PhoneIndex')
+            ])
+            .authorization(allow => [
+                // Allow admin to perform all operations
+                allow.groups(['ADMINS']).to(['read', 'update', 'delete']),
+                // Allow authenticated users to just read people records
+                allow.authenticated().to(['read'])
             ])
     })
     .authorization(allow => [allow.resource(postConfirmation)]);
