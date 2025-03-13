@@ -2,14 +2,12 @@ import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Bar, Icon, Text, MenuItem } from './style.ts';
-import FormSvg from '../../assets/form.svg';
 import addUser from '../../assets/adduser.svg';
 import Approval from '../../assets/approval.svg';
 import List from '../../assets/list.svg';
 import { setActiveTile } from '../../Redux/slices/adminControlSlice.ts';
 
 const tiles = [
-    { id: 0, name: 'Form Access', link: '/', icon: FormSvg },
     {
         id: 1,
         name: 'Pending Approvals',
