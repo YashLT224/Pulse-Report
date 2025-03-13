@@ -5,7 +5,7 @@ import useAuth from '../../Hooks/useAuth';
 import { usePagination } from '../../Hooks/usePagination';
 import PaginationControls from '../../components/PaginationControls';
 
-const LIMIT = 5; // Number of items to display per page
+const LIMIT = 10; // Number of items to display per page
 
 const UserList = () => {
     const { client } = useAuth();
