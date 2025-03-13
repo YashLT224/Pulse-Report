@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import Home from '../Screens/Home';
 import UserList from '../Screens/UserList';
 import PendingApprovals from '../Screens/PendingApprovals';
-import AddUser from '../Screens/AddUser';
+import AddPeople from '../Screens/AddPeople';
 import Alerts from '../Screens/Alerts';
 import ProtectedRoute from './protectedRoute';
 import { setUserProfile, stopLoader } from '../Redux/slices/userSlice';
@@ -62,7 +62,7 @@ const AppRoutes = () => {
                 path="/add-people"
                 element={
                     <ProtectedRoute
-                        element={<AddUser />}
+                        element={<AddPeople />}
                         requiredRole="admin"
                     />
                 }

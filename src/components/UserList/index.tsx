@@ -17,14 +17,64 @@ import {
 } from './style';
 import { formTypes, formLabelMap } from '../../data/forms';
 
-const UserList = ({ heading, staffMembers = [], onEdit }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [selectedForms, setSelectedForms] = useState([]);
+// Define a type for table column configuration
+interface TableColumn<T> {
+    key: keyof T | string;
+    header: string;
+    render?: (item: T) => React.ReactNode;
+}
 
-    const handleEdit = (user: any) => {
-        setSelectedUser(user);
-        setSelectedForms(user.allowedForms);
+// Define a common base interface with required fields for editing
+interface EditableItem {
+    allowedForms?: string[];
+    [key: string]: any; // For any other properties
+}
+
+// Define props interface for the component using generics
+interface UserListProps<T extends EditableItem> {
+    heading: string;
+    items: T[];
+    onEdit: (updatedItem: T) => void;
+    columns?: TableColumn<T>[];
+    nameField?: keyof T; // Field to show in the modal header
+}
+
+function UserList<T extends EditableItem>({
+    heading,
+    items = [],
+    onEdit,
+    columns,
+    nameField = 'userName' as keyof T
+}: UserListProps<T>) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<T | null>(null);
+    const [selectedForms, setSelectedForms] = useState<string[]>([]);
+
+    // Default columns if none provided
+    const defaultColumns: TableColumn<T>[] = [
+        { key: 'userName', header: 'Name' },
+        { key: 'phoneNumber', header: 'Phone Number' },
+        {
+            key: 'allowedForms',
+            header: 'Allowed Forms',
+            render: item =>
+                item.allowedForms
+                    ?.map((label: string) => formLabelMap[label] || label)
+                    .join(', ') || 'None 🚫'
+        },
+        {
+            key: 'createdAt',
+            header: 'Created At',
+            render: item =>
+                item.createdAt ? new Date(item.createdAt).toLocaleString() : ''
+        }
+    ];
+
+    const effectiveColumns = columns || defaultColumns;
+
+    const handleEdit = (item: T) => {
+        setSelectedItem(item);
+        setSelectedForms(item.allowedForms || []);
         setIsModalOpen(true);
     };
 
@@ -33,20 +83,22 @@ const UserList = ({ heading, staffMembers = [], onEdit }) => {
     };
 
     const handleSave = () => {
-        // Update the user's allowedForms
-        const updatedUser = {
-            ...selectedUser,
+        if (!selectedItem) return;
+
+        // Update the item's allowedForms
+        const updatedItem = {
+            ...selectedItem,
             allowedForms: selectedForms
         };
 
-        // Update the parent staffMembers state
-        onEdit(updatedUser);
+        // Update the parent items state
+        onEdit(updatedItem as T);
 
         // Close the modal
         setIsModalOpen(false);
     };
 
-    const handleFormChange = formLabel => {
+    const handleFormChange = (formLabel: string) => {
         setSelectedForms(
             prevSelectedForms =>
                 prevSelectedForms.includes(formLabel)
@@ -62,38 +114,30 @@ const UserList = ({ heading, staffMembers = [], onEdit }) => {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHeaderCell>User Name</TableHeaderCell>
-                            <TableHeaderCell>Phone Number</TableHeaderCell>
-                            <TableHeaderCell>Allowed Forms</TableHeaderCell>
-                            <TableHeaderCell>Created At</TableHeaderCell>
+                            {effectiveColumns.map(column => (
+                                <TableHeaderCell key={column.key.toString()}>
+                                    {column.header}
+                                </TableHeaderCell>
+                            ))}
                             <TableHeaderCell>Edit</TableHeaderCell>
                         </TableRow>
                     </TableHeader>
                     <tbody>
-                        {staffMembers.map((member, index) => (
+                        {items.map((item, index) => (
                             <TableRow key={index}>
+                                {effectiveColumns.map(column => (
+                                    <TableCell key={column.key.toString()}>
+                                        {column.render
+                                            ? column.render(item)
+                                            : item[column.key]}
+                                        {column.key === nameField &&
+                                        item.allowedForms?.length
+                                            ? ' ✅'
+                                            : ''}
+                                    </TableCell>
+                                ))}
                                 <TableCell>
-                                    {member.userName}{' '}
-                                    {member.allowedForms?.length ? ' ✅' : ''}
-                                </TableCell>
-                                <TableCell>{member.phoneNumber}</TableCell>
-                                <TableCell>
-                                    {member.allowedForms
-                                        .map(
-                                            (label: string) =>
-                                                formLabelMap[label] || label
-                                        )
-                                        .join(', ') || 'None 🚫'}
-                                </TableCell>
-                                <TableCell>
-                                    {new Date(
-                                        member.createdAt
-                                    ).toLocaleString()}
-                                </TableCell>
-                                <TableCell>
-                                    <EditIcon
-                                        onClick={() => handleEdit(member)}
-                                    >
+                                    <EditIcon onClick={() => handleEdit(item)}>
                                         ✏️
                                     </EditIcon>
                                 </TableCell>
@@ -102,11 +146,12 @@ const UserList = ({ heading, staffMembers = [], onEdit }) => {
                     </tbody>
                 </Table>
             </TableContainer>
-            {isModalOpen && (
+            {isModalOpen && selectedItem && (
                 <ModalOverlay>
                     <ModalContent>
                         <ModalHeader>
-                            Edit User <br /> Name: {selectedUser?.userName}
+                            Edit Item <br />
+                            {nameField && `Name: ${selectedItem[nameField]}`}
                         </ModalHeader>
                         {formTypes.map(form => (
                             <CheckboxContainer key={form.id}>
@@ -135,6 +180,6 @@ const UserList = ({ heading, staffMembers = [], onEdit }) => {
             )}
         </div>
     );
-};
+}
 
 export default UserList;

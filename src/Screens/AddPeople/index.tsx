@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { Loader } from '@aws-amplify/ui-react';
+import { Schema } from '../../../amplify/data/resource';
 import UserListItems from '../../components/UserList';
 import useAuth from '../../Hooks/useAuth';
 import { usePagination } from '../../Hooks/usePagination';
@@ -7,56 +8,78 @@ import PaginationControls from '../../components/PaginationControls';
 
 const LIMIT = 10; // Number of items to display per page
 
-const UserList = () => {
+type Person = Schema['People']['type'];
+
+const AddPeople = () => {
     const { client } = useAuth();
 
     // fetch function for usePagination
-    const fetchStaffMembers = useCallback(
+    const fetchPeople = useCallback(
         async (limit: number, token?: string) => {
             const params: any = {
-                role: 'staff',
+                entityType: 'PERSON',
                 nextToken: token,
                 limit,
-                sortDirection: 'DESC'
+                sortDirection: 'ASC'
             };
-            const response = await client.models.UserProfile.listByRole(params);
+            const response = await client.models.People.listAllByName(params);
 
             return {
                 data: response.data,
                 nextToken: response.nextToken || null
             };
         },
-        [client.models.UserProfile]
+        [client.models.People]
     );
 
     // Use the usePagination hook
     const {
-        items: staffMembers,
+        items: people,
         isLoading,
         hasNext,
         hasPrevious,
         goToNext,
         goToPrevious,
         updateItem
-    } = usePagination({
+    } = usePagination<Person>({
         limit: LIMIT,
-        fetchFn: fetchStaffMembers,
-        idField: 'userId'
+        fetchFn: fetchPeople,
+        idField: 'personId' // Use personId instead of userId for People
     });
 
-    const onEdit = (editedUser: any) => {
-        const { userId, allowedForms = [] } = editedUser;
+    // Define columns for the People list
+    const peopleColumns = [
+        { key: 'personName', header: 'Name' },
+        { key: 'phoneNumber', header: 'Phone Number' },
+        { key: 'email', header: 'Email' },
+        {
+            key: 'dob',
+            header: 'Date of Birth',
+            render: (item: Person) => new Date(item.dob).toLocaleDateString()
+        },
+        { key: 'sex', header: 'Sex' },
+        { key: 'address', header: 'Address' },
+        { key: 'status', header: 'Status' },
+        {
+            key: 'createdAt',
+            header: 'Created At',
+            render: (item: Person) => new Date(item.createdAt).toLocaleString()
+        }
+    ];
 
-        updateItem(editedUser);
+    const onEdit = (editedPerson: Person) => {
+        const { personId, allowedForms = [] } = editedPerson;
+
+        updateItem(editedPerson);
 
         const params: any = {
-            userId,
+            personId,
             allowedForms,
-            access: !editedUser.allowedForms?.length ? 'none' : null
+            access: !allowedForms.length ? 'none' : null
         };
 
-        client.models.UserProfile.update(params).catch(error => {
-            console.error('Failed to update user profile:', error);
+        client.models.People.update(params).catch(error => {
+            console.error('Failed to update person:', error);
         });
     };
 
@@ -88,11 +111,13 @@ const UserList = () => {
                     </div>
                 )}
 
-                {/* User List Items */}
-                <UserListItems
-                    heading={'Staff Members'}
-                    items={staffMembers}
+                {/* People Items */}
+                <UserListItems<Person>
+                    heading={'People'}
+                    items={people}
                     onEdit={onEdit}
+                    columns={peopleColumns}
+                    nameField="personName"
                 />
             </div>
             {/* Pagination Controls */}
@@ -106,4 +131,4 @@ const UserList = () => {
     );
 };
 
-export default UserList;
+export default AddPeople;

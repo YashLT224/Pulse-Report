@@ -94,7 +94,7 @@ const PendingApprovals = () => {
                 {/* User List Items */}
                 <UserListItems
                     heading={'Pending Approvals'}
-                    staffMembers={staffMembers}
+                    items={staffMembers}
                     onEdit={onEdit}
                 />
             </div>
