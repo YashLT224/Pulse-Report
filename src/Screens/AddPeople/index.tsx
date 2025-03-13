@@ -10,8 +10,13 @@ const LIMIT = 10; // Number of items to display per page
 
 type Person = Schema['People']['type'];
 
-const AddPeople = () => {
+type Party = Schema['Party']['type'];
+
+const AddPeople = ({ type = 'PEOPLE' } = {}) => {
     const { client } = useAuth();
+    const model =
+        type === 'PEOPLE' ? client.models.People : client.models.Party;
+    const idField = type === 'PEOPLE' ? 'personId' : 'partyId';
 
     // fetch function for usePagination
     const fetchPeople = useCallback(
@@ -22,14 +27,14 @@ const AddPeople = () => {
                 limit,
                 sortDirection: 'ASC'
             };
-            const response = await client.models.People.listAllByName(params);
+            const response = await model.listAllByName(params);
 
             return {
                 data: response.data,
                 nextToken: response.nextToken || null
             };
         },
-        [client.models.People]
+        [model]
     );
 
     // Use the usePagination hook
@@ -41,24 +46,17 @@ const AddPeople = () => {
         goToNext,
         goToPrevious,
         updateItem
-    } = usePagination<Person>({
+    } = usePagination<Person | Party>({
         limit: LIMIT,
         fetchFn: fetchPeople,
-        idField: 'personId' // Use personId instead of userId for People
+        idField
     });
 
     // Define columns for the People list
     const peopleColumns = [
         { key: 'personName', header: 'Name' },
         { key: 'phoneNumber', header: 'Phone Number' },
-        { key: 'email', header: 'Email' },
-        {
-            key: 'dob',
-            header: 'Date of Birth',
-            render: (item: Person) => new Date(item.dob).toLocaleDateString()
-        },
-        { key: 'sex', header: 'Sex' },
-        { key: 'address', header: 'Address' },
+        { key: 'designation', header: 'Designation' },
         { key: 'status', header: 'Status' },
         {
             key: 'createdAt',
@@ -67,18 +65,21 @@ const AddPeople = () => {
         }
     ];
 
-    const onEdit = (editedPerson: Person) => {
-        const { personId, allowedForms = [] } = editedPerson;
+    const onEdit = (editedPerson: Person | Party) => {
+        const {
+            createdAt,
+            updatedAt,
+            entityType,
+            ...editedEntity
+        } = editedPerson;
 
-        updateItem(editedPerson);
+        updateItem(editedEntity as Person | Party);
 
         const params: any = {
-            personId,
-            allowedForms,
-            access: !allowedForms.length ? 'none' : null
+            ...editedEntity
         };
 
-        client.models.People.update(params).catch(error => {
+        model.update(params).catch(error => {
             console.error('Failed to update person:', error);
         });
     };
