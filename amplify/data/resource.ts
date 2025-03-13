@@ -46,7 +46,7 @@ const schema = a
                 sex: a.enum(['male', 'female', 'other']),
                 address: a.string().required(),
                 status: a.enum(['active', 'inactive']),
-                entityType: a.string() // Constant attribute, e.g., "PERSON"
+                entityType: a.string().default('PERSON') // Constant attribute, e.g., "PERSON"
             })
             .identifier(['personId'])
             .secondaryIndexes(index => [
