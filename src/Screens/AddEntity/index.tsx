@@ -18,6 +18,8 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     const { client } = useAuth();
     const model =
         type === 'PEOPLE' ? client.models.People : client.models.Party;
+    const listfuncName =
+        type === 'PEOPLE' ? 'listPeopleAllByName' : 'listPartyAllByName';
     const idField = type === 'PEOPLE' ? 'personId' : 'partyId';
     const entityType = type === 'PEOPLE' ? 'PERSON' : 'PARTY';
     const heading = type === 'PEOPLE' ? 'People' : 'Parties';
@@ -32,14 +34,14 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                 limit,
                 sortDirection: 'ASC'
             };
-            const response = await model.listAllByName(params);
+            const response = await model[listfuncName](params);
 
             return {
                 data: response.data,
                 nextToken: response.nextToken || null
             };
         },
-        [model, entityType]
+        [entityType, model, listfuncName]
     );
 
     // Use the usePagination hook
