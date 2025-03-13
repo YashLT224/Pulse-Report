@@ -57,7 +57,13 @@ const schema = a
                 index('status')
                     .sortKeys(['personName'])
                     .queryField('listByStatus')
-                    .name('StatusIndex')
+                    .name('StatusIndex'),
+                index('email')
+                    .queryField('findByEmail')
+                    .name('EmailIndex'),
+                index('phoneNumber')
+                    .queryField('findByPhoneNumber')
+                    .name('PhoneIndex')
             ])
             .authorization(allow => [
                 // Allow admin to perform all operations
