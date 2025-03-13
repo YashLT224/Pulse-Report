@@ -70,7 +70,6 @@ const schema = a
                 partyId: a.id(),
                 partyName: a.string().required(),
                 phoneNumber: a.phone().required(), // Enforce uniqueness using the PhoneIndex
-                designation: a.string().required(),
                 status: a.enum(['active', 'inactive']),
                 entityType: a.string().default('PARTY') // Constant attribute, e.g., "PARTY"
             })

@@ -12,17 +12,22 @@ type Person = Schema['People']['type'];
 
 type Party = Schema['Party']['type'];
 
-const AddPeople = ({ type = 'PEOPLE' } = {}) => {
+type Entity = Person | Party;
+
+const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     const { client } = useAuth();
     const model =
         type === 'PEOPLE' ? client.models.People : client.models.Party;
     const idField = type === 'PEOPLE' ? 'personId' : 'partyId';
+    const entityType = type === 'PEOPLE' ? 'PERSON' : 'PARTY';
+    const heading = type === 'PEOPLE' ? 'People' : 'Parties';
+    const nameField = type === 'PEOPLE' ? 'personName' : 'partyName';
 
     // fetch function for usePagination
-    const fetchPeople = useCallback(
+    const fetchEntity = useCallback(
         async (limit: number, token?: string) => {
             const params: any = {
-                entityType: 'PERSON',
+                entityType,
                 nextToken: token,
                 limit,
                 sortDirection: 'ASC'
@@ -34,53 +39,50 @@ const AddPeople = ({ type = 'PEOPLE' } = {}) => {
                 nextToken: response.nextToken || null
             };
         },
-        [model]
+        [model, entityType]
     );
 
     // Use the usePagination hook
     const {
-        items: people,
+        items,
         isLoading,
         hasNext,
         hasPrevious,
         goToNext,
         goToPrevious,
         updateItem
-    } = usePagination<Person | Party>({
+    } = usePagination<Entity>({
         limit: LIMIT,
-        fetchFn: fetchPeople,
+        fetchFn: fetchEntity,
         idField
     });
 
-    // Define columns for the People list
-    const peopleColumns = [
-        { key: 'personName', header: 'Name' },
+    // Define columns for the People | Party list
+    const itemsColumns = [
+        { key: nameField, header: 'Name' },
         { key: 'phoneNumber', header: 'Phone Number' },
-        { key: 'designation', header: 'Designation' },
+        ...(type === 'PEOPLE'
+            ? [{ key: 'designation', header: 'Designation' }]
+            : []),
         { key: 'status', header: 'Status' },
         {
             key: 'createdAt',
             header: 'Created At',
-            render: (item: Person) => new Date(item.createdAt).toLocaleString()
+            render: (item: Entity) => new Date(item.createdAt).toLocaleString()
         }
     ];
 
-    const onEdit = (editedPerson: Person | Party) => {
-        const {
-            createdAt,
-            updatedAt,
-            entityType,
-            ...editedEntity
-        } = editedPerson;
+    const onEdit = (editedEntity: Entity) => {
+        const { createdAt, updatedAt, entityType, ...rest } = editedEntity;
 
-        updateItem(editedEntity as Person | Party);
+        updateItem(rest as Entity);
 
         const params: any = {
-            ...editedEntity
+            ...rest
         };
 
         model.update(params).catch(error => {
-            console.error('Failed to update person:', error);
+            console.error(`Failed to update ${type}:`, error);
         });
     };
 
@@ -111,14 +113,12 @@ const AddPeople = ({ type = 'PEOPLE' } = {}) => {
                         />
                     </div>
                 )}
-
-                {/* People Items */}
-                <UserListItems<Person>
-                    heading={'People'}
-                    items={people}
+                <UserListItems<Entity>
+                    heading={heading}
+                    items={items}
                     onEdit={onEdit}
-                    columns={peopleColumns}
-                    nameField="personName"
+                    columns={itemsColumns}
+                    nameField={nameField}
                 />
             </div>
             {/* Pagination Controls */}
@@ -132,4 +132,4 @@ const AddPeople = ({ type = 'PEOPLE' } = {}) => {
     );
 };
 
-export default AddPeople;
+export default AddEntity;
