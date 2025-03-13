@@ -46,8 +46,8 @@ export const formTypes = [
     { id: '7', label: 'requirement', name: 'Requirement', icon: docStatus },
     {
         id: '8',
-        label: 'displayInstructions',
-        name: 'Display Instructions',
+        label: 'dispatchInstructions',
+        name: 'Dispatch Instructions',
         icon: docStatus
     },
     {

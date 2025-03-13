@@ -59,7 +59,7 @@ const AppRoutes = () => {
                 }
             />
             <Route
-                path="/add-worker"
+                path="/add-people"
                 element={
                     <ProtectedRoute
                         element={<AddUser />}

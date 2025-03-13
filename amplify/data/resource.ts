@@ -31,10 +31,37 @@ const schema = a
                     .name('AccessIndex')
             ])
             .authorization(allow => [
-                // Allow admin to perform read and update operations
+                // Allow admin to perform all operations
                 allow.groups(['ADMINS']).to(['read', 'update', 'delete']),
                 // Allow staff to read their own profile only
                 allow.ownerDefinedIn('userId').to(['read'])
+            ]),
+        People: a
+            .model({
+                personId: a.id(),
+                personName: a.string().required(),
+                email: a.email(),
+                phoneNumber: a.phone().required(),
+                dob: a.datetime().required(),
+                sex: a.enum(['male', 'female', 'other']),
+                address: a.string().required(),
+                status: a.enum(['active', 'inactive']),
+                entityType: a.string() // Constant attribute, e.g., "PERSON"
+            })
+            .identifier(['personId'])
+            .secondaryIndexes(index => [
+                index('entityType')
+                    .sortKeys(['personName'])
+                    .queryField('listAllByName')
+                    .name('PersonNameIndex'),
+                index('status')
+                    .sortKeys(['personName'])
+                    .queryField('listByStatus')
+                    .name('StatusIndex')
+            ])
+            .authorization(allow => [
+                // Allow admin to perform all operations
+                allow.groups(['ADMINS']).to(['read', 'update', 'delete'])
             ])
     })
     .authorization(allow => [allow.resource(postConfirmation)]);
