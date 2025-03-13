@@ -258,7 +258,7 @@ function UserList<T extends EditableItem>({
                         <div
                             style={{
                                 display: 'flex',
-                                justifyContent: 'flex-end',
+                                justifyContent: 'center',
                                 gap: '10px',
                                 marginTop: '15px'
                             }}
