@@ -40,8 +40,8 @@ const schema = a
             .model({
                 personId: a.id(),
                 personName: a.string().required(),
-                email: a.email(),
-                phoneNumber: a.phone().required(),
+                email: a.email(), // Enforce uniqueness using the EmailIndex
+                phoneNumber: a.phone().required(), // Enforce uniqueness using the PhoneIndex
                 dob: a.datetime().required(),
                 sex: a.enum(['male', 'female', 'other']),
                 address: a.string().required(),
@@ -57,7 +57,13 @@ const schema = a
                 index('status')
                     .sortKeys(['personName'])
                     .queryField('listByStatus')
-                    .name('StatusIndex')
+                    .name('StatusIndex'),
+                index('email')
+                    .queryField('findByEmail')
+                    .name('EmailIndex'),
+                index('phoneNumber')
+                    .queryField('findByPhoneNumber')
+                    .name('PhoneIndex')
             ])
             .authorization(allow => [
                 // Allow admin to perform all operations
