@@ -54,7 +54,7 @@ const PendingApprovals = () => {
             key: 'userName',
             header: 'Name',
             render: (item: any) =>
-                `${item.userName}${item.allowedForms?.length ? ' 🟢' : ''}`
+                `${item.userName}${item.allowedForms?.length ? ' ✅' : ''}`
         },
         { key: 'phoneNumber', header: 'Phone Number' },
         {
