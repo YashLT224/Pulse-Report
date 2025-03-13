@@ -49,14 +49,14 @@ const schema = a
             .secondaryIndexes(index => [
                 index('entityType')
                     .sortKeys(['personName'])
-                    .queryField('listAllByName')
+                    .queryField('listPeopleAllByName')
                     .name('PersonNameIndex'),
                 index('status')
                     .sortKeys(['personName'])
-                    .queryField('listByStatus')
+                    .queryField('listPeopleByStatus')
                     .name('StatusIndex'),
                 index('phoneNumber')
-                    .queryField('findByPhoneNumber')
+                    .queryField('findPeopleByPhoneNumber')
                     .name('PhoneIndex')
             ])
             .authorization(allow => [
@@ -77,14 +77,14 @@ const schema = a
             .secondaryIndexes(index => [
                 index('entityType')
                     .sortKeys(['partyName'])
-                    .queryField('listAllByName')
+                    .queryField('listPartyAllByName')
                     .name('PartyNameIndex'),
                 index('status')
                     .sortKeys(['partyName'])
-                    .queryField('listByStatus')
+                    .queryField('listPartyByStatus')
                     .name('StatusIndex'),
                 index('phoneNumber')
-                    .queryField('findByPhoneNumber')
+                    .queryField('findPartyByPhoneNumber')
                     .name('PhoneIndex')
             ])
             .authorization(allow => [
