@@ -15,7 +15,8 @@ const tiles = [
         icon: Approval
     },
     { id: 2, name: 'Staff Members', link: '/staff-members', icon: List },
-    { id: 3, name: 'Add People', link: '/add-people', icon: addUser }
+    { id: 3, name: 'Add People', link: '/add-people', icon: addUser },
+    { id: 4, name: 'Add Party', link: '/add-party', icon: addUser }
 ];
 
 const Tile = ({ data, isActive, onClick }) => {

@@ -67,6 +67,15 @@ const AppRoutes = () => {
                     />
                 }
             />
+            <Route
+                path="/add-party"
+                element={
+                    <ProtectedRoute
+                        element={<AddPeople type="PARTY" />}
+                        requiredRole="admin"
+                    />
+                }
+            />
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     );
