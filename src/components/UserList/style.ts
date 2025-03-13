@@ -66,7 +66,7 @@ export const ModalContent = styled.div`
 
 export const ModalHeader = styled.h3`
     margin: 0px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 `;
 
 export const ModalInput = styled.input`
