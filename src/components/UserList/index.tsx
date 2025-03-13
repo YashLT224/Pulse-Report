@@ -10,12 +10,8 @@ import {
     ModalButton,
     ModalContent,
     ModalHeader,
-    CheckboxContainer,
-    CheckboxInput,
-    CheckboxLabel,
     TableContainer
 } from './style';
-import { formTypes, formLabelMap } from '../../data/forms';
 
 // Define a type for table column configuration
 interface TableColumn<T> {
@@ -24,18 +20,25 @@ interface TableColumn<T> {
     render?: (item: T) => React.ReactNode;
 }
 
-// Define a common base interface with required fields for editing
+// Define an interface for editable fields configuration
+interface EditableField<T> {
+    key: keyof T | string;
+    label: string;
+    type: 'text' | 'select' | 'checkbox'; // Editable field types
+    options?: { name: string; label: string }[]; // For dropdowns
+}
+
 interface EditableItem {
-    allowedForms?: string[];
     [key: string]: any; // For any other properties
 }
 
 // Define props interface for the component using generics
-interface UserListProps<T extends EditableItem> {
+interface UserListProps<T> {
     heading: string;
     items: T[];
-    onEdit: (updatedItem: T) => void;
     columns?: TableColumn<T>[];
+    editableFields?: EditableField<T>[]; // Fields that can be edited
+    onEdit: (updatedItem: T) => void;
     nameField?: keyof T; // Field to show in the modal header
 }
 
@@ -44,24 +47,17 @@ function UserList<T extends EditableItem>({
     items = [],
     onEdit,
     columns,
+    editableFields = [],
     nameField = 'userName' as keyof T
 }: UserListProps<T>) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<T | null>(null);
-    const [selectedForms, setSelectedForms] = useState<string[]>([]);
+    const [updatedFields, setUpdatedFields] = useState<Record<string, any>>({});
 
     // Default columns if none provided
     const defaultColumns: TableColumn<T>[] = [
         { key: 'userName', header: 'Name' },
         { key: 'phoneNumber', header: 'Phone Number' },
-        {
-            key: 'allowedForms',
-            header: 'Allowed Forms',
-            render: item =>
-                item.allowedForms
-                    ?.map((label: string) => formLabelMap[label] || label)
-                    .join(', ') || 'None 🚫'
-        },
         {
             key: 'createdAt',
             header: 'Created At',
@@ -74,7 +70,7 @@ function UserList<T extends EditableItem>({
 
     const handleEdit = (item: T) => {
         setSelectedItem(item);
-        setSelectedForms(item.allowedForms || []);
+        setUpdatedFields(item); // Initialize with current values
         setIsModalOpen(true);
     };
 
@@ -82,29 +78,18 @@ function UserList<T extends EditableItem>({
         setIsModalOpen(false);
     };
 
+    const handleFieldChange = (fieldKey: string, value: any) => {
+        setUpdatedFields(prev => ({
+            ...prev,
+            [fieldKey]: value
+        }));
+    };
+
     const handleSave = () => {
         if (!selectedItem) return;
 
-        // Update the item's allowedForms
-        const updatedItem = {
-            ...selectedItem,
-            allowedForms: selectedForms
-        };
-
-        // Update the parent items state
-        onEdit(updatedItem as T);
-
-        // Close the modal
+        onEdit({ ...selectedItem, ...updatedFields });
         setIsModalOpen(false);
-    };
-
-    const handleFormChange = (formLabel: string) => {
-        setSelectedForms(
-            prevSelectedForms =>
-                prevSelectedForms.includes(formLabel)
-                    ? prevSelectedForms.filter(form => form !== formLabel) // Deselect
-                    : [...prevSelectedForms, formLabel] // Select
-        );
     };
 
     return (
@@ -129,11 +114,7 @@ function UserList<T extends EditableItem>({
                                     <TableCell key={column.key.toString()}>
                                         {column.render
                                             ? column.render(item)
-                                            : item[column.key]}
-                                        {column.key === nameField &&
-                                        item.allowedForms?.length
-                                            ? ' ✅'
-                                            : ''}
+                                            : item[column.key as string]}
                                     </TableCell>
                                 ))}
                                 <TableCell>
@@ -146,6 +127,7 @@ function UserList<T extends EditableItem>({
                     </tbody>
                 </Table>
             </TableContainer>
+
             {isModalOpen && selectedItem && (
                 <ModalOverlay>
                     <ModalContent>
@@ -153,23 +135,134 @@ function UserList<T extends EditableItem>({
                             Edit Item <br />
                             {nameField && `Name: ${selectedItem[nameField]}`}
                         </ModalHeader>
-                        {formTypes.map(form => (
-                            <CheckboxContainer key={form.id}>
-                                <CheckboxLabel>
-                                    <CheckboxInput
-                                        type="checkbox"
-                                        checked={selectedForms.includes(
-                                            form.label
-                                        )}
-                                        onChange={() =>
-                                            handleFormChange(form.label)
+
+                        {editableFields.map(field => (
+                            <div
+                                key={field.key.toString()}
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '6px'
+                                }}
+                            >
+                                <label style={{ fontWeight: 'bold' }}>
+                                    {field.label}
+                                </label>
+
+                                {field.type === 'text' && (
+                                    <input
+                                        type="text"
+                                        value={
+                                            updatedFields[
+                                                field.key as string
+                                            ] || ''
                                         }
+                                        onChange={e =>
+                                            handleFieldChange(
+                                                field.key.toString(),
+                                                e.target.value
+                                            )
+                                        }
+                                        style={{
+                                            padding: '8px',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '5px'
+                                        }}
                                     />
-                                    {form.name}
-                                </CheckboxLabel>
-                            </CheckboxContainer>
+                                )}
+
+                                {field.type === 'select' && (
+                                    <select
+                                        value={
+                                            updatedFields[
+                                                field.key as string
+                                            ] || ''
+                                        }
+                                        onChange={e =>
+                                            handleFieldChange(
+                                                field.key.toString(),
+                                                e.target.value
+                                            )
+                                        }
+                                        style={{
+                                            padding: '8px',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '5px'
+                                        }}
+                                    >
+                                        {field.options?.map(option => (
+                                            <option
+                                                key={option.label}
+                                                value={option.label}
+                                            >
+                                                {option.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+
+                                {field.type === 'checkbox' && (
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '10px'
+                                        }}
+                                    >
+                                        {field.options?.map(option => (
+                                            <label
+                                                key={option.label}
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '5px'
+                                                }}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={updatedFields[
+                                                        field.key as string
+                                                    ]?.includes(option.label)}
+                                                    onChange={() => {
+                                                        const currentValues =
+                                                            updatedFields[
+                                                                field.key as string
+                                                            ] || [];
+                                                        handleFieldChange(
+                                                            field.key.toString(),
+                                                            currentValues.includes(
+                                                                option.label
+                                                            )
+                                                                ? currentValues.filter(
+                                                                      (
+                                                                          val: string
+                                                                      ) =>
+                                                                          val !==
+                                                                          option.label
+                                                                  )
+                                                                : [
+                                                                      ...currentValues,
+                                                                      option.label
+                                                                  ]
+                                                        );
+                                                    }}
+                                                />
+                                                {option.name}
+                                            </label>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         ))}
-                        <div>
+
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                gap: '10px',
+                                marginTop: '15px'
+                            }}
+                        >
                             <ModalButton onClick={handleSave}>Save</ModalButton>
                             <ModalButton onClick={handleCloseModal}>
                                 Cancel
