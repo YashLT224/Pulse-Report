@@ -4,6 +4,7 @@ import UserListItems from '../../components/UserList';
 import useAuth from '../../Hooks/useAuth';
 import { usePagination } from '../../Hooks/usePagination';
 import PaginationControls from '../../components/PaginationControls';
+import { formTypes, formLabelMap } from '../../data/forms';
 
 const LIMIT = 10; // Number of items to display per page
 
@@ -46,6 +47,31 @@ const PendingApprovals = () => {
         fetchFn: fetchStaffMembers,
         idField: 'userId'
     });
+
+    // Define columns for the user list
+    const userColumns = [
+        {
+            key: 'userName',
+            header: 'Name',
+            render: (item: any) =>
+                `${item.userName}${item.allowedForms?.length ? ' 🟢' : ''}`
+        },
+        { key: 'phoneNumber', header: 'Phone Number' },
+        {
+            key: 'allowedForms',
+            header: 'Allowed Forms',
+            render: (item: any) =>
+                item.allowedForms
+                    ?.map((label: string) => formLabelMap[label] || label)
+                    .join(', ') || 'None 🚫'
+        },
+        {
+            key: 'createdAt',
+            header: 'Created At',
+            render: item =>
+                item.createdAt ? new Date(item.createdAt).toLocaleString() : ''
+        }
+    ];
 
     const onEdit = (editedUser: any) => {
         const { userId, allowedForms = [] } = editedUser;
@@ -96,6 +122,15 @@ const PendingApprovals = () => {
                     heading={'Pending Approvals'}
                     items={staffMembers}
                     onEdit={onEdit}
+                    columns={userColumns}
+                    editableFields={[
+                        {
+                            key: 'allowedForms',
+                            label: 'Allowed Forms',
+                            type: 'checkbox',
+                            options: formTypes
+                        }
+                    ]}
                 />
             </div>
             {/* Pagination Controls */}
