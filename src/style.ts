@@ -1,7 +1,8 @@
 import styled from 'styled-components';
+
 export const ModalButton = styled.button`
-    padding: 6px 12px;
-    margin-right: 10px;
+    padding: 8px 16px;
+    margin: 0px 8px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -10,6 +11,12 @@ export const ModalButton = styled.button`
 
     &:hover {
         background-color: #0056b3;
+    }
+
+    &:disabled {
+        background-color: rgb(204, 204, 204);
+        color: rgb(255, 255, 255);
+        cursor: not-allowed;
     }
 `;
 
