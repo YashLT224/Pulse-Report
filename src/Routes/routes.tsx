@@ -4,7 +4,7 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from 'aws-amplify/data';
 import { useDispatch } from 'react-redux';
 import Home from '../Screens/Home';
-import UserList from '../Screens/UserList';
+import UserList from '../Screens/UserListScreen';
 import PendingApprovals from '../Screens/PendingApprovals';
 import AddEntity from '../Screens/AddEntity';
 import Alerts from '../Screens/Alerts';

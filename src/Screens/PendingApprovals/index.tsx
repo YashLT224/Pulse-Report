@@ -1,15 +1,25 @@
-import { useCallback } from 'react';
+import { useCallback,useState } from 'react';
 import { Loader } from '@aws-amplify/ui-react';
 import UserListItems from '../../components/UserList';
 import useAuth from '../../Hooks/useAuth';
 import { usePagination } from '../../Hooks/usePagination';
 import PaginationControls from '../../components/PaginationControls';
 import { formTypes, formLabelMap } from '../../data/forms';
+import Modal from '../../components/Modal';
+import {
+    ModalButton,
+    CheckboxContainer,
+    CheckboxLabel,
+    CheckboxInput
+} from './style';
 
 const LIMIT = 10; // Number of items to display per page
 
 const PendingApprovals = () => {
     const { client } = useAuth();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<T | null>(null); // selected user to update
+    const [selectedForms, setSelectedForms] = useState([]);
 
     // fetch function for usePagination
     const fetchStaffMembers = useCallback(
@@ -89,6 +99,30 @@ const PendingApprovals = () => {
         });
     };
 
+    const handleEdit = (item) => {
+        setSelectedItem(item)
+        setSelectedForms(item.allowedForms); // Initialize with current values
+        setIsModalOpen(true)
+      }
+
+      const handleCloseModal = () => {
+        setIsModalOpen(false)
+      }
+
+      const handleFormChange = (formLabel) => {
+        setSelectedForms((prevSelectedForms) =>
+            prevSelectedForms.includes(formLabel)
+                ? prevSelectedForms.filter((form) => form !== formLabel) // Deselect
+                : [...prevSelectedForms, formLabel] // Select
+        );
+    };
+
+    const handleSave = () => {
+        if (!selectedItem) return
+        onEdit({ ...selectedItem, allowedForms:selectedForms })
+        setIsModalOpen(false)
+      }
+
     return (
         <>
             <div style={{ position: 'relative' }}>
@@ -131,6 +165,7 @@ const PendingApprovals = () => {
                             options: formTypes
                         }
                     ]}
+                    handleEdit={handleEdit}
                 />
             </div>
             {/* Pagination Controls */}
@@ -140,6 +175,37 @@ const PendingApprovals = () => {
                 hasPrevious={hasPrevious}
                 hasNext={hasNext}
             />
+
+
+
+{isModalOpen && selectedItem && (
+        <Modal heading={`Name: ${selectedItem['userName']}`}>
+          {formTypes.map((form) => (
+              <CheckboxContainer key={form.id}>
+                <CheckboxLabel>
+                  <CheckboxInput
+                    type="checkbox"
+                    checked={selectedForms.includes(form.label)}
+                    onChange={() => handleFormChange(form.label)}
+                  />
+                  {form.name}
+                </CheckboxLabel>
+              </CheckboxContainer>
+            ))}
+
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '10px',
+              marginTop: '15px',
+            }}
+          >
+            <ModalButton onClick={handleSave}>Save</ModalButton>
+            <ModalButton onClick={handleCloseModal}>Cancel</ModalButton>
+          </div>
+        </Modal>
+      )}
         </>
     );
 };
