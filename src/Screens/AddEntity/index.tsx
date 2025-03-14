@@ -1,10 +1,12 @@
-import { useCallback } from 'react';
-import { Loader } from '@aws-amplify/ui-react';
+import { useCallback, useState } from 'react';
+import { Loader, Input, SelectField } from '@aws-amplify/ui-react';
 import { Schema } from '../../../amplify/data/resource';
 import UserListItems from '../../components/UserList';
 import useAuth from '../../Hooks/useAuth';
 import { usePagination } from '../../Hooks/usePagination';
 import PaginationControls from '../../components/PaginationControls';
+import Modal from '../../components/Modal';
+import { ModalButton, Heading } from '../../style';
 
 const LIMIT = 10; // Number of items to display per page
 
@@ -24,6 +26,11 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     const entityType = type === 'PEOPLE' ? 'PERSON' : 'PARTY';
     const heading = type === 'PEOPLE' ? 'People' : 'Parties';
     const nameField = type === 'PEOPLE' ? 'personName' : 'partyName';
+    const NameEntity = type === 'PEOPLE' ? 'Person' : 'Party';
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState({});
+    const [isUpdateMode, setUpdateMode] = useState(false);
 
     // fetch function for usePagination
     const fetchEntity = useCallback(
@@ -75,19 +82,62 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     ];
 
     const onEdit = (editedEntity: Entity) => {
-        const { createdAt, updatedAt, entityType, ...rest } = editedEntity;
-
-        updateItem(rest as Entity);
+        const { createdAt, updatedAt,entityType:_entityType, ...rest } = editedEntity;
 
         const params: any = {
-            ...rest
+            ...rest,personId:'123455',phoneNumber:`+91${rest.phoneNumber}`
         };
+        if (isUpdateMode) {
+            updateItem(rest as Entity);
 
-        model.update(params).catch(error => {
-            console.error(`Failed to update ${type}:`, error);
-        });
+            model.update(params).catch(error => {
+                console.error(`Failed to update ${type}:`, error);
+            });
+        } else {
+            model.create({ ...params, entityType }).catch(error => {
+                console.error(`Failed to update ${type}:`, error);
+            });
+        }
     };
 
+    const addNewItemHandler = () => {
+        setUpdateMode(false);
+        setIsModalOpen(true);
+        let peopleObj = {
+            personName: '',
+            phoneNumber: '', // Enforce uniqueness using the PhoneIndex
+            designation: '',
+            status: 'active'
+        };
+        let partyObj = {
+            partyName: '',
+            phoneNumber: '', // Enforce uniqueness using the PhoneIndex
+            status: 'active'
+        };
+        setSelectedItem(type === 'PEOPLE' ? peopleObj : partyObj);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const updateField = (value, key) => {
+        setSelectedItem(prev => ({ ...prev, [key]: value }));
+    };
+
+    const handleEdit = item => {
+        setSelectedItem(item);
+        setUpdateMode(true);
+        setIsModalOpen(true);
+    };
+
+    const handleSave = () => {
+        if (!selectedItem) return;
+        onEdit(selectedItem);
+        setIsModalOpen(false);
+    };
+
+    console.log(selectedItem);
     return (
         <>
             <div style={{ position: 'relative' }}>
@@ -121,6 +171,9 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                     onEdit={onEdit}
                     columns={itemsColumns}
                     nameField={nameField}
+                    addNewEntryAccess={true}
+                    addNewItemHandler={addNewItemHandler}
+                    handleEdit={handleEdit}
                 />
             </div>
             {/* Pagination Controls */}
@@ -130,6 +183,101 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                 hasPrevious={hasPrevious}
                 hasNext={hasNext}
             />
+
+            {isModalOpen && (
+                <Modal heading={`${NameEntity}`}>
+                    <form onSubmit={handleSave}>
+                        <div className="mb-8px">
+                            <Heading width="30vw" level={6}>
+                                {NameEntity} Name
+                            </Heading>
+
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                placeholder={nameField}
+                                value={selectedItem[nameField]}
+                                isRequired={true}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        type === 'PEOPLE'
+                                            ? 'personName'
+                                            : 'partyName'
+                                    )
+                                }
+                            />
+                        </div>
+                        <div className="mb-8px">
+                            <Heading width="30vw" level={6}>
+                                Phone No.
+                            </Heading>
+                            <Input
+                                type="number"
+                                variation="quiet"
+                                size="small"
+                                isRequired={true}
+                                placeholder="Phone No."
+                                value={selectedItem.phoneNumber}
+                                onChange={e =>
+                                    updateField(e.target.value, 'phoneNumber')
+                                }
+                            />
+                        </div>
+                        {type === 'PEOPLE' && (
+                            <div className="mb-8px">
+                                <Heading width="30vw" level={6}>
+                                    Designation
+                                </Heading>
+                                <Input
+                                    type="text"
+                                    variation="quiet"
+                                    size="small"
+                                    placeholder="designation"
+                                    isRequired={true}
+                                    value={selectedItem.designation}
+                                    onChange={e =>
+                                        updateField(
+                                            e.target.value,
+                                            'designation'
+                                        )
+                                    }
+                                />
+                            </div>
+                        )}
+                        <div className="mb-8px">
+                            <Heading width="30vw" level={6}>
+                                Status
+                            </Heading>
+                            <SelectField
+                                value={selectedItem.status}
+                                onChange={e =>
+                                    updateField(e.target.value, 'status')
+                                }
+                            >
+                                <option value="active">Active</option>
+                                <option value="inactive">InActive</option>
+                            </SelectField>
+                        </div>
+
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                marginTop: '15px'
+                            }}
+                        >
+                            <ModalButton type="submit">
+                                {isUpdateMode ? 'Update' : 'Save'}
+                            </ModalButton>
+                            <ModalButton onClick={handleCloseModal}>
+                                Cancel
+                            </ModalButton>
+                        </div>
+                    </form>
+                </Modal>
+            )}
         </>
     );
 };
