@@ -1,4 +1,4 @@
-import { useCallback,useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Loader } from '@aws-amplify/ui-react';
 import UserListItems from '../../components/UserList';
 import useAuth from '../../Hooks/useAuth';
@@ -18,7 +18,7 @@ const LIMIT = 10; // Number of items to display per page
 const PendingApprovals = () => {
     const { client } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedItem, setSelectedItem] = useState<T | null>(null); // selected user to update
+    const [selectedItem, setSelectedItem] = useState<any>(null); // selected user to update
     const [selectedForms, setSelectedForms] = useState([]);
 
     // fetch function for usePagination
@@ -99,29 +99,30 @@ const PendingApprovals = () => {
         });
     };
 
-    const handleEdit = (item) => {
-        setSelectedItem(item)
+    const handleEdit = item => {
+        setSelectedItem(item);
         setSelectedForms(item.allowedForms); // Initialize with current values
-        setIsModalOpen(true)
-      }
+        setIsModalOpen(true);
+    };
 
-      const handleCloseModal = () => {
-        setIsModalOpen(false)
-      }
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
-      const handleFormChange = (formLabel) => {
-        setSelectedForms((prevSelectedForms) =>
-            prevSelectedForms.includes(formLabel)
-                ? prevSelectedForms.filter((form) => form !== formLabel) // Deselect
-                : [...prevSelectedForms, formLabel] // Select
+    const handleFormChange = formLabel => {
+        setSelectedForms(
+            prevSelectedForms =>
+                prevSelectedForms.includes(formLabel)
+                    ? prevSelectedForms.filter(form => form !== formLabel) // Deselect
+                    : [...prevSelectedForms, formLabel] // Select
         );
     };
 
     const handleSave = () => {
-        if (!selectedItem) return
-        onEdit({ ...selectedItem, allowedForms:selectedForms })
-        setIsModalOpen(false)
-      }
+        if (!selectedItem) return;
+        onEdit({ ...selectedItem, allowedForms: selectedForms });
+        setIsModalOpen(false);
+    };
 
     return (
         <>
@@ -155,16 +156,7 @@ const PendingApprovals = () => {
                 <UserListItems
                     heading={'Pending Approvals'}
                     items={staffMembers}
-                    onEdit={onEdit}
                     columns={userColumns}
-                    editableFields={[
-                        {
-                            key: 'allowedForms',
-                            label: 'Allowed Forms',
-                            type: 'checkbox',
-                            options: formTypes
-                        }
-                    ]}
                     handleEdit={handleEdit}
                 />
             </div>
@@ -176,36 +168,38 @@ const PendingApprovals = () => {
                 hasNext={hasNext}
             />
 
+            {isModalOpen && selectedItem && (
+                <Modal heading={`User: ${selectedItem['userName']}`}>
+                    {formTypes.map(form => (
+                        <CheckboxContainer key={form.id}>
+                            <CheckboxLabel>
+                                <CheckboxInput
+                                    type="checkbox"
+                                    checked={selectedForms.includes(form.label)}
+                                    onChange={() =>
+                                        handleFormChange(form.label)
+                                    }
+                                />
+                                {form.name}
+                            </CheckboxLabel>
+                        </CheckboxContainer>
+                    ))}
 
-
-{isModalOpen && selectedItem && (
-        <Modal heading={`Name: ${selectedItem['userName']}`}>
-          {formTypes.map((form) => (
-              <CheckboxContainer key={form.id}>
-                <CheckboxLabel>
-                  <CheckboxInput
-                    type="checkbox"
-                    checked={selectedForms.includes(form.label)}
-                    onChange={() => handleFormChange(form.label)}
-                  />
-                  {form.name}
-                </CheckboxLabel>
-              </CheckboxContainer>
-            ))}
-
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '10px',
-              marginTop: '15px',
-            }}
-          >
-            <ModalButton onClick={handleSave}>Save</ModalButton>
-            <ModalButton onClick={handleCloseModal}>Cancel</ModalButton>
-          </div>
-        </Modal>
-      )}
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '10px',
+                            marginTop: '15px'
+                        }}
+                    >
+                        <ModalButton onClick={handleSave}>Save</ModalButton>
+                        <ModalButton onClick={handleCloseModal}>
+                            Cancel
+                        </ModalButton>
+                    </div>
+                </Modal>
+            )}
         </>
     );
 };

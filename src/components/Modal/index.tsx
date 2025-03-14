@@ -1,27 +1,17 @@
-import React from 'react'
-import {
-   
-    ModalOverlay,
-    ModalButton,
-    ModalContent,
-    ModalHeader,
-   
-  } from './style'
-const Modal = ({children,heading}) => {
-  return (
-    <ModalOverlay>
-          <ModalContent>
-            <ModalHeader>
-              Edit Item <br />
-              {heading}
-            </ModalHeader>
+import { ModalOverlay, ModalContent, ModalHeader } from './style';
 
-        {children}
-          </ModalContent>
+const Modal = ({ children, isUpdateMode = true, heading }) => {
+    return (
+        <ModalOverlay>
+            <ModalContent>
+                <ModalHeader>
+                    {isUpdateMode ? 'Edit' : 'Add'} {heading}
+                </ModalHeader>
+
+                {children}
+            </ModalContent>
         </ModalOverlay>
-  )
-}
+    );
+};
 
-export default Modal
-
-
+export default Modal;

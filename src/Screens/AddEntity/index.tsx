@@ -29,7 +29,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     const NameEntity = type === 'PEOPLE' ? 'Person' : 'Party';
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedItem, setSelectedItem] = useState({});
+    const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
 
     // fetch function for usePagination
@@ -82,10 +82,17 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     ];
 
     const onEdit = (editedEntity: Entity) => {
-        const { createdAt, updatedAt,entityType:_entityType, ...rest } = editedEntity;
+        const {
+            createdAt,
+            updatedAt,
+            entityType: _entityType,
+            ...rest
+        } = editedEntity;
 
         const params: any = {
-            ...rest,personId:'123455',phoneNumber:`+91${rest.phoneNumber}`
+            ...rest,
+            personId: '123455',
+            phoneNumber: `+91${rest.phoneNumber}`
         };
         if (isUpdateMode) {
             updateItem(rest as Entity);
@@ -103,13 +110,13 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     const addNewItemHandler = () => {
         setUpdateMode(false);
         setIsModalOpen(true);
-        let peopleObj = {
+        const peopleObj = {
             personName: '',
             phoneNumber: '', // Enforce uniqueness using the PhoneIndex
             designation: '',
             status: 'active'
         };
-        let partyObj = {
+        const partyObj = {
             partyName: '',
             phoneNumber: '', // Enforce uniqueness using the PhoneIndex
             status: 'active'
@@ -121,11 +128,11 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         setIsModalOpen(false);
     };
 
-    const updateField = (value, key) => {
-        setSelectedItem(prev => ({ ...prev, [key]: value }));
+    const updateField = (value: any, key: string) => {
+        setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
     };
 
-    const handleEdit = item => {
+    const handleEdit = (item: any) => {
         setSelectedItem(item);
         setUpdateMode(true);
         setIsModalOpen(true);
@@ -133,7 +140,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
 
     const handleSave = () => {
         if (!selectedItem) return;
-        onEdit(selectedItem);
+        onEdit(selectedItem as Entity);
         setIsModalOpen(false);
     };
 
@@ -168,9 +175,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                 <UserListItems<Entity>
                     heading={heading}
                     items={items}
-                    onEdit={onEdit}
                     columns={itemsColumns}
-                    nameField={nameField}
                     addNewEntryAccess={true}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
@@ -185,12 +190,10 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
             />
 
             {isModalOpen && (
-                <Modal heading={`${NameEntity}`}>
+                <Modal heading={`${NameEntity}`} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
-                            <Heading width="30vw" level={6}>
-                                {NameEntity} Name
-                            </Heading>
+                            <Heading>{NameEntity} Name</Heading>
 
                             <Input
                                 variation="quiet"
@@ -209,9 +212,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                             />
                         </div>
                         <div className="mb-8px">
-                            <Heading width="30vw" level={6}>
-                                Phone No.
-                            </Heading>
+                            <Heading>Phone No.</Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -226,9 +227,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                         </div>
                         {type === 'PEOPLE' && (
                             <div className="mb-8px">
-                                <Heading width="30vw" level={6}>
-                                    Designation
-                                </Heading>
+                                <Heading>Designation</Heading>
                                 <Input
                                     type="text"
                                     variation="quiet"
@@ -246,10 +245,9 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                             </div>
                         )}
                         <div className="mb-8px">
-                            <Heading width="30vw" level={6}>
-                                Status
-                            </Heading>
+                            <Heading>Status</Heading>
                             <SelectField
+                                label=""
                                 value={selectedItem.status}
                                 onChange={e =>
                                     updateField(e.target.value, 'status')
