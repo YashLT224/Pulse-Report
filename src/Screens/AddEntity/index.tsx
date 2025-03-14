@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { ulid } from 'ulid';
 import { Loader, Input, SelectField } from '@aws-amplify/ui-react';
 import { Schema } from '../../../amplify/data/resource';
 import UserListItems from '../../components/UserList';
@@ -59,7 +60,9 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         hasPrevious,
         goToNext,
         goToPrevious,
-        updateItem
+        initiateLoding,
+        updateItem,
+        refreshList
     } = usePagination<Entity>({
         limit: LIMIT,
         fetchFn: fetchEntity,
@@ -73,7 +76,11 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         ...(type === 'PEOPLE'
             ? [{ key: 'designation', header: 'Designation' }]
             : []),
-        { key: 'status', header: 'Status' },
+        {
+            key: 'status',
+            header: 'Status',
+            render: (item: Entity) => item.status.toUpperCase()
+        },
         {
             key: 'createdAt',
             header: 'Created At',
@@ -81,7 +88,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         }
     ];
 
-    const onEdit = (editedEntity: Entity) => {
+    const onEdit = async (editedEntity: Entity) => {
         const {
             createdAt,
             updatedAt,
@@ -91,9 +98,10 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
 
         const params: any = {
             ...rest,
-            personId: '123455',
+            [idField]: ulid(),
             phoneNumber: `+91${rest.phoneNumber}`
         };
+
         if (isUpdateMode) {
             updateItem(rest as Entity);
 
@@ -101,9 +109,15 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                 console.error(`Failed to update ${type}:`, error);
             });
         } else {
-            model.create({ ...params, entityType }).catch(error => {
-                console.error(`Failed to update ${type}:`, error);
-            });
+            initiateLoding();
+            model
+                .create({ ...params, entityType })
+                .catch(error => {
+                    console.error(`Failed to update ${type}:`, error);
+                })
+                .then(() => {
+                    refreshList();
+                });
         }
     };
 
@@ -133,7 +147,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     };
 
     const handleEdit = (item: any) => {
-        setSelectedItem(item);
+        setSelectedItem({ ...item, phoneNumber: +item.phoneNumber.slice(3) });
         setUpdateMode(true);
         setIsModalOpen(true);
     };
@@ -144,7 +158,6 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         setIsModalOpen(false);
     };
 
-    console.log(selectedItem);
     return (
         <>
             <div style={{ position: 'relative' }}>
@@ -198,7 +211,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                             <Input
                                 variation="quiet"
                                 size="small"
-                                placeholder={nameField}
+                                placeholder={`${NameEntity} Name`}
                                 value={selectedItem[nameField]}
                                 isRequired={true}
                                 onChange={e =>
@@ -224,6 +237,12 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                                     updateField(e.target.value, 'phoneNumber')
                                 }
                             />
+                            {selectedItem.phoneNumber &&
+                                `${selectedItem.phoneNumber}`.length !== 10 && (
+                                    <div style={{ color: 'red' }}>
+                                        Invalid Phone number
+                                    </div>
+                                )}
                         </div>
                         {type === 'PEOPLE' && (
                             <div className="mb-8px">
@@ -232,7 +251,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                                     type="text"
                                     variation="quiet"
                                     size="small"
-                                    placeholder="designation"
+                                    placeholder="Designation"
                                     isRequired={true}
                                     value={selectedItem.designation}
                                     onChange={e =>
@@ -254,7 +273,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                                 }
                             >
                                 <option value="active">Active</option>
-                                <option value="inactive">InActive</option>
+                                <option value="inactive">Inactive</option>
                             </SelectField>
                         </div>
 
@@ -266,7 +285,12 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                                 marginTop: '15px'
                             }}
                         >
-                            <ModalButton type="submit">
+                            <ModalButton
+                                type="submit"
+                                disabled={
+                                    `${selectedItem.phoneNumber}`.length !== 10
+                                }
+                            >
                                 {isUpdateMode ? 'Update' : 'Save'}
                             </ModalButton>
                             <ModalButton onClick={handleCloseModal}>
