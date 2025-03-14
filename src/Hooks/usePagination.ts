@@ -19,6 +19,8 @@ interface PaginationState<T> {
     hasPrevious: boolean;
     goToNext: () => Promise<void>;
     goToPrevious: () => Promise<void>;
+    initiateLoding: () => void;
+    refreshList: () => Promise<void>;
     updateItem: (updatedItem: T) => void; // New function to update a specific item
     deleteItem: (deletedItem: T) => void; // New function to delete a specific item
 }
@@ -99,6 +101,14 @@ export function usePagination<T>({
         [idField]
     );
 
+    const initiateLoding = useCallback(() => {
+        setIsLoading(true);
+    }, []);
+
+    const refreshList = useCallback(async () => {
+        fetchItems();
+    }, [fetchItems]);
+
     // Add method to delete a specific item in the list
     const deleteItem = useCallback(
         (deletedItem: T & { allowedForms?: string[] }) => {
@@ -144,6 +154,8 @@ export function usePagination<T>({
         hasPrevious: !!pageTokens.length,
         goToNext,
         goToPrevious,
+        initiateLoding,
+        refreshList,
         updateItem,
         deleteItem
     };
