@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { ulid } from 'ulid';
-import { Loader, Input, SelectField } from '@aws-amplify/ui-react';
+import { Loader, Input, SelectField, Message } from '@aws-amplify/ui-react';
 import { Schema } from '../../../amplify/data/resource';
 import UserListItems from '../../components/UserList';
 import useAuth from '../../Hooks/useAuth';
@@ -143,7 +143,10 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     };
 
     const updateField = (value: any, key: string) => {
-        setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
+        setSelectedItem((prev: any) => ({
+            ...prev,
+            [key]: key === 'phoneNumber' ? value.slice(0, 10) : value
+        }));
     };
 
     const handleEdit = (item: any) => {
@@ -157,6 +160,13 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         onEdit(selectedItem as Entity);
         setIsModalOpen(false);
     };
+
+    const showPhoneError =
+        selectedItem.phoneNumber && `${selectedItem.phoneNumber}`.length !== 10;
+    const isSubmitDisabled =
+        showPhoneError ||
+        !selectedItem[nameField] ||
+        (type === 'PEOPLE' && !selectedItem.designation);
 
     return (
         <>
@@ -237,12 +247,17 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                                     updateField(e.target.value, 'phoneNumber')
                                 }
                             />
-                            {selectedItem.phoneNumber &&
-                                `${selectedItem.phoneNumber}`.length !== 10 && (
-                                    <div style={{ color: 'red' }}>
-                                        Invalid Phone number
-                                    </div>
-                                )}
+                            {showPhoneError && (
+                                <Message
+                                    variation="filled"
+                                    colorTheme="error"
+                                    style={{
+                                        marginTop: '5px'
+                                    }}
+                                >
+                                    Invalid Phone number
+                                </Message>
+                            )}
                         </div>
                         {type === 'PEOPLE' && (
                             <div className="mb-8px">
@@ -287,9 +302,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                         >
                             <ModalButton
                                 type="submit"
-                                disabled={
-                                    `${selectedItem.phoneNumber}`.length !== 10
-                                }
+                                disabled={isSubmitDisabled}
                             >
                                 {isUpdateMode ? 'Update' : 'Save'}
                             </ModalButton>
