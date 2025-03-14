@@ -42,7 +42,7 @@ const Header = () => {
 
     return (
         <Container>
-            <Link to="/">
+            <Link to="/" onClick={() => dispatch(resetActiveTile())}>
                 <Logo
                     src={'https://ui.docs.amplify.aws/amplify-logo.svg'}
                     alt="logo"
