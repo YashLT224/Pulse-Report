@@ -11,6 +11,16 @@ import Alerts from '../Screens/Alerts';
 import ProtectedRoute from './protectedRoute';
 import { setUserProfile, stopLoader } from '../Redux/slices/userSlice';
 import { Schema } from '../../amplify/data/resource';
+import ExpenseReport from '../Screens/Reports/ExpenseReport/index';
+import VechileReport from '../Screens/Reports/VechileReport/index';
+import VechileInsurance from '../Screens/Reports/VechileInsurance/index';
+import BuildingInsurance from '../Screens/Reports/BuildingInsurance/index';
+import BuildingMclTax from '../Screens/Reports/BuildingMclTax/index';
+import DocumentFileStatus from '../Screens/Reports/DocumentFileStatus/index';
+import Todolist from '../Screens/Reports/todolistReport/index';
+import Requirements from '../Screens/Reports/Requirements/index';
+import Dispatch from '../Screens/Reports/Dispatch/index';
+import Performance from '../Screens/Reports/Performance/index';
 
 const client = generateClient<Schema>();
 
@@ -76,6 +86,105 @@ const AppRoutes = () => {
                     />
                 }
             />
+            <Route
+                path="/expense-report"
+                element={
+                    <ProtectedRoute
+                        element={<ExpenseReport />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+
+            <Route
+                path="/vechile-insurance"
+                element={
+                    <ProtectedRoute
+                        element={<VechileInsurance />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+
+            <Route
+                path="/vechile-report"
+                element={
+                    <ProtectedRoute
+                        element={<VechileReport />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+            <Route
+                path="/building-insurance"
+                element={
+                    <ProtectedRoute
+                        element={<BuildingInsurance />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+
+            <Route
+                path="/building-mcl-tax"
+                element={
+                    <ProtectedRoute
+                        element={<BuildingMclTax />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+
+            <Route
+                path="/document"
+                element={
+                    <ProtectedRoute
+                        element={<DocumentFileStatus />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+
+            <Route
+                path="/todo-list"
+                element={
+                    <ProtectedRoute
+                        element={<Todolist />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+
+            <Route
+                path="/requirements"
+                element={
+                    <ProtectedRoute
+                        element={<Requirements />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+
+            <Route
+                path="/dispatch-instructions"
+                element={
+                    <ProtectedRoute
+                        element={<Dispatch />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+
+            <Route
+                path="/performance"
+                element={
+                    <ProtectedRoute
+                        element={<Performance />}
+                        requiredRole="admin"
+                    />
+                }
+            />
+
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     );

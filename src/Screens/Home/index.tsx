@@ -22,7 +22,7 @@ const Home = () => {
                             form => allowedForms.includes(form.label) || isAdmin
                         )
                         .map(form => (
-                            <CardWrapper key={form.id}>
+                            <CardWrapper to={form.route} key={form.id}>
                                 <CardIcon src={form.icon} alt={form.name} />
                                 <CardTitle>{form.name}</CardTitle>
                             </CardWrapper>

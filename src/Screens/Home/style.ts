@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-
+import { Link } from 'react-router-dom';
 export const CardContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
@@ -8,7 +8,7 @@ export const CardContainer = styled.div`
     padding: 20px;
 `;
 
-export const CardWrapper = styled.div`
+export const CardWrapper = styled(Link)`
     cursor: pointer;
     background: #ffffff;
     border: 1px solid #e0e0e0;
