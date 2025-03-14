@@ -162,7 +162,7 @@ const UserList = () => {
             />
 
             {isModalOpen && selectedItem && (
-                <Modal heading={`Name: ${selectedItem['userName']}`}>
+                <Modal heading={`User: ${selectedItem['userName']}`}>
                     {formTypes.map(form => (
                         <CheckboxContainer key={form.id}>
                             <CheckboxLabel>
