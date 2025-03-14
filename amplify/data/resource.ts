@@ -91,7 +91,9 @@ const schema = a
             ])
             .authorization(allow => [
                 // Allow admin to perform all operations
-                allow.groups(['ADMINS']).to(['read', 'update', 'delete']),
+                allow
+                    .groups(['ADMINS'])
+                    .to(['create', 'read', 'update', 'delete']),
                 // Allow authenticated users to just read people records
                 allow.authenticated().to(['read'])
             ])
