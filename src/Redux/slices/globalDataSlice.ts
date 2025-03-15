@@ -51,7 +51,7 @@ const initialState = {
 };
 
 const globalSlice = createSlice({
-    name: 'userAuth',
+    name: 'global',
     initialState,
     reducers: {
         setPersons: (state, action) => {
