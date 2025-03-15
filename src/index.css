@@ -70,3 +70,36 @@ a {
     align-items:center;
     justify-content: space-between;
 }
+
+
+
+.select-search-container{
+width:100% !important;
+}
+.selectSearch .select-search-input {
+    background-color: #fff !important;
+    border:unset !important;
+    border-radius:0px !important;
+    border-bottom:1px solid black !important;
+}
+
+.select-search-option{
+    background-color: unset !important;
+    color:#333 !important;
+     height:28px !important;
+}
+.select-search-option:hover{
+    background-color: #d0d0d0 !important;
+    outline:unset !important;
+    
+}
+.select-search-row:hover{
+    background-color: #d0d0d0 !important;
+    outline:unset !important;
+}
+.select-search-select{
+    background-color: #fff !important;
+    outline:unset !important;
+    border:unset !important;
+    top:48px !important
+}

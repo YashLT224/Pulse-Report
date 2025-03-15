@@ -10,6 +10,7 @@ import AddEntity from '../Screens/AddEntity';
 import Alerts from '../Screens/Alerts';
 import ProtectedRoute from './protectedRoute';
 import { setUserProfile, stopLoader } from '../Redux/slices/userSlice';
+import { setPersons, setParties } from '../Redux/slices/globalDataSlice';
 import { Schema } from '../../amplify/data/resource';
 import ExpenseReport from '../Screens/Reports/ExpenseReport/index';
 import VechileReport from '../Screens/Reports/VechileReport/index';
@@ -21,7 +22,7 @@ import Todolist from '../Screens/Reports/todolistReport/index';
 import Requirements from '../Screens/Reports/Requirements/index';
 import Dispatch from '../Screens/Reports/Dispatch/index';
 import Performance from '../Screens/Reports/Performance/index';
-
+import 'react-select-search/style.css'
 const client = generateClient<Schema>();
 
 const AppRoutes = () => {
@@ -43,7 +44,39 @@ const AppRoutes = () => {
             }
         };
 
+        const fetchAllWorkers = async () => {
+            try {
+                const result = await client.models.People.listPeopleByStatus({
+                    status:'active'
+                });
+                if (result.data) {
+                    dispatch(setPersons(result.data.map((user)=>({...user,name:user.personName, value:user.personId}))));
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+                dispatch(stopLoader());
+            }
+        };
+
+
+        const fetchAllAgencies = async () => {
+            try {
+                const result = await client.models.Party.listPartyByStatus({
+                    status:'active'
+                });
+                if (result.data) {
+                    dispatch(setParties(result.data));
+                    dispatch(setParties(result.data.map((party)=>({...party,name:party.partyName, value:party.partyId}))));
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+                dispatch(stopLoader());
+            }
+        };
+
         fetchUserProfile();
+        fetchAllWorkers();
+        fetchAllAgencies();
     }, [user.userId, dispatch]);
 
     return (

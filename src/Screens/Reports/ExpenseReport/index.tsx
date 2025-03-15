@@ -1,4 +1,5 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { ulid } from 'ulid';
 import { Loader, Input, SelectField } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
@@ -8,18 +9,23 @@ import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
+import SelectSearch from 'react-select-search';
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Requirements';
 const idField='formId';
+
+
 const ExpenseReport = () => {
   const { client } = useAuth();
+
+  const personsList = useSelector(
+    (state: any) => state.globalReducer.persons
+);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>({});
   const [isUpdateMode, setUpdateMode] = useState(false);
-
-
     // Define columns for the People | Party list
     const itemsColumns = [
       {
@@ -64,6 +70,9 @@ const ExpenseReport = () => {
 }
   ];
 
+  useEffect(()=>{
+
+  },[])
   // fetch function for usePagination
     const fetchEntity = useCallback(
         async (limit: number, token?: string) => {
@@ -177,10 +186,13 @@ const ExpenseReport = () => {
 {isModalOpen && (
                 <Modal heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
-                        <div className="mb-8px">
+                        <div className="mb-8px selectSearch">
                             <Heading>Person Name</Heading>
+                            <SelectSearch
+                             search ={true} options={personsList} value={selectedItem.personName} name="person name" placeholder="Choose person" />
 
-                            <Input
+
+                            {/* <Input
                                 variation="quiet"
                                 size="small"
                                 placeholder={'person Name'}
@@ -194,7 +206,7 @@ const ExpenseReport = () => {
                                             : 'partyName'
                                     )
                                 }
-                            />
+                            /> */}
                         </div>
                         <div className="mb-8px">
                             <Heading>Work Assign</Heading>
