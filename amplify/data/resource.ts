@@ -120,23 +120,22 @@ const schema = a
                 expenseReport_personId: a.string(),
                 expenseReport_personName: a.string(),
 
-                //Building MCL Tax
+                // Building MCL Tax
                 buildingMclTax_buildingName: a.string(),
                 buildingMclTax_buildingTax: a.float(),
-                buildingMclTax_dueDate: a.date(),
                 buildingMclTax_taxType: a.string(),
-                buildingMclTax_status: a.string(),
+                buildingMclTax_status: a.enum(['PENDING', 'PAID']),
                 buildingMclTax_paidDate: a.date(),
                 buildingMclTax_documentFileNo: a.string(),
-                //Building Insurance
+
+                // Building Insurance
                 buildingInsurance_buildingName: a.string(),
                 buildingInsurance_insuranceDate: a.date(),
                 buildingInsurance_insureAmount: a.float(),
                 buildingInsurance_insuranceAmount: a.float(),
-                buildingInsurance_dueDate: a.date(),
-                buildingInsurance_status: a.string(),
-                buildingInsurance_markToName: a.string(),
-                buildingInsurance_markToId: a.string()
+                buildingInsurance_status: a.enum(['PENDING', 'PAID']),
+                buildingInsurance_markToId: a.string(),
+                buildingInsurance_markToName: a.string()
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [

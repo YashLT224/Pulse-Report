@@ -118,7 +118,7 @@ const addNewItemHandler = () => {
         buildingMclTax_buildingTax: 0,
         buildingMclTax_dueDate: formatDateForInput(new Date()),
         buildingMclTax_taxType: '',
-        buildingMclTax_status: 'pending',
+        buildingMclTax_status: 'PENDING',
         buildingMclTax_paidDate: formatDateForInput(new Date()),
         buildingMclTax_documentFileNo: '',
     });

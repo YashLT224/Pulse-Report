@@ -121,7 +121,7 @@ const BuildingInsurance = () => {
             buildingInsurance_insuranceDate: formatDateForInput(new Date()),
             buildingInsurance_markToName: '',
             buildingInsurance_markToId:'',
-            buildingInsurance_status: 'pending',
+            buildingInsurance_status: 'PENDING',
             buildingInsurance_dueDate: formatDateForInput(new Date())
         });
     };
