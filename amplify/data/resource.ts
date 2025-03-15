@@ -103,9 +103,9 @@ const schema = a
                 formType: a.string().required(), // Contains both type and state, e.g., 'expenseReport#active'
                 state: a.string().default('active'), // e.g., 'active', 'inactive'
                 createdAt: a.datetime().required(),
-                createdBy: a.string().required(),
+                createdById: a.string().required(),
                 updatedAt: a.datetime(),
-                updatedBy: a.string(),
+                updatedById: a.string(),
                 hasExpiration: a.string(), // Encodes expiration status and state, e.g., 'yes#active'
                 expirationDate: a.datetime(),
                 completedAt: a.datetime(),
@@ -155,7 +155,7 @@ const schema = a
                     .to(['create', 'read', 'update', 'delete']),
                 // Allow owner to perform create, read, and update operations
                 allow
-                    .ownerDefinedIn('createdBy')
+                    .ownerDefinedIn('createdById')
                     .to(['create', 'read', 'update'])
             ])
     })
