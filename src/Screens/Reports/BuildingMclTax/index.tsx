@@ -141,7 +141,7 @@ const addNewItemHandler = () => {
             const params: any = {
                 ...expenseForm,
                 updatedAt: new Date().toISOString(),
-                updatedById: userProfile.userId
+                updatedBy: userProfile.userId
             };
             updateItem(editedForm);
 
@@ -155,7 +155,7 @@ const addNewItemHandler = () => {
                 createdAt: new Date().toISOString(),
                 formType: 'buildingMclTax#active',
                 state: 'active',
-                createdById: userProfile.userId
+                createdBy: userProfile.userId
             };
             initiateLoding();
             client.models.Form.create(params)
