@@ -108,7 +108,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         };
 
         if (isUpdateMode) {
-            updateItem(modifiedEntity as Entity);
+            updateItem(editedEntity);
 
             model
                 .update(modifiedEntity as any)
