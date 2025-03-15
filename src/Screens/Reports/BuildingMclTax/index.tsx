@@ -129,7 +129,7 @@ const addNewItemHandler = () => {
         setIsModalOpen(false);
     };
 
-    const handleEdit = () => {
+    const handleEdit = (item: any) => {
         setSelectedItem(item);
         setUpdateMode(true);
         setIsModalOpen(true);
@@ -179,8 +179,8 @@ const addNewItemHandler = () => {
             setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
         }
         else{
-            let keys= key.split('#')
-            let values= value.split('#')
+            const keys= key.split('#')
+            const values= value.split('#')
             setSelectedItem((prev: any) => ({ ...prev, [keys[0]]: values[0],[keys[1]]: values[1] }));
         }
     }
@@ -219,7 +219,7 @@ const addNewItemHandler = () => {
                         />
                     </div>
                 )}
-                <UserListItems<Entity>
+                <UserListItems
                     heading={heading}
                     items={items}
                     columns={itemsColumns}
