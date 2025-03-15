@@ -11,66 +11,57 @@ import { ModalButton, Heading } from '../../../style';
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Building MCL Tax';
-const idField='formId';
+const idField = 'formId';
 
 type Form = Schema['Form']['type'];
 
 const BuildingMCLTax = () => {
     const { userProfile, client } = useAuth();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>({});
-  const [isUpdateMode, setUpdateMode] = useState(false);
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<any>({});
+    const [isUpdateMode, setUpdateMode] = useState(false);
 
     // Define columns for the People | Party list
     const itemsColumns = [
-     
-      {
-          key: 'buildingMclTax_buildingName',
-          header: 'Building Name'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-          key: 'buildingMclTax_buildingTax',
-          header: 'Building Tax'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-        key: 'buildingMclTax_dueDate',
-        header: 'Due Date'
-        // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-    },
-      {
-          key: 'buildingMclTax_taxType',
-          header: 'Tax Type'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-          key: 'buildingMclTax_status',
-          header: 'Status'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-    
-    {
-      key: 'buildingMclTax_paidDate',
-      header: 'Paid On'
-      // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-  },
-  {
-    key: 'buildingMclTax_documentFileNo',
-    header: 'Document File No.'
-    // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-},
-{
-    key: 'createdAt',
-    header: 'Created At',
-    render: (item: Form) => new Date(item.createdAt).toLocaleString()
-},
-  ];
+        {
+            key: 'buildingMclTax_buildingName',
+            header: 'Building Name'
+        },
+        {
+            key: 'buildingMclTax_buildingTax',
+            header: 'Building Tax'
+        },
+        {
+            key: 'expirationDate',
+            header: 'Due Date'
+        },
+        {
+            key: 'buildingMclTax_taxType',
+            header: 'Tax Type'
+        },
+        {
+            key: 'buildingMclTax_status',
+            header: 'Status'
+        },
 
-     // fetch function for usePagination
-     const fetchForm = useCallback(
+        {
+            key: 'buildingMclTax_paidDate',
+            header: 'Paid On'
+        },
+        {
+            key: 'buildingMclTax_documentFileNo',
+            header: 'Document File No.'
+        },
+        {
+            key: 'createdAt',
+            header: 'Created At',
+            render: (item: Form) => new Date(item.createdAt).toLocaleString()
+        }
+    ];
+
+    // fetch function for usePagination
+    const fetchForm = useCallback(
         async (limit: number, token?: string) => {
             const params: any = {
                 formType: 'buildingMclTax#active',
@@ -87,43 +78,41 @@ const BuildingMCLTax = () => {
         [client.models.Form]
     );
 
- // Use the usePagination hook
- const {
-    items,
-    isLoading,
-    hasNext,
-    hasPrevious,
-    goToNext,
-    goToPrevious,
-    initiateLoding,
-    updateItem,
-    refreshList
-} = usePagination<Form>({
-    limit: LIMIT,
-    fetchFn: fetchForm as any,
-    idField
-});
-
-const formatDateForInput = (date) => {
-    const d = new Date(date);
-    return d.toISOString().split('T')[0];
-  };
-  
-
-const addNewItemHandler = () => {
-    setUpdateMode(false);
-    setIsModalOpen(true);
-    setSelectedItem({
-        buildingMclTax_buildingName: '',
-        buildingMclTax_buildingTax: 0,
-        buildingMclTax_dueDate: formatDateForInput(new Date()),
-        buildingMclTax_taxType: '',
-        buildingMclTax_status: 'PENDING',
-        buildingMclTax_paidDate: formatDateForInput(new Date()),
-        buildingMclTax_documentFileNo: '',
+    // Use the usePagination hook
+    const {
+        items,
+        isLoading,
+        hasNext,
+        hasPrevious,
+        goToNext,
+        goToPrevious,
+        initiateLoding,
+        updateItem,
+        refreshList
+    } = usePagination<Form>({
+        limit: LIMIT,
+        fetchFn: fetchForm as any,
+        idField
     });
-};
 
+    const formatDateForInput = date => {
+        const d = new Date(date);
+        return d.toISOString().split('T')[0];
+    };
+
+    const addNewItemHandler = () => {
+        setUpdateMode(false);
+        setIsModalOpen(true);
+        setSelectedItem({
+            buildingMclTax_buildingName: '',
+            buildingMclTax_buildingTax: 0,
+            expirationDate: formatDateForInput(new Date()),
+            buildingMclTax_taxType: '',
+            buildingMclTax_status: 'PENDING',
+            buildingMclTax_paidDate: formatDateForInput(new Date()),
+            buildingMclTax_documentFileNo: ''
+        });
+    };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -167,31 +156,34 @@ const addNewItemHandler = () => {
                 });
         }
     };
- 
+
     const handleSave = () => {
         if (!selectedItem) return;
         onEdit(selectedItem as Form);
         setIsModalOpen(false);
     };
 
-    const updateField = (value: any, key: string,ismultiValue=false) => {
-        if(!ismultiValue){
+    const updateField = (value: any, key: string, ismultiValue = false) => {
+        if (!ismultiValue) {
             setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
+        } else {
+            const keys = key.split('#');
+            const values = value.split('#');
+            setSelectedItem((prev: any) => ({
+                ...prev,
+                [keys[0]]: values[0],
+                [keys[1]]: values[1]
+            }));
         }
-        else{
-            const keys= key.split('#')
-            const values= value.split('#')
-            setSelectedItem((prev: any) => ({ ...prev, [keys[0]]: values[0],[keys[1]]: values[1] }));
-        }
-    }
+    };
 
- 
     const isSubmitDisabled =
-    !selectedItem.buildingMclTax_buildingName ||
-    !selectedItem.buildingMclTax_taxType ||
-    selectedItem.buildingMclTax_buildingTax === '' ||
-    !selectedItem.buildingMclTax_status ||
-    !selectedItem.buildingMclTax_documentFileNo;
+        !selectedItem.buildingMclTax_buildingName ||
+        !selectedItem.buildingMclTax_taxType ||
+        selectedItem.buildingMclTax_buildingTax === '' ||
+        !selectedItem.buildingMclTax_status ||
+        !selectedItem.buildingMclTax_documentFileNo;
+
     return (
         <>
             <div style={{ position: 'relative' }}>
@@ -227,26 +219,25 @@ const addNewItemHandler = () => {
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
                 />
-                 {/* Pagination Controls */}
-            <PaginationControls
-                onPrevious={goToPrevious}
-                onNext={goToNext}
-                hasPrevious={hasPrevious}
-                hasNext={hasNext}
-            />
+                {/* Pagination Controls */}
+                <PaginationControls
+                    onPrevious={goToPrevious}
+                    onNext={goToNext}
+                    hasPrevious={hasPrevious}
+                    hasNext={hasNext}
+                />
             </div>
-
 
             {isModalOpen && (
                 <Modal heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
-                        <Heading>Building Name</Heading>
+                            <Heading>Building Name</Heading>
                             <Input
                                 variation="quiet"
                                 size="small"
                                 isRequired={true}
-                                placeholder="buildingName"
+                                placeholder="Building Name"
                                 value={selectedItem.buildingMclTax_buildingName}
                                 onChange={e =>
                                     updateField(
@@ -263,7 +254,7 @@ const addNewItemHandler = () => {
                                 type="number"
                                 variation="quiet"
                                 size="small"
-                                placeholder="buildingTax"
+                                placeholder="Building Tax"
                                 isRequired={true}
                                 value={selectedItem.buildingMclTax_buildingTax}
                                 onChange={e =>
@@ -281,13 +272,13 @@ const addNewItemHandler = () => {
                                 type="date"
                                 variation="quiet"
                                 size="small"
-                                placeholder="dueDate"
+                                placeholder="Due Date"
                                 isRequired={true}
-                                value={selectedItem.buildingMclTax_dueDate}
+                                value={selectedItem.expirationDate}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'buildingMclTax_dueDate'
+                                        'expirationDate'
                                     )
                                 }
                             />
@@ -299,7 +290,7 @@ const addNewItemHandler = () => {
                                 type="text"
                                 variation="quiet"
                                 size="small"
-                                placeholder="taxType"
+                                placeholder="Tax Type"
                                 isRequired={true}
                                 value={selectedItem.buildingMclTax_taxType}
                                 onChange={e =>
@@ -316,7 +307,10 @@ const addNewItemHandler = () => {
                                 label=""
                                 value={selectedItem.buildingMclTax_status}
                                 onChange={e =>
-                                    updateField(e.target.value, 'buildingMclTax_status')
+                                    updateField(
+                                        e.target.value,
+                                        'buildingMclTax_status'
+                                    )
                                 }
                             >
                                 <option value="pending">Pending</option>
@@ -349,7 +343,9 @@ const addNewItemHandler = () => {
                                 size="small"
                                 placeholder="Balance"
                                 isRequired={true}
-                                value={selectedItem.buildingMclTax_documentFileNo}
+                                value={
+                                    selectedItem.buildingMclTax_documentFileNo
+                                }
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
@@ -380,7 +376,7 @@ const addNewItemHandler = () => {
                 </Modal>
             )}
         </>
-  )
-}
+    );
+};
 
-export default BuildingMCLTax
+export default BuildingMCLTax;
