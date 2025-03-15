@@ -11,13 +11,15 @@ const schema = a
     .schema({
         UserProfile: a
             .model({
-                userId: a.id(),
+                userId: a.id().required(),
                 createdAt: a.datetime().required(),
                 role: a.enum(['admin', 'staff']),
                 userName: a.string().required(),
                 phoneNumber: a.string().required(),
                 allowedForms: a.string().array(),
-                access: a.string() // undefined or 'none'
+                access: a.string(), // undefined or 'none'
+                createdForms: a.hasMany('Form', 'createdById'),
+                updatedForms: a.hasMany('Form', 'updatedById')
             })
             .identifier(['userId'])
             .secondaryIndexes(index => [
@@ -38,12 +40,13 @@ const schema = a
             ]),
         People: a
             .model({
-                personId: a.id(),
+                personId: a.id().required(),
                 personName: a.string().required(),
                 phoneNumber: a.phone().required(), // Enforce uniqueness using the PhoneIndex
                 designation: a.string().required(),
                 status: a.enum(['active', 'inactive']),
-                entityType: a.string().default('PERSON') // Constant attribute, e.g., "PERSON"
+                entityType: a.string().default('PERSON'), // Constant attribute, e.g., "PERSON"
+                expenseReports: a.hasMany('Form', 'expenseReport_personId')
             })
             .identifier(['personId'])
             .secondaryIndexes(index => [
@@ -69,7 +72,7 @@ const schema = a
             ]),
         Party: a
             .model({
-                partyId: a.id(),
+                partyId: a.id().required(),
                 partyName: a.string().required(),
                 phoneNumber: a.phone().required(), // Enforce uniqueness using the PhoneIndex
                 status: a.enum(['active', 'inactive']),
@@ -96,6 +99,54 @@ const schema = a
                     .to(['create', 'read', 'update', 'delete']),
                 // Allow authenticated users to just read people records
                 allow.authenticated().to(['read'])
+            ]),
+        Form: a
+            .model({
+                formId: a.id().required(),
+                formType: a.string().required(), // Contains both type and state, e.g., 'expenseReport#active'
+                state: a.string().default('active'), // e.g., 'active', 'inactive'
+                createdAt: a.datetime().required(),
+                createdById: a.id().required(),
+                createdBy: a.belongsTo('UserProfile', 'createdById'),
+                updatedAt: a.datetime(),
+                updatedById: a.id(),
+                updatedBy: a.belongsTo('UserProfile', 'updatedById'),
+                hasExpiration: a.string(), // Encodes expiration status and state, e.g., 'yes#active'
+                expirationDate: a.datetime(),
+                completedAt: a.datetime(),
+                // Expense Report fields
+                expenseReport_balanceBF: a.float(),
+                expenseReport_payment: a.float(),
+                expenseReport_expense: a.float(),
+                expenseReport_balance: a.float(),
+                expenseReport_remarks: a.string(),
+                expenseReport_workAssign: a.string(),
+                expenseReport_personId: a.id(),
+                expenseReport_person: a.belongsTo(
+                    'People',
+                    'expenseReport_personId'
+                )
+            })
+            .identifier(['formId'])
+            .secondaryIndexes(index => [
+                index('formType')
+                    .sortKeys(['createdAt'])
+                    .queryField('listFormByType')
+                    .name('FormTypeIndex'),
+                index('hasExpiration')
+                    .sortKeys(['expirationDate'])
+                    .queryField('listByExpiration')
+                    .name('ExpirationIndex')
+            ])
+            .authorization(allow => [
+                // Allow admin to perform all operations
+                allow
+                    .groups(['ADMINS'])
+                    .to(['create', 'read', 'update', 'delete']),
+                // Allow owner to perform create, read, and update operations
+                allow
+                    .ownerDefinedIn('createdById')
+                    .to(['create', 'read', 'update'])
             ])
     })
     .authorization(allow => [allow.resource(postConfirmation)]);
