@@ -125,7 +125,15 @@ const BuildingMCLTax = () => {
     };
 
     const onEdit = async (editedForm: Form) => {
-        const { createdAt, updatedAt, ...expenseForm } = editedForm;
+        const {
+            createdAt,
+            updatedAt,
+            hasExpiration,
+            formType,
+            state,
+            createdBy,
+            ...expenseForm
+        } = editedForm;
         if (isUpdateMode) {
             const params: any = {
                 ...expenseForm,
@@ -141,6 +149,7 @@ const BuildingMCLTax = () => {
             const params: any = {
                 ...expenseForm,
                 [idField]: ulid(),
+                hasExpiration: 'yes#active',
                 createdAt: new Date().toISOString(),
                 formType: 'buildingMclTax#active',
                 state: 'active',
