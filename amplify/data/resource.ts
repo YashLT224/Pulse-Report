@@ -107,7 +107,7 @@ const schema = a
                 updatedAt: a.datetime(),
                 updatedBy: a.string(),
                 hasExpiration: a.string(), // Encodes expiration status and state, e.g., 'yes#active'
-                expirationDate: a.datetime(),
+                expirationDate: a.date(),
                 completedAt: a.datetime(),
 
                 // Expense Report fields
