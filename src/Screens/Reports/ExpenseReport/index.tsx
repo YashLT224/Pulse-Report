@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ulid } from 'ulid';
-import { Loader, Input, SelectField } from '@aws-amplify/ui-react';
+import { Loader, Input } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
 import useAuth from '../../../Hooks/useAuth';
@@ -12,84 +12,74 @@ import { ModalButton, Heading } from '../../../style';
 import SelectSearch from 'react-select-search';
 
 const LIMIT = 10; // Number of items to display per page
-const heading = 'Requirements';
-const idField='formId';
+const heading = 'Expense Report';
+const idField = 'formId';
 
+type Form = Schema['Form']['type'];
 
 const ExpenseReport = () => {
-  const { client } = useAuth();
+    const { client } = useAuth();
 
-  const personsList = useSelector(
-    (state: any) => state.globalReducer.persons
-);
+    const personsList = useSelector(
+        (state: any) => state.globalReducer.persons
+    );
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>({});
-  const [isUpdateMode, setUpdateMode] = useState(false);
-    // Define columns for the People | Party list
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<any>({});
+    const [isUpdateMode, setUpdateMode] = useState(false);
+
     const itemsColumns = [
-      {
-          key: 'createdAt',
-          header: 'Created At'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-          key: 'personName',
-          header: 'Person Name'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-          key: 'workAssign',
-          header: 'Work Assign'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-          key: 'balanceBF',
-          header: 'Balance B/F'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-          key: 'payment',
-          header: 'Payment'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-        key: 'expense',
-        header: 'Expense'
-        // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-    },
-    {
-      key: 'balance',
-      header: 'Balance'
-      // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-  },
-  {
-    key: 'remarks',
-    header: 'Remarks'
-    // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-}
-  ];
+        {
+            key: 'createdAt',
+            header: 'Created At'
+        },
+        {
+            key: 'expenseReport_personId',
+            header: 'Person Name'
+        },
+        {
+            key: 'expenseReport_workAssign',
+            header: 'Work Assign'
+        },
+        {
+            key: 'expenseReport_balanceBF',
+            header: 'Balance B/F'
+        },
+        {
+            key: 'expenseReport_payment',
+            header: 'Payment'
+        },
+        {
+            key: 'expenseReport_expense',
+            header: 'Expense'
+        },
+        {
+            key: 'expenseReport_balance',
+            header: 'Balance'
+        },
+        {
+            key: 'expenseReport_remarks',
+            header: 'Remarks'
+        }
+    ];
 
-  useEffect(()=>{
-
-  },[])
-  // fetch function for usePagination
-    const fetchEntity = useCallback(
+    // fetch function for usePagination
+    const fetchForm = useCallback(
         async (limit: number, token?: string) => {
-            // const params: any = {
-            //     entityType,
-            //     nextToken: token,
-            //     limit,
-            //     sortDirection: 'ASC'
-            // };
-            // const response = await model[listfuncName](params);
+            const params: any = {
+                formType: 'expenseReport',
+                nextToken: token,
+                limit,
+                sortDirection: 'DESC'
+            };
+            const response = await client.models.Form.listFormByType(params);
 
             return {
-                data:[],
-                nextToken:  null
+                data: response.data,
+                nextToken: response.nextToken || null
             };
         },
-        []
+        [client.models.Form]
     );
 
     // Use the usePagination hook
@@ -103,9 +93,9 @@ const ExpenseReport = () => {
         initiateLoding,
         updateItem,
         refreshList
-    } = usePagination<Entity>({
+    } = usePagination<Form>({
         limit: LIMIT,
-        fetchFn: fetchEntity,
+        fetchFn: fetchForm,
         idField
     });
 
@@ -113,13 +103,13 @@ const ExpenseReport = () => {
         setUpdateMode(false);
         setIsModalOpen(true);
         setSelectedItem({
-            personName:'',
-            workAssign:'',
-            balanceBF:0,
-            payment:0,
-            balance:0,
-            expense:0,
-            remarks:''
+            expenseReport_personId: '',
+            expenseReport_workAssign: '',
+            expenseReport_balanceBF: 0,
+            expenseReport_payment: 0,
+            expenseReport_balance: 0,
+            expenseReport_expense: 0,
+            expenseReport_remarks: ''
         });
     };
 
@@ -128,6 +118,7 @@ const ExpenseReport = () => {
     };
 
     const handleEdit = () => {};
+
     const handleSave = () => {
         if (!selectedItem) return;
         // onEdit(selectedItem as Entity);
@@ -135,8 +126,18 @@ const ExpenseReport = () => {
     };
 
     const updateField = (value: any, key: string) => {
-        // setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
+        setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
     };
+
+    const isSubmitDisabled =
+        !selectedItem.expenseReport_personId ||
+        !selectedItem.expenseReport_workAssign ||
+        selectedItem.expenseReport_balanceBF === '' ||
+        selectedItem.expenseReport_payment === '' ||
+        selectedItem.expenseReport_expense === '' ||
+        selectedItem.expenseReport_balance === '' ||
+        !selectedItem.expenseReport_remarks;
+
     return (
         <>
             <div style={{ position: 'relative' }}>
@@ -164,7 +165,7 @@ const ExpenseReport = () => {
                         />
                     </div>
                 )}
-                <UserListItems<Entity>
+                <UserListItems<Form>
                     heading={heading}
                     items={items}
                     columns={itemsColumns}
@@ -174,39 +175,42 @@ const ExpenseReport = () => {
                 />
             </div>
 
-             {/* Pagination Controls */}
-             <PaginationControls
+            {/* Pagination Controls */}
+            <PaginationControls
                 onPrevious={goToPrevious}
                 onNext={goToNext}
                 hasPrevious={hasPrevious}
                 hasNext={hasNext}
             />
 
-
-{isModalOpen && (
+            {isModalOpen && (
                 <Modal heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
                             <Heading>Person Name</Heading>
                             <SelectSearch
-                             search ={true} options={personsList} value={selectedItem.personName} name="person name" placeholder="Choose person" />
-
-
-                            {/* <Input
-                                variation="quiet"
-                                size="small"
-                                placeholder={'person Name'}
-                                value={selectedItem.personName}
-                                isRequired={true}
-                                onChange={e =>
+                                search={true}
+                                options={personsList}
+                                value={selectedItem.expenseReport_personId}
+                                // name="Person Name"
+                                placeholder="Choose Person"
+                                onBlur={(_event: Event): void => {
+                                    throw new Error(
+                                        'Function not implemented.'
+                                    );
+                                }}
+                                onFocus={(_event: Event): void => {
+                                    throw new Error(
+                                        'Function not implemented.'
+                                    );
+                                }}
+                                onChange={selectedValue => {
                                     updateField(
-                                        e.target.value,
-                                        type === 'PEOPLE'
-                                            ? 'personName'
-                                            : 'partyName'
-                                    )
-                                }
-                            /> */}
+                                        selectedValue,
+                                        'expenseReport_personId'
+                                    );
+                                }}
+                            />
                         </div>
                         <div className="mb-8px">
                             <Heading>Work Assign</Heading>
@@ -214,107 +218,107 @@ const ExpenseReport = () => {
                                 variation="quiet"
                                 size="small"
                                 isRequired={true}
-                                placeholder="workAssign"
-                                value={selectedItem.workAssign}
+                                placeholder="WorkAssign"
+                                value={selectedItem.expenseReport_workAssign}
                                 onChange={e =>
-                                    updateField(e.target.value, 'phoneNumber')
+                                    updateField(
+                                        e.target.value,
+                                        'expenseReport_workAssign'
+                                    )
                                 }
                             />
                         </div>
-                      
-                            <div className="mb-8px">
-                                <Heading>Balance B/F</Heading>
-                                <Input
-                                    type="number"
-                                    variation="quiet"
-                                    size="small"
-                                    placeholder="balance b/f"
-                                    isRequired={true}
-                                    value={selectedItem.balanceBF}
-                                    onChange={e =>
-                                        updateField(
-                                            e.target.value,
-                                            'designation'
-                                        )
-                                    }
-                                />
-                            </div>
 
-                            <div className="mb-8px">
-                                <Heading>Payment</Heading>
-                                <Input
-                                    type="number"
-                                    variation="quiet"
-                                    size="small"
-                                    placeholder="payment"
-                                    isRequired={true}
-                                    value={selectedItem.payment}
-                                    onChange={e =>
-                                        updateField(
-                                            e.target.value,
-                                            'designation'
-                                        )
-                                    }
-                                />
-                            </div>
+                        <div className="mb-8px">
+                            <Heading>Balance B/F</Heading>
+                            <Input
+                                type="number"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Balance b/f"
+                                isRequired={true}
+                                value={selectedItem.expenseReport_balanceBF}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expenseReport_balanceBF'
+                                    )
+                                }
+                            />
+                        </div>
 
-                            <div className="mb-8px">
-                                <Heading>Expense</Heading>
-                                <Input
-                                    type="number"
-                                    variation="quiet"
-                                    size="small"
-                                    placeholder="expense"
-                                    isRequired={true}
-                                    value={selectedItem.expense}
-                                    onChange={e =>
-                                        updateField(
-                                            e.target.value,
-                                            'designation'
-                                        )
-                                    }
-                                />
-                            </div>
+                        <div className="mb-8px">
+                            <Heading>Payment</Heading>
+                            <Input
+                                type="number"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Payment"
+                                isRequired={true}
+                                value={selectedItem.expenseReport_payment}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expenseReport_payment'
+                                    )
+                                }
+                            />
+                        </div>
 
-                            <div className="mb-8px">
-                                <Heading>Balance</Heading>
-                                <Input
-                                    type="number"
-                                    variation="quiet"
-                                    size="small"
-                                    placeholder="balance"
-                                    isRequired={true}
-                                    value={selectedItem.balance}
-                                    onChange={e =>
-                                        updateField(
-                                            e.target.value,
-                                            'designation'
-                                        )
-                                    }
-                                />
-                            </div>
+                        <div className="mb-8px">
+                            <Heading>Expense</Heading>
+                            <Input
+                                type="number"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Expense"
+                                isRequired={true}
+                                value={selectedItem.expenseReport_expense}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expenseReport_expense'
+                                    )
+                                }
+                            />
+                        </div>
 
-                            <div className="mb-8px">
+                        <div className="mb-8px">
+                            <Heading>Balance</Heading>
+                            <Input
+                                type="number"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Balance"
+                                isRequired={true}
+                                value={selectedItem.expenseReport_balance}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expenseReport_balance'
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="mb-8px">
                             <Heading>Remarks</Heading>
 
                             <Input
                                 variation="quiet"
                                 size="small"
-                                placeholder={'remarks'}
-                                value={selectedItem.remarks}
+                                placeholder={'Remarks'}
+                                value={selectedItem.expenseReport_remarks}
                                 isRequired={true}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        type === 'PEOPLE'
-                                            ? 'personName'
-                                            : 'partyName'
+                                        'expenseReport_remarks'
                                     )
                                 }
                             />
                         </div>
-                        
-                       
+
                         <div
                             style={{
                                 display: 'flex',
@@ -325,9 +329,7 @@ const ExpenseReport = () => {
                         >
                             <ModalButton
                                 type="submit"
-                                // disabled={
-                                //     `${selectedItem.phoneNumber}`.length !== 10
-                                // }
+                                disabled={isSubmitDisabled}
                             >
                                 {isUpdateMode ? 'Update' : 'Save'}
                             </ModalButton>
@@ -339,7 +341,7 @@ const ExpenseReport = () => {
                 </Modal>
             )}
         </>
-  )
-}
+    );
+};
 
-export default ExpenseReport
+export default ExpenseReport;
