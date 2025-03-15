@@ -96,19 +96,22 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
             ...rest
         } = editedEntity;
 
-        const params: any = {
+        const modifiedEntity = {
             ...rest,
-            [idField]: ulid(),
             phoneNumber: `+91${rest.phoneNumber}`
         };
 
         if (isUpdateMode) {
-            updateItem(rest as Entity);
+            updateItem(modifiedEntity as Entity);
 
-            model.update(params).catch(error => {
+            model.update(modifiedEntity as any).catch(error => {
                 console.error(`Failed to update ${type}:`, error);
             });
         } else {
+            const params: any = {
+                ...modifiedEntity,
+                [idField]: ulid()
+            };
             initiateLoding();
             model
                 .create({ ...params, entityType })
