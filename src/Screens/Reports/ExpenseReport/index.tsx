@@ -35,7 +35,7 @@ const ExpenseReport = () => {
             render: (item: Form) => new Date(item.createdAt).toLocaleString()
         },
         {
-            key: 'expenseReport_personId',
+            key: 'expenseReport_personName',
             header: 'Person Name'
         },
         {
@@ -74,22 +74,8 @@ const ExpenseReport = () => {
                 sortDirection: 'DESC'
             };
             const response = await client.models.Form.listFormByType(params);
-
-            const personNames = await Promise.all(
-                response.data.map(async form => {
-                    form.expenseReport_person();
-                    const person = await form.expenseReport_person();
-                    return person.data.personName || 'Unknown';
-                })
-            );
-
             return {
-                data: response.data.map((form, index) => {
-                    return {
-                        ...form,
-                        expenseReport_personId: personNames[index]
-                    };
-                }),
+                data: response.data,
                 nextToken: response.nextToken || null
             };
         },
@@ -118,6 +104,7 @@ const ExpenseReport = () => {
         setIsModalOpen(true);
         setSelectedItem({
             expenseReport_personId: '',
+            expenseReport_personName: '',
             expenseReport_workAssign: '',
             expenseReport_balanceBF: 0,
             expenseReport_payment: 0,
@@ -139,7 +126,6 @@ const ExpenseReport = () => {
 
     const onEdit = async (editedForm: Form) => {
         const { createdAt, updatedAt, ...expenseForm } = editedForm;
-
         if (isUpdateMode) {
             const params: any = {
                 ...expenseForm,
@@ -177,19 +163,27 @@ const ExpenseReport = () => {
         setIsModalOpen(false);
     };
 
-    const updateField = (value: any, key: string) => {
-        setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
-    };
+    const updateField = (value: any, key: string,ismultiValue=false) => {
+        if(!ismultiValue){
+            setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
+        }
+        else{
+            let keys= key.split('#')
+            let values= value.split('#')
+            setSelectedItem((prev: any) => ({ ...prev, [keys[0]]: values[0],[keys[1]]: values[1] }));
+        }
+    }
+      
 
     const isSubmitDisabled =
         !selectedItem.expenseReport_personId ||
+        !selectedItem.expenseReport_personName ||
         !selectedItem.expenseReport_workAssign ||
         selectedItem.expenseReport_balanceBF === '' ||
         selectedItem.expenseReport_payment === '' ||
         selectedItem.expenseReport_expense === '' ||
         selectedItem.expenseReport_balance === '' ||
         !selectedItem.expenseReport_remarks;
-
     return (
         <>
             <div style={{ position: 'relative' }}>
@@ -243,7 +237,7 @@ const ExpenseReport = () => {
                             <SelectSearch
                                 search={true}
                                 options={personsList}
-                                value={selectedItem.expenseReport_personId}
+                                value={`${selectedItem.expenseReport_personName}#${selectedItem.expenseReport_personId}`}
                                 // name="Person Name"
                                 placeholder="Choose Person"
                                 onBlur={(_event: Event): void => {
@@ -259,7 +253,8 @@ const ExpenseReport = () => {
                                 onChange={selectedValue => {
                                     updateField(
                                         selectedValue,
-                                        'expenseReport_personId'
+                                        'expenseReport_personName#expenseReport_personId',
+                                        true
                                     );
                                 }}
                             />

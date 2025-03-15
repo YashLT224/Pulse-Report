@@ -11,7 +11,7 @@ const fetchAllWorkers = async () => {
         return data.map(user => ({
             ...user,
             name: user.personName,
-            value: user.personId
+            value: `${user.personName}#${user.personId}`
         }));
     } catch (error) {
         console.error('Error fetching people:', error);

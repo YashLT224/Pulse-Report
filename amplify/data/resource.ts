@@ -109,6 +109,7 @@ const schema = a
                 hasExpiration: a.string(), // Encodes expiration status and state, e.g., 'yes#active'
                 expirationDate: a.datetime(),
                 completedAt: a.datetime(),
+
                 // Expense Report fields
                 expenseReport_balanceBF: a.float(),
                 expenseReport_payment: a.float(),
@@ -117,7 +118,25 @@ const schema = a
                 expenseReport_remarks: a.string(),
                 expenseReport_workAssign: a.string(),
                 expenseReport_personId: a.string(),
-                expenseReport_personName: a.string()
+                expenseReport_personName: a.string(),
+
+                //Building MCL Tax
+                buildingMclTax_buildingName: a.string(),
+                buildingMclTax_buildingTax: a.float(),
+                buildingMclTax_dueDate: a.date(),
+                buildingMclTax_taxType: a.string(),
+                buildingMclTax_status: a.string(),
+                buildingMclTax_paidDate: a.date(),
+                buildingMclTax_documentFileNo: a.string(),
+                //Building Insurance
+                buildingInsurance_buildingName: a.string(),
+                buildingInsurance_insuranceDate: a.date(),
+                buildingInsurance_insureAmount: a.float(),
+                buildingInsurance_insuranceAmount: a.float(),
+                buildingInsurance_dueDate: a.date(),
+                buildingInsurance_status: a.string(),
+                buildingInsurance_markToName: a.string(),
+                buildingInsurance_markToId: a.string()
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [
