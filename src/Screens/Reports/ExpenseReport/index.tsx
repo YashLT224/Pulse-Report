@@ -18,7 +18,7 @@ const idField = 'formId';
 type Form = Schema['Form']['type'];
 
 const ExpenseReport = () => {
-    const { client } = useAuth();
+    const { userProfile, client } = useAuth();
 
     const personsList = useSelector(
         (state: any) => state.globalReducer.persons
@@ -31,7 +31,8 @@ const ExpenseReport = () => {
     const itemsColumns = [
         {
             key: 'createdAt',
-            header: 'Created At'
+            header: 'Created At',
+            render: (item: Form) => new Date(item.createdAt).toLocaleString()
         },
         {
             key: 'expenseReport_personId',
@@ -67,15 +68,28 @@ const ExpenseReport = () => {
     const fetchForm = useCallback(
         async (limit: number, token?: string) => {
             const params: any = {
-                formType: 'expenseReport',
+                formType: 'expenseReport#active',
                 nextToken: token,
                 limit,
                 sortDirection: 'DESC'
             };
             const response = await client.models.Form.listFormByType(params);
 
+            const personNames = await Promise.all(
+                response.data.map(async form => {
+                    form.expenseReport_person();
+                    const person = await form.expenseReport_person();
+                    return person.data.personName || 'Unknown';
+                })
+            );
+
             return {
-                data: response.data,
+                data: response.data.map((form, index) => {
+                    return {
+                        ...form,
+                        expenseReport_personId: personNames[index]
+                    };
+                }),
                 nextToken: response.nextToken || null
             };
         },
@@ -95,7 +109,7 @@ const ExpenseReport = () => {
         refreshList
     } = usePagination<Form>({
         limit: LIMIT,
-        fetchFn: fetchForm,
+        fetchFn: fetchForm as any,
         idField
     });
 
@@ -117,11 +131,49 @@ const ExpenseReport = () => {
         setIsModalOpen(false);
     };
 
-    const handleEdit = () => {};
+    const handleEdit = (item: any) => {
+        setSelectedItem(item);
+        setUpdateMode(true);
+        setIsModalOpen(true);
+    };
+
+    const onEdit = async (editedForm: Form) => {
+        const { createdAt, updatedAt, ...expenseForm } = editedForm;
+
+        if (isUpdateMode) {
+            const params: any = {
+                ...expenseForm,
+                updatedAt: new Date().toISOString(),
+                updatedById: userProfile.userId
+            };
+            updateItem(editedForm);
+
+            client.models.Form.update(params).catch(error => {
+                console.error(`Failed to update ${heading}:`, error);
+            });
+        } else {
+            const params: any = {
+                ...expenseForm,
+                [idField]: ulid(),
+                createdAt: new Date().toISOString(),
+                formType: 'expenseReport#active',
+                state: 'active',
+                createdById: userProfile.userId
+            };
+            initiateLoding();
+            client.models.Form.create(params)
+                .then(() => {
+                    refreshList();
+                })
+                .catch(error => {
+                    console.error(`Failed to create ${heading}:`, error);
+                });
+        }
+    };
 
     const handleSave = () => {
         if (!selectedItem) return;
-        // onEdit(selectedItem as Entity);
+        onEdit(selectedItem as Form);
         setIsModalOpen(false);
     };
 

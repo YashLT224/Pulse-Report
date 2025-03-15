@@ -108,7 +108,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         };
 
         if (isUpdateMode) {
-            updateItem(editedEntity);
+            updateItem({ ...editedEntity, ...modifiedEntity } as any);
 
             model
                 .update(modifiedEntity as any)
@@ -131,7 +131,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                     dispatch(fetchEntityAsyncThunk() as any);
                 })
                 .catch(error => {
-                    console.error(`Failed to update ${type}:`, error);
+                    console.error(`Failed to create ${type}:`, error);
                 });
         }
     };
@@ -165,7 +165,10 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     };
 
     const handleEdit = (item: any) => {
-        setSelectedItem({ ...item, phoneNumber: +item.phoneNumber.slice(3) });
+        setSelectedItem({
+            ...item,
+            phoneNumber: parseInt(item.phoneNumber.slice(3))
+        });
         setUpdateMode(true);
         setIsModalOpen(true);
     };
