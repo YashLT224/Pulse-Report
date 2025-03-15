@@ -54,7 +54,7 @@ const BuildingInsurance = () => {
             header: 'Status'
         },
         {
-            key: 'buildingInsurance_markTo',
+            key: 'buildingInsurance_markToName',
             header: 'Mark To'
         },
         {
@@ -128,7 +128,15 @@ const BuildingInsurance = () => {
         setIsModalOpen(true);
     };
     const onEdit = async (editedForm: Form) => {
-        const { createdAt, updatedAt, ...expenseForm } = editedForm;
+        const {
+            createdAt,
+            updatedAt,
+            hasExpiration,
+            formType,
+            state,
+            createdBy,
+            ...expenseForm
+        } = editedForm;
         if (isUpdateMode) {
             const params: any = {
                 ...expenseForm,
@@ -144,6 +152,7 @@ const BuildingInsurance = () => {
             const params: any = {
                 ...expenseForm,
                 [idField]: ulid(),
+                hasExpiration: 'yes#active',
                 createdAt: new Date().toISOString(),
                 formType: 'buildingInsurance#active',
                 state: 'active',
