@@ -17,9 +17,7 @@ const schema = a
                 userName: a.string().required(),
                 phoneNumber: a.string().required(),
                 allowedForms: a.string().array(),
-                access: a.string(), // undefined or 'none'
-                createdForms: a.hasMany('Form', 'createdById'),
-                updatedForms: a.hasMany('Form', 'updatedById')
+                access: a.string() // undefined or 'none'
             })
             .identifier(['userId'])
             .secondaryIndexes(index => [
@@ -45,7 +43,7 @@ const schema = a
                 phoneNumber: a.phone().required(), // Enforce uniqueness using the PhoneIndex
                 designation: a.string().required(),
                 status: a.enum(['active', 'inactive']),
-                entityType: a.string().default('PERSON'), // Constant attribute, e.g., "PERSON"
+                entityType: a.string().default('PERSON') // Constant attribute, e.g., "PERSON"
             })
             .identifier(['personId'])
             .secondaryIndexes(index => [
@@ -105,11 +103,9 @@ const schema = a
                 formType: a.string().required(), // Contains both type and state, e.g., 'expenseReport#active'
                 state: a.string().default('active'), // e.g., 'active', 'inactive'
                 createdAt: a.datetime().required(),
-                createdById: a.id().required(),
-                createdBy: a.belongsTo('UserProfile', 'createdById'),
+                createdBy: a.string().required(),
                 updatedAt: a.datetime(),
-                updatedById: a.id(),
-                updatedBy: a.belongsTo('UserProfile', 'updatedById'),
+                updatedBy: a.string(),
                 hasExpiration: a.string(), // Encodes expiration status and state, e.g., 'yes#active'
                 expirationDate: a.datetime(),
                 completedAt: a.datetime(),
@@ -121,7 +117,7 @@ const schema = a
                 expenseReport_remarks: a.string(),
                 expenseReport_workAssign: a.string(),
                 expenseReport_personId: a.string(),
-                expenseReport_personName: a.string(),
+                expenseReport_personName: a.string()
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [
@@ -141,7 +137,7 @@ const schema = a
                     .to(['create', 'read', 'update', 'delete']),
                 // Allow owner to perform create, read, and update operations
                 allow
-                    .ownerDefinedIn('createdById')
+                    .ownerDefinedIn('createdBy')
                     .to(['create', 'read', 'update'])
             ])
     })
