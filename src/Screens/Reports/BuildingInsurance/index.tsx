@@ -140,7 +140,7 @@ const BuildingInsurance = () => {
             const params: any = {
                 ...expenseForm,
                 updatedAt: new Date().toISOString(),
-                updatedById: userProfile.userId
+                updatedBy: userProfile.userId
             };
             updateItem(editedForm);
 
@@ -154,7 +154,7 @@ const BuildingInsurance = () => {
                 createdAt: new Date().toISOString(),
                 formType: 'buildingInsurance#active',
                 state: 'active',
-                createdById: userProfile.userId
+                createdBy: userProfile.userId
             };
             initiateLoding();
             client.models.Form.create(params)
