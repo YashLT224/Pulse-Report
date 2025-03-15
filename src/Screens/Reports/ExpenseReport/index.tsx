@@ -163,17 +163,19 @@ const ExpenseReport = () => {
         setIsModalOpen(false);
     };
 
-    const updateField = (value: any, key: string,ismultiValue=false) => {
-        if(!ismultiValue){
+    const updateField = (value: any, key: string, ismultiValue = false) => {
+        if (!ismultiValue) {
             setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
+        } else {
+            const keys = key.split('#');
+            const values = value.split('#');
+            setSelectedItem((prev: any) => ({
+                ...prev,
+                [keys[0]]: values[0],
+                [keys[1]]: values[1]
+            }));
         }
-        else{
-            let keys= key.split('#')
-            let values= value.split('#')
-            setSelectedItem((prev: any) => ({ ...prev, [keys[0]]: values[0],[keys[1]]: values[1] }));
-        }
-    }
-      
+    };
 
     const isSubmitDisabled =
         !selectedItem.expenseReport_personId ||
@@ -234,22 +236,13 @@ const ExpenseReport = () => {
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
                             <Heading>Person Name</Heading>
+                            {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
                                 options={personsList}
                                 value={`${selectedItem.expenseReport_personName}#${selectedItem.expenseReport_personId}`}
                                 // name="Person Name"
                                 placeholder="Choose Person"
-                                onBlur={(_event: Event): void => {
-                                    throw new Error(
-                                        'Function not implemented.'
-                                    );
-                                }}
-                                onFocus={(_event: Event): void => {
-                                    throw new Error(
-                                        'Function not implemented.'
-                                    );
-                                }}
                                 onChange={selectedValue => {
                                     updateField(
                                         selectedValue,
