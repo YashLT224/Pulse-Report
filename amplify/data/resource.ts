@@ -46,7 +46,6 @@ const schema = a
                 designation: a.string().required(),
                 status: a.enum(['active', 'inactive']),
                 entityType: a.string().default('PERSON'), // Constant attribute, e.g., "PERSON"
-                expenseReports: a.hasMany('Form', 'expenseReport_personId')
             })
             .identifier(['personId'])
             .secondaryIndexes(index => [
@@ -121,11 +120,8 @@ const schema = a
                 expenseReport_balance: a.float(),
                 expenseReport_remarks: a.string(),
                 expenseReport_workAssign: a.string(),
-                expenseReport_personId: a.id(),
-                expenseReport_person: a.belongsTo(
-                    'People',
-                    'expenseReport_personId'
-                )
+                expenseReport_personId: a.string(),
+                expenseReport_personName: a.string(),
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [

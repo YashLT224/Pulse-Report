@@ -1,7 +1,8 @@
-import {  useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { Schema } from '../../amplify/data/resource';
 import { generateClient } from 'aws-amplify/data';
+
 export const client = generateClient<Schema>();
 
 const useAuth = () => {
@@ -9,7 +10,7 @@ const useAuth = () => {
     const userProfile = useSelector(
         (state: any) => state.authReducer.userProfile
     );
-  return {user,userProfile,client}
-}
+    return { user, userProfile, client };
+};
 
-export default useAuth
+export default useAuth;

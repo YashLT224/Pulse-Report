@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { ulid } from 'ulid';
-import { Loader, Input, SelectField } from '@aws-amplify/ui-react';
+import { Loader, Input } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
 import useAuth from '../../../Hooks/useAuth';
@@ -8,79 +9,91 @@ import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
+import SelectSearch from 'react-select-search';
 
 const LIMIT = 10; // Number of items to display per page
-const heading = 'Requirements';
-const idField='formId';
+const heading = 'Expense Report';
+const idField = 'formId';
+
+type Form = Schema['Form']['type'];
+
 const ExpenseReport = () => {
-  const { client } = useAuth();
+    const { userProfile, client } = useAuth();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>({});
-  const [isUpdateMode, setUpdateMode] = useState(false);
+    const personsList = useSelector(
+        (state: any) => state.globalReducer.persons
+    );
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<any>({});
+    const [isUpdateMode, setUpdateMode] = useState(false);
 
-    // Define columns for the People | Party list
     const itemsColumns = [
-      {
-          key: 'createdAt',
-          header: 'Created At'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-          key: 'personName',
-          header: 'Person Name'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-          key: 'workAssign',
-          header: 'Work Assign'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-          key: 'balanceBF',
-          header: 'Balance B/F'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-          key: 'payment',
-          header: 'Payment'
-          // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-      },
-      {
-        key: 'expense',
-        header: 'Expense'
-        // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-    },
-    {
-      key: 'balance',
-      header: 'Balance'
-      // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-  },
-  {
-    key: 'remarks',
-    header: 'Remarks'
-    // render: (item: Entity) => new Date(item.createdAt).toLocaleString()
-}
-  ];
+        {
+            key: 'createdAt',
+            header: 'Created At',
+            render: (item: Form) => new Date(item.createdAt).toLocaleString()
+        },
+        {
+            key: 'expenseReport_personId',
+            header: 'Person Name'
+        },
+        {
+            key: 'expenseReport_workAssign',
+            header: 'Work Assign'
+        },
+        {
+            key: 'expenseReport_balanceBF',
+            header: 'Balance B/F'
+        },
+        {
+            key: 'expenseReport_payment',
+            header: 'Payment'
+        },
+        {
+            key: 'expenseReport_expense',
+            header: 'Expense'
+        },
+        {
+            key: 'expenseReport_balance',
+            header: 'Balance'
+        },
+        {
+            key: 'expenseReport_remarks',
+            header: 'Remarks'
+        }
+    ];
 
-  // fetch function for usePagination
-    const fetchEntity = useCallback(
+    // fetch function for usePagination
+    const fetchForm = useCallback(
         async (limit: number, token?: string) => {
-            // const params: any = {
-            //     entityType,
-            //     nextToken: token,
-            //     limit,
-            //     sortDirection: 'ASC'
-            // };
-            // const response = await model[listfuncName](params);
+            const params: any = {
+                formType: 'expenseReport#active',
+                nextToken: token,
+                limit,
+                sortDirection: 'DESC'
+            };
+            const response = await client.models.Form.listFormByType(params);
+
+            const personNames = await Promise.all(
+                response.data.map(async form => {
+                    form.expenseReport_person();
+                    const person = await form.expenseReport_person();
+                    return person.data.personName || 'Unknown';
+                })
+            );
 
             return {
-                data:[],
-                nextToken:  null
+                data: response.data.map((form, index) => {
+                    return {
+                        ...form,
+                        expenseReport_personId: personNames[index]
+                    };
+                }),
+                nextToken: response.nextToken || null
             };
         },
-        []
+        [client.models.Form]
     );
 
     // Use the usePagination hook
@@ -94,25 +107,89 @@ const ExpenseReport = () => {
         initiateLoding,
         updateItem,
         refreshList
-    } = usePagination<Entity>({
+    } = usePagination<Form>({
         limit: LIMIT,
-        fetchFn: fetchEntity,
+        fetchFn: fetchForm as any,
         idField
     });
 
     const addNewItemHandler = () => {
         setUpdateMode(false);
         setIsModalOpen(true);
+        setSelectedItem({
+            expenseReport_personId: '',
+            expenseReport_workAssign: '',
+            expenseReport_balanceBF: 0,
+            expenseReport_payment: 0,
+            expenseReport_balance: 0,
+            expenseReport_expense: 0,
+            expenseReport_remarks: ''
+        });
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
 
-    const handleEdit = () => {};
+    const handleEdit = (item: any) => {
+        setSelectedItem(item);
+        setUpdateMode(true);
+        setIsModalOpen(true);
+    };
 
+    const onEdit = async (editedForm: Form) => {
+        const { createdAt, updatedAt, ...expenseForm } = editedForm;
 
- 
+        if (isUpdateMode) {
+            const params: any = {
+                ...expenseForm,
+                updatedAt: new Date().toISOString(),
+                updatedById: userProfile.userId
+            };
+            updateItem(editedForm);
+
+            client.models.Form.update(params).catch(error => {
+                console.error(`Failed to update ${heading}:`, error);
+            });
+        } else {
+            const params: any = {
+                ...expenseForm,
+                [idField]: ulid(),
+                createdAt: new Date().toISOString(),
+                formType: 'expenseReport#active',
+                state: 'active',
+                createdById: userProfile.userId
+            };
+            initiateLoding();
+            client.models.Form.create(params)
+                .then(() => {
+                    refreshList();
+                })
+                .catch(error => {
+                    console.error(`Failed to create ${heading}:`, error);
+                });
+        }
+    };
+
+    const handleSave = () => {
+        if (!selectedItem) return;
+        onEdit(selectedItem as Form);
+        setIsModalOpen(false);
+    };
+
+    const updateField = (value: any, key: string) => {
+        setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
+    };
+
+    const isSubmitDisabled =
+        !selectedItem.expenseReport_personId ||
+        !selectedItem.expenseReport_workAssign ||
+        selectedItem.expenseReport_balanceBF === '' ||
+        selectedItem.expenseReport_payment === '' ||
+        selectedItem.expenseReport_expense === '' ||
+        selectedItem.expenseReport_balance === '' ||
+        !selectedItem.expenseReport_remarks;
+
     return (
         <>
             <div style={{ position: 'relative' }}>
@@ -140,7 +217,7 @@ const ExpenseReport = () => {
                         />
                     </div>
                 )}
-                <UserListItems<Entity>
+                <UserListItems<Form>
                     heading={heading}
                     items={items}
                     columns={itemsColumns}
@@ -149,8 +226,174 @@ const ExpenseReport = () => {
                     handleEdit={handleEdit}
                 />
             </div>
-        </>
-  )
-}
 
-export default ExpenseReport
+            {/* Pagination Controls */}
+            <PaginationControls
+                onPrevious={goToPrevious}
+                onNext={goToNext}
+                hasPrevious={hasPrevious}
+                hasNext={hasNext}
+            />
+
+            {isModalOpen && (
+                <Modal heading={heading} isUpdateMode={isUpdateMode}>
+                    <form onSubmit={handleSave}>
+                        <div className="mb-8px selectSearch">
+                            <Heading>Person Name</Heading>
+                            <SelectSearch
+                                search={true}
+                                options={personsList}
+                                value={selectedItem.expenseReport_personId}
+                                // name="Person Name"
+                                placeholder="Choose Person"
+                                onBlur={(_event: Event): void => {
+                                    throw new Error(
+                                        'Function not implemented.'
+                                    );
+                                }}
+                                onFocus={(_event: Event): void => {
+                                    throw new Error(
+                                        'Function not implemented.'
+                                    );
+                                }}
+                                onChange={selectedValue => {
+                                    updateField(
+                                        selectedValue,
+                                        'expenseReport_personId'
+                                    );
+                                }}
+                            />
+                        </div>
+                        <div className="mb-8px">
+                            <Heading>Work Assign</Heading>
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                isRequired={true}
+                                placeholder="WorkAssign"
+                                value={selectedItem.expenseReport_workAssign}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expenseReport_workAssign'
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="mb-8px">
+                            <Heading>Balance B/F</Heading>
+                            <Input
+                                type="number"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Balance b/f"
+                                isRequired={true}
+                                value={selectedItem.expenseReport_balanceBF}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expenseReport_balanceBF'
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="mb-8px">
+                            <Heading>Payment</Heading>
+                            <Input
+                                type="number"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Payment"
+                                isRequired={true}
+                                value={selectedItem.expenseReport_payment}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expenseReport_payment'
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="mb-8px">
+                            <Heading>Expense</Heading>
+                            <Input
+                                type="number"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Expense"
+                                isRequired={true}
+                                value={selectedItem.expenseReport_expense}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expenseReport_expense'
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="mb-8px">
+                            <Heading>Balance</Heading>
+                            <Input
+                                type="number"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Balance"
+                                isRequired={true}
+                                value={selectedItem.expenseReport_balance}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expenseReport_balance'
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="mb-8px">
+                            <Heading>Remarks</Heading>
+
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                placeholder={'Remarks'}
+                                value={selectedItem.expenseReport_remarks}
+                                isRequired={true}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expenseReport_remarks'
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                marginTop: '15px'
+                            }}
+                        >
+                            <ModalButton
+                                type="submit"
+                                disabled={isSubmitDisabled}
+                            >
+                                {isUpdateMode ? 'Update' : 'Save'}
+                            </ModalButton>
+                            <ModalButton onClick={handleCloseModal}>
+                                Cancel
+                            </ModalButton>
+                        </div>
+                    </form>
+                </Modal>
+            )}
+        </>
+    );
+};
+
+export default ExpenseReport;

@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthenticator } from '@aws-amplify/ui-react';
-import { generateClient } from 'aws-amplify/data';
 import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../Redux/store';
+import useAuth from '../Hooks/useAuth';
 import Home from '../Screens/Home';
 import UserList from '../Screens/UserListScreen';
 import PendingApprovals from '../Screens/PendingApprovals';
@@ -10,7 +10,7 @@ import AddEntity from '../Screens/AddEntity';
 import Alerts from '../Screens/Alerts';
 import ProtectedRoute from './protectedRoute';
 import { setUserProfile, stopLoader } from '../Redux/slices/userSlice';
-import { Schema } from '../../amplify/data/resource';
+import { fetchPeople, fetchParties } from '../Redux/slices/globalDataSlice';
 import ExpenseReport from '../Screens/Reports/ExpenseReport/index';
 import VechileReport from '../Screens/Reports/VechileReport/index';
 import VechileInsurance from '../Screens/Reports/VechileInsurance/index';
@@ -21,12 +21,11 @@ import Todolist from '../Screens/Reports/todolistReport/index';
 import Requirements from '../Screens/Reports/Requirements/index';
 import Dispatch from '../Screens/Reports/Dispatch/index';
 import Performance from '../Screens/Reports/Performance/index';
-
-const client = generateClient<Schema>();
+import 'react-select-search/style.css';
 
 const AppRoutes = () => {
-    const dispatch = useDispatch();
-    const { user } = useAuthenticator();
+    const dispatch = useDispatch<AppDispatch>();
+    const { user, client } = useAuth();
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -44,7 +43,15 @@ const AppRoutes = () => {
         };
 
         fetchUserProfile();
-    }, [user.userId, dispatch]);
+        dispatch(fetchPeople());
+        dispatch(fetchParties());
+    }, [
+        user.userId,
+        dispatch,
+        client.models.UserProfile,
+        client.models.People,
+        client.models.Party
+    ]);
 
     return (
         <Routes>
