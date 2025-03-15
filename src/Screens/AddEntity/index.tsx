@@ -166,6 +166,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     const isSubmitDisabled =
         showPhoneError ||
         !selectedItem[nameField] ||
+        !selectedItem.phoneNumber ||
         (type === 'PEOPLE' && !selectedItem.designation);
 
     return (
