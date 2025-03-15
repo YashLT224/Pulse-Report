@@ -103,6 +103,15 @@ const ExpenseReport = () => {
     const addNewItemHandler = () => {
         setUpdateMode(false);
         setIsModalOpen(true);
+        setSelectedItem({
+            personName:'',
+            workAssign:'',
+            balanceBF:0,
+            payment:0,
+            balance:0,
+            expense:0,
+            remarks:''
+        });
     };
 
     const handleCloseModal = () => {
@@ -110,9 +119,15 @@ const ExpenseReport = () => {
     };
 
     const handleEdit = () => {};
+    const handleSave = () => {
+        if (!selectedItem) return;
+        // onEdit(selectedItem as Entity);
+        setIsModalOpen(false);
+    };
 
-
- 
+    const updateField = (value: any, key: string) => {
+        // setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
+    };
     return (
         <>
             <div style={{ position: 'relative' }}>
@@ -149,6 +164,168 @@ const ExpenseReport = () => {
                     handleEdit={handleEdit}
                 />
             </div>
+
+             {/* Pagination Controls */}
+             <PaginationControls
+                onPrevious={goToPrevious}
+                onNext={goToNext}
+                hasPrevious={hasPrevious}
+                hasNext={hasNext}
+            />
+
+
+{isModalOpen && (
+                <Modal heading={heading} isUpdateMode={isUpdateMode}>
+                    <form onSubmit={handleSave}>
+                        <div className="mb-8px">
+                            <Heading>Person Name</Heading>
+
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                placeholder={'person Name'}
+                                value={selectedItem.personName}
+                                isRequired={true}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        type === 'PEOPLE'
+                                            ? 'personName'
+                                            : 'partyName'
+                                    )
+                                }
+                            />
+                        </div>
+                        <div className="mb-8px">
+                            <Heading>Work Assign</Heading>
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                isRequired={true}
+                                placeholder="workAssign"
+                                value={selectedItem.workAssign}
+                                onChange={e =>
+                                    updateField(e.target.value, 'phoneNumber')
+                                }
+                            />
+                        </div>
+                      
+                            <div className="mb-8px">
+                                <Heading>Balance B/F</Heading>
+                                <Input
+                                    type="number"
+                                    variation="quiet"
+                                    size="small"
+                                    placeholder="balance b/f"
+                                    isRequired={true}
+                                    value={selectedItem.balanceBF}
+                                    onChange={e =>
+                                        updateField(
+                                            e.target.value,
+                                            'designation'
+                                        )
+                                    }
+                                />
+                            </div>
+
+                            <div className="mb-8px">
+                                <Heading>Payment</Heading>
+                                <Input
+                                    type="number"
+                                    variation="quiet"
+                                    size="small"
+                                    placeholder="payment"
+                                    isRequired={true}
+                                    value={selectedItem.payment}
+                                    onChange={e =>
+                                        updateField(
+                                            e.target.value,
+                                            'designation'
+                                        )
+                                    }
+                                />
+                            </div>
+
+                            <div className="mb-8px">
+                                <Heading>Expense</Heading>
+                                <Input
+                                    type="number"
+                                    variation="quiet"
+                                    size="small"
+                                    placeholder="expense"
+                                    isRequired={true}
+                                    value={selectedItem.expense}
+                                    onChange={e =>
+                                        updateField(
+                                            e.target.value,
+                                            'designation'
+                                        )
+                                    }
+                                />
+                            </div>
+
+                            <div className="mb-8px">
+                                <Heading>Balance</Heading>
+                                <Input
+                                    type="number"
+                                    variation="quiet"
+                                    size="small"
+                                    placeholder="balance"
+                                    isRequired={true}
+                                    value={selectedItem.balance}
+                                    onChange={e =>
+                                        updateField(
+                                            e.target.value,
+                                            'designation'
+                                        )
+                                    }
+                                />
+                            </div>
+
+                            <div className="mb-8px">
+                            <Heading>Remarks</Heading>
+
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                placeholder={'remarks'}
+                                value={selectedItem.remarks}
+                                isRequired={true}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        type === 'PEOPLE'
+                                            ? 'personName'
+                                            : 'partyName'
+                                    )
+                                }
+                            />
+                        </div>
+                        
+                       
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                marginTop: '15px'
+                            }}
+                        >
+                            <ModalButton
+                                type="submit"
+                                // disabled={
+                                //     `${selectedItem.phoneNumber}`.length !== 10
+                                // }
+                            >
+                                {isUpdateMode ? 'Update' : 'Save'}
+                            </ModalButton>
+                            <ModalButton onClick={handleCloseModal}>
+                                Cancel
+                            </ModalButton>
+                        </div>
+                    </form>
+                </Modal>
+            )}
         </>
   )
 }
