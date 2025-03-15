@@ -1,6 +1,9 @@
 import { useCallback, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { ulid } from 'ulid';
 import { Loader, Input, SelectField, Message } from '@aws-amplify/ui-react';
+import { AppDispatch } from '../../Redux/store';
+import { fetchPeople, fetchParties } from '../../Redux/slices/globalDataSlice';
 import { Schema } from '../../../amplify/data/resource';
 import UserListItems from '../../components/UserList';
 import useAuth from '../../Hooks/useAuth';
@@ -18,6 +21,7 @@ type Party = Schema['Party']['type'];
 type Entity = Person | Party;
 
 const AddEntity = ({ type = 'PEOPLE' } = {}) => {
+    const dispatch = useDispatch<AppDispatch>();
     const { client } = useAuth();
     const model =
         type === 'PEOPLE' ? client.models.People : client.models.Party;
@@ -32,6 +36,8 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
+    const fetchEntityAsyncThunk =
+        type === 'PEOPLE' ? fetchPeople : fetchParties;
 
     // fetch function for usePagination
     const fetchEntity = useCallback(
@@ -104,9 +110,14 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         if (isUpdateMode) {
             updateItem(modifiedEntity as Entity);
 
-            model.update(modifiedEntity as any).catch(error => {
-                console.error(`Failed to update ${type}:`, error);
-            });
+            model
+                .update(modifiedEntity as any)
+                .then(() => {
+                    dispatch(fetchEntityAsyncThunk() as any);
+                })
+                .catch(error => {
+                    console.error(`Failed to update ${type}:`, error);
+                });
         } else {
             const params: any = {
                 ...modifiedEntity,
@@ -115,11 +126,12 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
             initiateLoding();
             model
                 .create({ ...params, entityType })
-                .catch(error => {
-                    console.error(`Failed to update ${type}:`, error);
-                })
                 .then(() => {
                     refreshList();
+                    dispatch(fetchEntityAsyncThunk() as any);
+                })
+                .catch(error => {
+                    console.error(`Failed to update ${type}:`, error);
                 });
         }
     };
