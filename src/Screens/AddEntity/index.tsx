@@ -82,6 +82,12 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         ...(type === 'PEOPLE'
             ? [{ key: 'designation', header: 'Designation' }]
             : []),
+        ...(type === 'PARTY'
+            ? [
+                  { key: 'city', header: 'City' },
+                  { key: 'address', header: 'Address' }
+              ]
+            : []),
         {
             key: 'status',
             header: 'Status',
@@ -141,13 +147,15 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         setIsModalOpen(true);
         const peopleObj = {
             personName: '',
-            phoneNumber: '', // Enforce uniqueness using the PhoneIndex
+            phoneNumber: '',
             designation: '',
             status: 'active'
         };
         const partyObj = {
             partyName: '',
-            phoneNumber: '', // Enforce uniqueness using the PhoneIndex
+            phoneNumber: '',
+            city: '',
+            address: '',
             status: 'active'
         };
         setSelectedItem(type === 'PEOPLE' ? peopleObj : partyObj);
@@ -185,7 +193,8 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         showPhoneError ||
         !selectedItem[nameField] ||
         !selectedItem.phoneNumber ||
-        (type === 'PEOPLE' && !selectedItem.designation);
+        (type === 'PEOPLE' && !selectedItem.designation) ||
+        (type === 'PARTY' && (!selectedItem.city || !selectedItem.address));
 
     return (
         <>
@@ -296,6 +305,42 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                                     }
                                 />
                             </div>
+                        )}
+                        {type === 'PARTY' && (
+                            <>
+                                <div className="mb-8px">
+                                    <Heading>City</Heading>
+                                    <Input
+                                        type="text"
+                                        variation="quiet"
+                                        size="small"
+                                        placeholder="City"
+                                        isRequired={true}
+                                        value={selectedItem.city}
+                                        onChange={e =>
+                                            updateField(e.target.value, 'city')
+                                        }
+                                    />
+                                </div>
+                                ,
+                                <div className="mb-8px">
+                                    <Heading>Address</Heading>
+                                    <Input
+                                        type="text"
+                                        variation="quiet"
+                                        size="small"
+                                        placeholder="Address"
+                                        isRequired={true}
+                                        value={selectedItem.address}
+                                        onChange={e =>
+                                            updateField(
+                                                e.target.value,
+                                                'address'
+                                            )
+                                        }
+                                    />
+                                </div>
+                            </>
                         )}
                         <div className="mb-8px">
                             <Heading>Status</Heading>
