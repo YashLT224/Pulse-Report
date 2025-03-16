@@ -126,8 +126,8 @@ const VechileInsurance = () => {
                         ...prevFiles,
                         [fileName]: {
                             status: 'uploading',
-                            fileName,
-                            fileType
+                            type: fileType,
+                            name: fileName
                         }
                     };
                 });
@@ -417,8 +417,8 @@ const VechileInsurance = () => {
                                 maxFileCount={5}
                                 isResumable
                                 processFile={processFile}
-                                onFileRemove={({ key: fileKey }) => {
-                                    const fileName = fileKey.split('/').pop();
+                                onFileRemove={({ key }) => {
+                                    const fileName = key.split('/').pop();
                                     setFiles(prevFiles => {
                                         return {
                                             ...prevFiles,
@@ -426,10 +426,10 @@ const VechileInsurance = () => {
                                         };
                                     });
                                 }}
-                                onUploadError={(error, { key: fileKey }) => {
-                                    const fileName = fileKey.split('/').pop();
+                                onUploadError={(error, { key }) => {
+                                    const fileName = key.split('/').pop();
                                     console.error(
-                                        `Failed to upload file with key: ${fileKey}`,
+                                        `Failed to upload file with key: ${key}`,
                                         error
                                     );
                                     setFiles(prevFiles => {
@@ -437,20 +437,20 @@ const VechileInsurance = () => {
                                             ...prevFiles,
                                             [fileName]: {
                                                 ...prevFiles[fileName],
-                                                fileKey,
+                                                key,
                                                 status: 'error'
                                             }
                                         };
                                     });
                                 }}
-                                onUploadSuccess={({ key: fileKey }) => {
-                                    const fileName = fileKey.split('/').pop();
+                                onUploadSuccess={({ key }) => {
+                                    const fileName = key.split('/').pop();
                                     setFiles(prevFiles => {
                                         return {
                                             ...prevFiles,
                                             [fileName]: {
                                                 ...prevFiles[fileName],
-                                                fileKey,
+                                                key,
                                                 status: 'success'
                                             }
                                         };
