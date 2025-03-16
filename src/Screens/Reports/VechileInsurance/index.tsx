@@ -303,7 +303,7 @@ const VechileInsurance = () => {
                         <div className="mb-8px">
                             <Heading>Insurance Company</Heading>
                             <Input
-                                type="number"
+                                type="text"
                                 variation="quiet"
                                 size="small"
                                 placeholder="Insurance Company"
@@ -363,7 +363,7 @@ const VechileInsurance = () => {
                         <div className="mb-8px">
                             <Heading>Vehicle Type</Heading>
                             <Input
-                                type="number"
+                                type="text"
                                 variation="quiet"
                                 size="small"
                                 placeholder="Vehicle Type"
