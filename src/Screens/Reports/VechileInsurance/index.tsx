@@ -13,7 +13,7 @@ import { ModalButton, Heading } from '../../../style';
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Vechile Insurance';
 const idField = 'formId';
-const formType = 'vehicleInsurance';
+const FORM_TYPE = 'vehicleInsurance';
 
 type Form = Schema['Form']['type'];
 
@@ -74,7 +74,7 @@ const VechileInsurance = () => {
     const fetchForm = useCallback(
         async (limit: number, token?: string) => {
             const params: any = {
-                formType: `${formType}#active`,
+                formType: `${FORM_TYPE}#active`,
                 nextToken: token,
                 limit,
                 sortDirection: 'DESC'
@@ -124,7 +124,7 @@ const VechileInsurance = () => {
                 setFiles(prevFiles => {
                     return {
                         ...prevFiles,
-                        [fileName]: {
+                        [key]: {
                             status: 'uploading',
                             type: fileType,
                             name: fileName
@@ -200,7 +200,7 @@ const VechileInsurance = () => {
                 [idField]: ulid(),
                 hasExpiration: 'yes#active',
                 createdAt: new Date().toISOString(),
-                formType: `${formType}#active`,
+                formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,
                 vehicleInsurance_insuranceCopy
@@ -418,16 +418,16 @@ const VechileInsurance = () => {
                                 isResumable
                                 processFile={processFile}
                                 onFileRemove={({ key }) => {
-                                    const fileName = key.split('/').pop();
+                                    const fileNameHash = key.split('/').pop();
                                     setFiles(prevFiles => {
                                         return {
                                             ...prevFiles,
-                                            [fileName]: undefined
+                                            [fileNameHash]: undefined
                                         };
                                     });
                                 }}
                                 onUploadError={(error, { key }) => {
-                                    const fileName = key.split('/').pop();
+                                    const fileNameHash = key.split('/').pop();
                                     console.error(
                                         `Failed to upload file with key: ${key}`,
                                         error
@@ -435,8 +435,8 @@ const VechileInsurance = () => {
                                     setFiles(prevFiles => {
                                         return {
                                             ...prevFiles,
-                                            [fileName]: {
-                                                ...prevFiles[fileName],
+                                            [fileNameHash]: {
+                                                ...prevFiles[fileNameHash],
                                                 key,
                                                 status: 'error'
                                             }
@@ -444,12 +444,12 @@ const VechileInsurance = () => {
                                     });
                                 }}
                                 onUploadSuccess={({ key }) => {
-                                    const fileName = key.split('/').pop();
+                                    const fileNameHash = key.split('/').pop();
                                     setFiles(prevFiles => {
                                         return {
                                             ...prevFiles,
-                                            [fileName]: {
-                                                ...prevFiles[fileName],
+                                            [fileNameHash]: {
+                                                ...prevFiles[fileNameHash],
                                                 key,
                                                 status: 'success'
                                             }

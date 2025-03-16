@@ -14,7 +14,7 @@ import SelectSearch from 'react-select-search';
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Expense Report';
 const idField = 'formId';
-const formType = 'expenseReport';
+const FORM_TYPE = 'expenseReport';
 
 type Form = Schema['Form']['type'];
 
@@ -69,7 +69,7 @@ const ExpenseReport = () => {
     const fetchForm = useCallback(
         async (limit: number, token?: string) => {
             const params: any = {
-                formType: `${formType}#active`,
+                formType: `${FORM_TYPE}#active`,
                 nextToken: token,
                 limit,
                 sortDirection: 'DESC'
@@ -143,7 +143,7 @@ const ExpenseReport = () => {
                 ...restForm,
                 [idField]: ulid(),
                 createdAt: new Date().toISOString(),
-                formType: `${formType}#active`,
+                formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId
             };

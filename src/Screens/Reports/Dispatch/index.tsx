@@ -16,7 +16,7 @@ const LIMIT = 10; // Number of items to display per page
 const heading = 'Dispatch Instructions';
 const idField = 'formId';
 type Form = Schema['Form']['type'];
-const formType = 'dispatchInstructions';
+const FORM_TYPE = 'dispatchInstructions';
 
 const Dispatch = () => {
     const { userProfile, client } = useAuth();
@@ -85,7 +85,7 @@ const Dispatch = () => {
     const fetchForm = useCallback(
         async (limit: number, token?: string) => {
             const params: any = {
-                formType: `${formType}#active`,
+                formType: `${FORM_TYPE}#active`,
                 nextToken: token,
                 limit,
                 sortDirection: 'DESC'
@@ -161,7 +161,7 @@ const Dispatch = () => {
                 ...restForm,
                 [idField]: ulid(),
                 createdAt: new Date().toISOString(),
-                formType: `${formType}#active`,
+                formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId
             };
