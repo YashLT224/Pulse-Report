@@ -15,7 +15,7 @@ const LIMIT = 10; // Number of items to display per page
 const heading = 'Building Insurance';
 const idField = 'formId';
 type Form = Schema['Form']['type'];
-const formType = 'buildingInsurance';
+const FORM_TYPE = 'buildingInsurance';
 
 const formatDateForInput = (date: Date) => {
     const d = new Date(date);
@@ -74,7 +74,7 @@ const BuildingInsurance = () => {
     const fetchForm = useCallback(
         async (limit: number, token?: string) => {
             const params: any = {
-                formType: `${formType}#active`,
+                formType: `${FORM_TYPE}#active`,
                 nextToken: token,
                 limit,
                 sortDirection: 'DESC'
@@ -155,7 +155,7 @@ const BuildingInsurance = () => {
                 [idField]: ulid(),
                 hasExpiration: 'yes#active',
                 createdAt: new Date().toISOString(),
-                formType: `${formType}#active`,
+                formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId
             };

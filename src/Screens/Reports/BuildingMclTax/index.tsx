@@ -12,7 +12,7 @@ import { ModalButton, Heading } from '../../../style';
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Building MCL Tax';
 const idField = 'formId';
-const formType = 'buildingMclTax';
+const FORM_TYPE = 'buildingMclTax';
 
 type Form = Schema['Form']['type'];
 
@@ -65,7 +65,7 @@ const BuildingMCLTax = () => {
     const fetchForm = useCallback(
         async (limit: number, token?: string) => {
             const params: any = {
-                formType: `${formType}#active`,
+                formType: `${FORM_TYPE}#active`,
                 nextToken: token,
                 limit,
                 sortDirection: 'DESC'
@@ -152,7 +152,7 @@ const BuildingMCLTax = () => {
                 [idField]: ulid(),
                 hasExpiration: 'yes#active',
                 createdAt: new Date().toISOString(),
-                formType: `${formType}#active`,
+                formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId
             };
