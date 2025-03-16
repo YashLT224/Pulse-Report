@@ -12,6 +12,7 @@ import { ModalButton, Heading } from '../../../style';
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Building MCL Tax';
 const idField = 'formId';
+const formType = 'buildingMclTax';
 
 type Form = Schema['Form']['type'];
 
@@ -64,7 +65,7 @@ const BuildingMCLTax = () => {
     const fetchForm = useCallback(
         async (limit: number, token?: string) => {
             const params: any = {
-                formType: 'buildingMclTax#active',
+                formType: `${formType}#active`,
                 nextToken: token,
                 limit,
                 sortDirection: 'DESC'
@@ -132,11 +133,11 @@ const BuildingMCLTax = () => {
             formType,
             state,
             createdBy,
-            ...expenseForm
+            ...restForm
         } = editedForm;
         if (isUpdateMode) {
             const params: any = {
-                ...expenseForm,
+                ...restForm,
                 updatedAt: new Date().toISOString(),
                 updatedBy: userProfile.userId
             };
@@ -147,11 +148,11 @@ const BuildingMCLTax = () => {
             });
         } else {
             const params: any = {
-                ...expenseForm,
+                ...restForm,
                 [idField]: ulid(),
                 hasExpiration: 'yes#active',
                 createdAt: new Date().toISOString(),
-                formType: 'buildingMclTax#active',
+                formType: `${formType}#active`,
                 state: 'active',
                 createdBy: userProfile.userId
             };
@@ -172,8 +173,8 @@ const BuildingMCLTax = () => {
         setIsModalOpen(false);
     };
 
-    const updateField = (value: any, key: string, ismultiValue = false) => {
-        if (!ismultiValue) {
+    const updateField = (value: any, key: string, isMultiValue = false) => {
+        if (!isMultiValue) {
             setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
         } else {
             const keys = key.split('#');

@@ -9,6 +9,11 @@ specifies that any user authenticated via an API key can "create", "read",
 =========================================================================*/
 const schema = a
     .schema({
+        File: a.customType({
+            fileType: a.string(),
+            fileName: a.string(),
+            fileUrl: a.string()
+        }),
         UserProfile: a
             .model({
                 userId: a.id().required(),
@@ -145,7 +150,17 @@ const schema = a
                 dispatchInstructions_instructions: a.string(),
                 dispatchInstructions_responsiblePersonId: a.string(),
                 dispatchInstructions_responsiblePersonName: a.string(),
-                dispatchInstructions_remarks: a.string()
+                dispatchInstructions_remarks: a.string(),
+
+                // Vehicle Insurance
+                vehicleInsurance_vehicleNo: a.string(),
+                vehicleInsurance_insuranceDate: a.date(),
+                vehicleInsurance_insuranceCompany: a.string(),
+                vehicleInsurance_insureAmount: a.float(),
+                vehicleInsurance_insuranceAmount: a.float(),
+                vehicleInsurance_insuranceCopy: a.ref('File').array(),
+                vehicleInsurance_vehicleType: a.string(),
+                vehicleInsurance_remarks: a.string()
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [

@@ -1,11 +1,5 @@
-import React from 'react'
-
 const VechileReport = () => {
-  return (
-    <div>
-      VechileReport
-    </div>
-  )
-}
+    return <div>Vechile Report</div>;
+};
 
-export default VechileReport
+export default VechileReport;
