@@ -135,7 +135,16 @@ const schema = a
                 buildingInsurance_insuranceAmount: a.float(),
                 buildingInsurance_status: a.enum(['PENDING', 'PAID']),
                 buildingInsurance_markToId: a.string(),
-                buildingInsurance_markToName: a.string()
+                buildingInsurance_markToName: a.string(),
+
+
+                 // Dispatch Instruction
+                 dispatchInstructions_partyId: a.string(),
+                 dispatchInstructions_partyName: a.string(),
+                 dispatchInstructions_instructions: a.string(),
+                 dispatchInstructions_responsiblePersonId: a.string(),
+                 dispatchInstructions_responsiblePersonName: a.string(),
+                 dispatchInstructions_remarks: a.string(),
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [
