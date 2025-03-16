@@ -1,9 +1,472 @@
-const Todolist = () => {
-  return (
-    <div>
-      ExpenseReport
-    </div>
-  )
-}
+import { useCallback, useState } from 'react';
+import { ulid } from 'ulid';
+import { useSelector } from 'react-redux';
+import { Loader, Input, SelectField } from '@aws-amplify/ui-react';
+import { Schema } from '../../../../amplify/data/resource';
+import UserListItems from '../../../components/UserList';
+import useAuth from '../../../Hooks/useAuth';
+import { usePagination } from '../../../Hooks/usePagination';
+import PaginationControls from '../../../components/PaginationControls';
+import Modal from '../../../components/Modal';
+import { ModalButton, Heading } from '../../../style';
+import SelectSearch from 'react-select-search';
 
-export default Todolist
+const LIMIT = 10; // Number of items to display per page
+const heading = 'TodoList';
+const idField = 'formId';
+const FORM_TYPE = 'toDoList';
+
+type Form = Schema['Form']['type'];
+
+const BuildingMCLTax = () => {
+    const { userProfile, client } = useAuth();
+    const personsList = useSelector(
+      (state: any) => state.globalReducer.persons
+  );
+
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<any>({});
+    const [isUpdateMode, setUpdateMode] = useState(false);
+
+    // Define columns for the People | Party list
+    const itemsColumns = [
+      {
+        key: 'createdAt',
+        header: 'Created At',
+        render: (item: Form) => new Date(item.createdAt).toLocaleString()
+    },
+        {
+            key: 'toDoList_assignName',
+            header: 'Assign'
+        },
+        {
+            key: 'toDoList_jointAssignName',
+            header: 'Joint Assign'
+        },
+        {
+            key: 'toDoList_jointWork',
+            header: 'Joint work'
+        },
+        {
+            key: 'buildingMclTax_taxType',
+            header: 'Tax Type'
+        },
+        {
+            key: 'toDoList_work',
+            header: 'Work'
+        },
+         {
+            key: 'expirationDate',
+            header: 'Dead Line'
+        },
+
+        {
+            key: 'toDoList_reportToName',
+            header: 'Report To'
+        },
+        {
+            key: 'toDoList_workStatus',
+            header: 'Work Status'
+        },
+        {
+          key: 'toDoList_nexttDate',
+          header: 'Next Date'
+      },
+      {
+        key: 'toDoList_remarks',
+        header: 'Remarks'
+    },
+       
+    ];
+
+    // fetch function for usePagination
+    const fetchForm = useCallback(
+        async (limit: number, token?: string) => {
+            const params: any = {
+                formType: `${FORM_TYPE}#active`,
+                nextToken: token,
+                limit,
+                sortDirection: 'DESC'
+            };
+            const response = await client.models.Form.listFormByType(params);
+            return {
+                data: response.data,
+                nextToken: response.nextToken || null
+            };
+        },
+        [client.models.Form]
+    );
+
+    // Use the usePagination hook
+    const {
+        items,
+        isLoading,
+        hasNext,
+        hasPrevious,
+        goToNext,
+        goToPrevious,
+        initiateLoding,
+        updateItem,
+        refreshList
+    } = usePagination<Form>({
+        limit: LIMIT,
+        fetchFn: fetchForm as any,
+        idField
+    });
+
+    const formatDateForInput = date => {
+        const d = new Date(date);
+        return d.toISOString().split('T')[0];
+    };
+
+    const addNewItemHandler = () => {
+        setUpdateMode(false);
+        setIsModalOpen(true);
+        setSelectedItem({
+          toDoList_assignName: '',
+          toDoList_assignId:'',
+          toDoList_jointAssignName:'',
+          toDoList_jointAssignId:'',
+          toDoList_jointWork:'',
+          toDoList_work:'',
+          expirationDate: formatDateForInput(new Date()),
+          toDoList_reportToName:'',
+          toDoList_reportToId:'',
+          toDoList_workStatus:'pending',
+          toDoList_nexttDate: formatDateForInput(new Date()),
+          toDoList_remarks:'',
+        });
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleEdit = (item: any) => {
+        setSelectedItem(item);
+        setUpdateMode(true);
+        setIsModalOpen(true);
+    };
+
+    const onEdit = async (editedForm: Form) => {
+        const {
+            createdAt,
+            updatedAt,
+            hasExpiration,
+            formType,
+            state,
+            createdBy,
+            ...restForm
+        } = editedForm;
+        if (isUpdateMode) {
+            const params: any = {
+                ...restForm,
+                updatedAt: new Date().toISOString(),
+                updatedBy: userProfile.userId
+            };
+            updateItem(editedForm);
+
+            client.models.Form.update(params).catch(error => {
+                console.error(`Failed to update ${heading}:`, error);
+            });
+        } else {
+            const params: any = {
+                ...restForm,
+                [idField]: ulid(),
+                hasExpiration: 'yes#active',
+                createdAt: new Date().toISOString(),
+                formType: `${FORM_TYPE}#active`,
+                state: 'active',
+                createdBy: userProfile.userId
+            };
+            initiateLoding();
+            client.models.Form.create(params)
+                .then(() => {
+                    refreshList();
+                })
+                .catch(error => {
+                    console.error(`Failed to create ${heading}:`, error);
+                });
+        }
+    };
+
+    const handleSave = () => {
+        if (!selectedItem) return;
+        onEdit(selectedItem as Form);
+        setIsModalOpen(false);
+    };
+
+    const updateField = (value: any, key: string, isMultiValue = false) => {
+        if (!isMultiValue) {
+            setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
+        } else {
+            const keys = key.split('#');
+            const values = value.split('#');
+            setSelectedItem((prev: any) => ({
+                ...prev,
+                [keys[0]]: values[0],
+                [keys[1]]: values[1]
+            }));
+        }
+    };
+
+    const isSubmitDisabled =
+        !selectedItem.toDoList_assignName ||
+        !selectedItem.toDoList_assignId ||
+        !selectedItem.toDoList_jointAssignName ||
+        !selectedItem.toDoList_jointAssignId ||
+        !selectedItem.toDoList_jointWork ||
+        !selectedItem.toDoList_work ||
+        !selectedItem.toDoList_reportToName ||
+        !selectedItem.toDoList_reportToId ||
+        !selectedItem.toDoList_workStatus ||
+        !selectedItem.toDoList_nexttDate ||
+        !selectedItem.toDoList_remarks 
+
+    return (
+        <>
+            <div style={{ position: 'relative' }}>
+                {/* Loader overlay */}
+                {isLoading && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: 'rgba(255, 255, 255, 0.7)',
+                            zIndex: 10
+                        }}
+                    >
+                        <Loader
+                            height={'80px'}
+                            size="large"
+                            emptyColor="#007aff"
+                            filledColor="white"
+                        />
+                    </div>
+                )}
+                <UserListItems
+                    heading={heading}
+                    items={items}
+                    columns={itemsColumns}
+                    addNewEntryAccess={true}
+                    addNewItemHandler={addNewItemHandler}
+                    handleEdit={handleEdit}
+                />
+                {/* Pagination Controls */}
+                <PaginationControls
+                    onPrevious={goToPrevious}
+                    onNext={goToNext}
+                    hasPrevious={hasPrevious}
+                    hasNext={hasNext}
+                />
+            </div>
+
+            {isModalOpen && (
+                <Modal heading={heading} isUpdateMode={isUpdateMode}>
+                    <form onSubmit={handleSave}>
+                    <div className="mb-8px selectSearch">
+                            <Heading>Assign</Heading>
+                            {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
+                            <SelectSearch
+                                search={true}
+                                options={personsList}
+                                value={`${selectedItem.toDoList_assignName}#${selectedItem.toDoList_assignId}`}
+                                // name="Person Name"
+                                placeholder="Assign To"
+                                onChange={selectedValue => {
+                                    updateField(
+                                        selectedValue,
+                                        'toDoList_assignName#toDoList_assignId',
+                                        true
+                                    );
+                                }}
+                            />
+                        </div>
+
+                        <div className="mb-8px selectSearch">
+                            <Heading>Assign</Heading>
+                            {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
+                            <SelectSearch
+                                search={true}
+                                options={personsList}
+                                value={`${selectedItem.toDoList_jointAssignName}#${selectedItem.toDoList_jointAssignId}`}
+                                // name="Person Name"
+                                placeholder="Joint Assign To"
+                                onChange={selectedValue => {
+                                    updateField(
+                                        selectedValue,
+                                        'toDoList_jointAssignName#toDoList_jointAssignId',
+                                        true
+                                    );
+                                }}
+                            />
+                        </div>
+
+                        <div className="mb-8px">
+                            <Heading>Joint Work</Heading>
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                isRequired={true}
+                                placeholder="Joint Work"
+                                value={selectedItem.toDoList_jointWork}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'toDoList_jointWork'
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="mb-8px">
+                            <Heading>Work</Heading>
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                isRequired={true}
+                                placeholder="Work"
+                                value={selectedItem.toDoList_work}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'toDoList_work'
+                                    )
+                                }
+                            />
+                        </div>
+
+
+                        <div className="mb-8px">
+                            <Heading>Due Date</Heading>
+                            <Input
+                                type="date"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Due Date"
+                                isRequired={true}
+                                value={selectedItem.expirationDate}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expirationDate'
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="mb-8px selectSearch">
+                            <Heading>Report To</Heading>
+                            {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
+                            <SelectSearch
+                                search={true}
+                                options={personsList}
+                                value={`${selectedItem.toDoList_reportToName}#${selectedItem.toDoList_reportToId}`}
+                                // name="Person Name"
+                                placeholder="Report To"
+                                onChange={selectedValue => {
+                                    updateField(
+                                        selectedValue,
+                                        'toDoList_reportToName#toDoList_reportToId',
+                                        true
+                                    );
+                                }}
+                            />
+                        </div>
+
+                        <div className="mb-8px">
+                            <Heading>Work Status</Heading>
+                            <SelectField
+                                label=""
+                                value={selectedItem.toDoList_workStatus}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'toDoList_workStatus'
+                                    )
+                                }
+                            >
+                                <option value="pending">Pending</option>
+                                <option value="inProgress">InProgress</option>
+                                <option value="completed">Completed</option>
+                            </SelectField>
+                        </div>
+                        <div className="mb-8px">
+                            <Heading>Next Date</Heading>
+                            <Input
+                                type="date"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Next Date"
+                                isRequired={true}
+                                value={selectedItem.toDoList_nexttDate}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'toDoList_nexttDate'
+                                    )
+                                }
+                            />
+                        </div>
+
+
+                        <div className="mb-8px">
+                            <Heading>Remarks</Heading>
+                            <Input
+                                type="text"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Remarks"
+                                isRequired={true}
+                                value={
+                                    selectedItem.toDoList_remarks
+                                }
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'toDoList_remarks'
+                                    )
+                                }
+                            />
+                        </div>
+                       
+                        
+
+                         
+                        
+                        
+
+                        
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                marginTop: '15px'
+                            }}
+                        >
+                            <ModalButton
+                                type="submit"
+                                disabled={isSubmitDisabled}
+                            >
+                                {isUpdateMode ? 'Update' : 'Save'}
+                            </ModalButton>
+                            <ModalButton onClick={handleCloseModal}>
+                                Cancel
+                            </ModalButton>
+                        </div>
+                    </form>
+                </Modal>
+            )}
+        </>
+    );
+};
+
+export default BuildingMCLTax;

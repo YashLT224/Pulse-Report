@@ -160,7 +160,22 @@ const schema = a
                 vehicleInsurance_insuranceAmount: a.float(),
                 vehicleInsurance_insuranceCopy: a.ref('File').array(),
                 vehicleInsurance_vehicleType: a.string(),
-                vehicleInsurance_remarks: a.string()
+                vehicleInsurance_remarks: a.string(),
+
+                //todo-list 
+                toDoList_assignName:a.string(),
+                toDoList_assignId:a.string(),
+                 toDoList_jointAssignName:a.string(),
+                toDoList_jointAssignId:a.string(),
+                toDoList_jointWork:a.string(),
+                toDoList_work:a.string(),
+                toDoList_reportToName:a.string(),
+                toDoList_reportToId:a.string(),
+                toDoList_workStatus:a.string(),
+                toDoList_nexttDate:a.string(),
+                toDoList_remarks:a.string(),
+
+       
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [
