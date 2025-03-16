@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { ulid } from 'ulid';
-import { FileUploader } from '@aws-amplify/ui-react-storage';
+import { FileUploader, StorageImage } from '@aws-amplify/ui-react-storage';
 import { Loader, Input } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
@@ -29,6 +29,7 @@ const VechileInsurance = () => {
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
     const [files, setFiles] = useState({});
+    const [defaultFiles, setDefaultFiles] = useState([]);
 
     const itemsColumns = [
         {
@@ -59,6 +60,29 @@ const VechileInsurance = () => {
         {
             key: 'vehicleInsurance_insuranceAmount',
             header: 'Insurance Amount'
+        },
+        {
+            key: 'vehicleInsurance_insuranceCopy',
+            header: 'Insurance Copy',
+            render: (item: Form) => {
+                return (
+                    <div style={{ display: 'flex', gap: '5px' }}>
+                        {item.vehicleInsurance_insuranceCopy?.map(
+                            ({ key, name }) => (
+                                <StorageImage
+                                    alt={name}
+                                    path={key}
+                                    style={{
+                                        width: '50px',
+                                        height: '50px',
+                                        objectFit: 'cover'
+                                    }}
+                                />
+                            )
+                        )}
+                    </div>
+                );
+            }
         },
         {
             key: 'vehicleInsurance_vehicleType',
@@ -157,7 +181,13 @@ const VechileInsurance = () => {
 
     const handleEdit = (item: any) => {
         setSelectedItem(item);
-        setFiles({}); // TODO: Replace with stored files
+        setFiles({});
+        setDefaultFiles(
+            item.vehicleInsurance_insuranceCopy?.map(({ key: _, name }) => ({
+                key: name,
+                status: 'uploaded'
+            })) || []
+        );
         setUpdateMode(true);
         setIsModalOpen(true);
     };
@@ -175,7 +205,7 @@ const VechileInsurance = () => {
 
         const vehicleInsurance_insuranceCopy = Object.keys(files).reduce(
             (acc, key) => {
-                const { status, ...fileData } = files[key];
+                const { status, ...fileData } = files[key] || {};
                 if (status !== 'success') return acc;
                 return [...acc, fileData];
             },
@@ -243,8 +273,10 @@ const VechileInsurance = () => {
         selectedItem.vehicleInsurance_insuranceAmount === '' ||
         !selectedItem.vehicleInsurance_vehicleType ||
         !selectedItem.vehicleInsurance_remarks ||
-        Object.keys(files).length === 0 ||
-        !Object.values(files).every((file: any) => file?.status === 'success');
+        Object.keys(files).filter(Boolean).length === 0 ||
+        !Object.values(files)
+            .filter(Boolean)
+            .every((file: any) => file?.status === 'success');
 
     return (
         <>
@@ -411,6 +443,7 @@ const VechileInsurance = () => {
                         <div className="mb-8px">
                             <Heading>Insurance Copy</Heading>
                             <FileUploader
+                                defaultFiles={defaultFiles}
                                 path={({ identityId }) =>
                                     `forms/vehicleInsurance/${identityId}/`
                                 }
