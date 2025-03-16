@@ -18,6 +18,7 @@ const PaginationControls = ({
                 disabled={!hasPrevious}
                 style={{
                     padding: '8px 16px',
+                    minWidth: '90px',
                     margin: '0 8px',
                     backgroundColor: !hasPrevious ? '#ccc' : '#007bff',
                     color: '#fff',

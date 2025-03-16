@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { ulid } from 'ulid';
+import { FileUploader } from '@aws-amplify/ui-react-storage';
 import { Loader, Input } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
@@ -27,6 +28,7 @@ const VechileInsurance = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
+    const [files, setFiles] = useState({});
 
     const itemsColumns = [
         {
@@ -103,6 +105,36 @@ const VechileInsurance = () => {
         idField
     });
 
+    const processFile = async ({ file }) => {
+        const fileName = file.name;
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop();
+
+        return file
+            .arrayBuffer()
+            .then((filebuffer: Buffer) =>
+                window.crypto.subtle.digest('SHA-1', filebuffer)
+            )
+            .then((hashBuffer: Buffer) => {
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray
+                    .map(a => a.toString(16).padStart(2, '0'))
+                    .join('');
+                const key = `${hashHex}.${fileExtension}`;
+                setFiles(prevFiles => {
+                    return {
+                        ...prevFiles,
+                        [fileName]: {
+                            status: 'uploading',
+                            fileName,
+                            fileType
+                        }
+                    };
+                });
+                return { file, key };
+            });
+    };
+
     const addNewItemHandler = () => {
         setUpdateMode(false);
         setIsModalOpen(true);
@@ -116,6 +148,7 @@ const VechileInsurance = () => {
             vehicleInsurance_vehicleType: '',
             vehicleInsurance_remarks: ''
         });
+        setFiles({});
     };
 
     const handleCloseModal = () => {
@@ -124,6 +157,7 @@ const VechileInsurance = () => {
 
     const handleEdit = (item: any) => {
         setSelectedItem(item);
+        setFiles({}); // TODO: Replace with stored files
         setUpdateMode(true);
         setIsModalOpen(true);
     };
@@ -138,11 +172,22 @@ const VechileInsurance = () => {
             createdBy,
             ...restForm
         } = editedForm;
+
+        const vehicleInsurance_insuranceCopy = Object.keys(files).reduce(
+            (acc, key) => {
+                const { status, ...fileData } = files[key];
+                if (status !== 'success') return acc;
+                return [...acc, fileData];
+            },
+            []
+        );
+
         if (isUpdateMode) {
             const params: any = {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
-                updatedBy: userProfile.userId
+                updatedBy: userProfile.userId,
+                vehicleInsurance_insuranceCopy
             };
             updateItem(editedForm);
 
@@ -153,10 +198,12 @@ const VechileInsurance = () => {
             const params: any = {
                 ...restForm,
                 [idField]: ulid(),
+                hasExpiration: 'yes#active',
                 createdAt: new Date().toISOString(),
                 formType: `${formType}#active`,
                 state: 'active',
-                createdBy: userProfile.userId
+                createdBy: userProfile.userId,
+                vehicleInsurance_insuranceCopy
             };
             initiateLoding();
             client.models.Form.create(params)
@@ -195,7 +242,9 @@ const VechileInsurance = () => {
         selectedItem.vehicleInsurance_insureAmount === '' ||
         selectedItem.vehicleInsurance_insuranceAmount === '' ||
         !selectedItem.vehicleInsurance_vehicleType ||
-        !selectedItem.vehicleInsurance_remarks;
+        !selectedItem.vehicleInsurance_remarks ||
+        Object.keys(files).length === 0 ||
+        !Object.values(files).every((file: any) => file?.status === 'success');
 
     return (
         <>
@@ -357,6 +406,68 @@ const VechileInsurance = () => {
                                         'vehicleInsurance_insuranceAmount'
                                     )
                                 }
+                            />
+                        </div>
+                        <div className="mb-8px">
+                            <Heading>Insurance Copy</Heading>
+                            <FileUploader
+                                path={({ identityId }) =>
+                                    `forms/vehicleInsurance/${identityId}/`
+                                }
+                                maxFileCount={5}
+                                isResumable
+                                processFile={processFile}
+                                onFileRemove={({ key: fileKey }) => {
+                                    const fileName = fileKey.split('/').pop();
+                                    setFiles(prevFiles => {
+                                        return {
+                                            ...prevFiles,
+                                            [fileName]: undefined
+                                        };
+                                    });
+                                }}
+                                onUploadError={(error, { key: fileKey }) => {
+                                    const fileName = fileKey.split('/').pop();
+                                    console.error(
+                                        `Failed to upload file with key: ${fileKey}`,
+                                        error
+                                    );
+                                    setFiles(prevFiles => {
+                                        return {
+                                            ...prevFiles,
+                                            [fileName]: {
+                                                ...prevFiles[fileName],
+                                                fileKey,
+                                                status: 'error'
+                                            }
+                                        };
+                                    });
+                                }}
+                                onUploadSuccess={({ key: fileKey }) => {
+                                    const fileName = fileKey.split('/').pop();
+                                    setFiles(prevFiles => {
+                                        return {
+                                            ...prevFiles,
+                                            [fileName]: {
+                                                ...prevFiles[fileName],
+                                                fileKey,
+                                                status: 'success'
+                                            }
+                                        };
+                                    });
+                                }}
+                                // onUploadStart={({ key }) => {
+                                //     const fileKey = key.split('/').pop();
+                                //     setFiles(prevFiles => {
+                                //         return {
+                                //             ...prevFiles,
+                                //             [key]: {
+                                //                 ...prevFiles[fileKey],
+                                //                 status: 'uploading'
+                                //             }
+                                //         };
+                                //     });
+                                // }}
                             />
                         </div>
 

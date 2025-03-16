@@ -12,7 +12,7 @@ const schema = a
         File: a.customType({
             fileType: a.string(),
             fileName: a.string(),
-            fileUrl: a.string()
+            fileKey: a.string()
         }),
         UserProfile: a
             .model({
