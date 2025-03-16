@@ -322,7 +322,6 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                                         }
                                     />
                                 </div>
-                                ,
                                 <div className="mb-8px">
                                     <Heading>Address</Heading>
                                     <Input

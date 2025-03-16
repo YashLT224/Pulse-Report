@@ -1,11 +1,17 @@
 import { ModalOverlay, ModalContent, ModalHeader } from './style';
 
-const Modal = ({ children, isUpdateMode = true, heading }) => {
+const Modal = ({
+    children,
+    isViewMode = false,
+    isUpdateMode = true,
+    heading
+}) => {
     return (
         <ModalOverlay>
             <ModalContent>
                 <ModalHeader>
-                    {isUpdateMode ? 'Edit' : 'Add'} {heading}
+                    {isViewMode ? 'View' : isUpdateMode ? 'Edit' : 'Add'}{' '}
+                    {heading}
                 </ModalHeader>
 
                 {children}
