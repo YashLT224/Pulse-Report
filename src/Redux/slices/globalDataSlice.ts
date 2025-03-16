@@ -29,7 +29,7 @@ const fetchAllAgencies = async () => {
         return data.map(party => ({
             ...party,
             name: party.partyName,
-            value: party.partyId
+            value: `${party.partyName}#${party.partyId}`
         }));
     } catch (error) {
         console.error('Error fetching parties:', error);
