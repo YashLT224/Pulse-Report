@@ -9,6 +9,7 @@ import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import SelectSearch from 'react-select-search';
+import eyeIcon from '../../../assets/eye.svg';
 import { ModalButton, Heading } from '../../../style';
 
 const LIMIT = 10; // Number of items to display per page
@@ -16,7 +17,7 @@ const heading = 'Dispatch Instructions';
 const idField = 'formId';
 type Form = Schema['Form']['type'];
 
-const BuildingInsurance = () => {
+const Dispatch = () => {
     const { userProfile, client } = useAuth();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,21 +46,27 @@ const BuildingInsurance = () => {
         {
             key: 'dispatchInstructions_instructions',
             header: 'Instructions',
-            render: item => (
-                <div className="flexbox-between pointer">
+            render: (item: Form) => (
+                <div className="flexbox-between">
                     <div>
-                        {item.dispatchInstructions_instructions.slice(0, 40)}...
+                        {item.dispatchInstructions_instructions.slice(0, 40)}
+                        {item.dispatchInstructions_instructions.length > 40
+                            ? '...'
+                            : ''}
                     </div>
-                    <div
+                    <img
+                        className="pointer"
+                        src={eyeIcon}
+                        alt="View"
+                        width="30"
+                        height="30"
                         onClick={() =>
                             setViewDescription({
                                 value: item.dispatchInstructions_instructions,
                                 isOpen: true
                             })
                         }
-                    >
-                        👁️
-                    </div>
+                    />
                 </div>
             )
         },
@@ -107,11 +114,6 @@ const BuildingInsurance = () => {
         fetchFn: fetchForm as any,
         idField
     });
-
-    const formatDateForInput = date => {
-        const d = new Date(date);
-        return d.toISOString().split('T')[0];
-    };
 
     const addNewItemHandler = () => {
         setUpdateMode(false);
@@ -242,12 +244,10 @@ const BuildingInsurance = () => {
                 />
             </div>
             {viewDescription.isOpen && (
-                <Modal heading={'Instructions'} isUpdateMode={isUpdateMode}>
+                <Modal heading={'Instructions'} isViewMode={true}>
                     <div className="mb-8px">
-                      
                         <TextAreaField
-                            descriptiveText="Enter Instructions"
-                            placeholder="Enter Instructions"
+                            label=""
                             value={viewDescription.value}
                             rows={10}
                         />
@@ -279,6 +279,7 @@ const BuildingInsurance = () => {
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
                             <Heading>Party Name</Heading>
+                            {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
                                 options={partyList}
@@ -297,7 +298,7 @@ const BuildingInsurance = () => {
                         <div className="mb-8px">
                             <Heading>Instructions</Heading>
                             <TextAreaField
-                                descriptiveText="Enter Instructions"
+                                label=""
                                 placeholder="Enter Instructions"
                                 value={
                                     selectedItem.dispatchInstructions_instructions
@@ -313,6 +314,7 @@ const BuildingInsurance = () => {
                         </div>
                         <div className="mb-8px selectSearch">
                             <Heading>Responsible person</Heading>
+                            {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
                                 options={personsList}
@@ -372,4 +374,4 @@ const BuildingInsurance = () => {
     );
 };
 
-export default BuildingInsurance;
+export default Dispatch;
