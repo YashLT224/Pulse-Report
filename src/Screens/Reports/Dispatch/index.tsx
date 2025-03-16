@@ -22,6 +22,10 @@ const BuildingInsurance = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
+    const [viewDescription, setViewDescription] = useState({
+        isOpen: false,
+        value: ''
+    });
 
     const partyList = useSelector((state: any) => state.globalReducer.parties);
     const personsList = useSelector(
@@ -40,7 +44,24 @@ const BuildingInsurance = () => {
         },
         {
             key: 'dispatchInstructions_instructions',
-            header: 'Instructions'
+            header: 'Instructions',
+            render: item => (
+                <div className="flexbox-between pointer">
+                    <div>
+                        {item.dispatchInstructions_instructions.slice(0, 40)}...
+                    </div>
+                    <div
+                        onClick={() =>
+                            setViewDescription({
+                                value: item.dispatchInstructions_instructions,
+                                isOpen: true
+                            })
+                        }
+                    >
+                        👁️
+                    </div>
+                </div>
+            )
         },
         {
             key: 'dispatchInstructions_responsiblePersonName',
@@ -220,6 +241,38 @@ const BuildingInsurance = () => {
                     hasNext={hasNext}
                 />
             </div>
+            {viewDescription.isOpen && (
+                <Modal heading={'Instructions'} isUpdateMode={isUpdateMode}>
+                    <div className="mb-8px">
+                      
+                        <TextAreaField
+                            descriptiveText="Enter Instructions"
+                            placeholder="Enter Instructions"
+                            value={viewDescription.value}
+                            rows={10}
+                        />
+                    </div>
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '10px',
+                            marginTop: '15px'
+                        }}
+                    >
+                        <ModalButton
+                            onClick={() =>
+                                setViewDescription({
+                                    value: '',
+                                    isOpen: false
+                                })
+                            }
+                        >
+                            Close
+                        </ModalButton>
+                    </div>
+                </Modal>
+            )}
 
             {isModalOpen && (
                 <Modal heading={heading} isUpdateMode={isUpdateMode}>
@@ -231,7 +284,7 @@ const BuildingInsurance = () => {
                                 options={partyList}
                                 value={`${selectedItem.dispatchInstructions_partyName}#${selectedItem.dispatchInstructions_partyId}`}
                                 // name="Person Name"
-                                placeholder="Mark To"
+                                placeholder="Party Name"
                                 onChange={selectedValue => {
                                     updateField(
                                         selectedValue,
@@ -247,14 +300,14 @@ const BuildingInsurance = () => {
                                 descriptiveText="Enter Instructions"
                                 placeholder="Enter Instructions"
                                 value={
-                                  selectedItem.dispatchInstructions_instructions
-                              }
-                              onChange={e =>
-                                  updateField(
-                                      e.target.value,
-                                      'dispatchInstructions_instructions'
-                                  )
-                              }
+                                    selectedItem.dispatchInstructions_instructions
+                                }
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'dispatchInstructions_instructions'
+                                    )
+                                }
                                 rows={10}
                             />
                         </div>
@@ -263,12 +316,12 @@ const BuildingInsurance = () => {
                             <SelectSearch
                                 search={true}
                                 options={personsList}
-                                value={`${selectedItem.dispatchInstructions_responsiblePersonId}#${selectedItem.dispatchInstructions_responsiblePersonName}`}
-                                placeholder="Mark To"
+                                value={`${selectedItem.dispatchInstructions_responsiblePersonName}#${selectedItem.dispatchInstructions_responsiblePersonId}`}
+                                placeholder="Responsible Person"
                                 onChange={selectedValue => {
                                     updateField(
                                         selectedValue,
-                                        'dispatchInstructions_responsiblePersonId#dispatchInstructions_responsiblePersonName',
+                                        'dispatchInstructions_responsiblePersonName#dispatchInstructions_responsiblePersonId',
                                         true
                                     );
                                 }}

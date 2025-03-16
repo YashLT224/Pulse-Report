@@ -72,6 +72,8 @@ const schema = a
                 partyId: a.id().required(),
                 partyName: a.string().required(),
                 phoneNumber: a.phone().required(), // Enforce uniqueness using the PhoneIndex
+                city: a.string().required(),
+                address: a.string().required(),
                 status: a.enum(['active', 'inactive']),
                 entityType: a.string().default('PARTY') // Constant attribute, e.g., "PARTY"
             })
@@ -137,14 +139,13 @@ const schema = a
                 buildingInsurance_markToId: a.string(),
                 buildingInsurance_markToName: a.string(),
 
-
-                 // Dispatch Instruction
-                 dispatchInstructions_partyId: a.string(),
-                 dispatchInstructions_partyName: a.string(),
-                 dispatchInstructions_instructions: a.string(),
-                 dispatchInstructions_responsiblePersonId: a.string(),
-                 dispatchInstructions_responsiblePersonName: a.string(),
-                 dispatchInstructions_remarks: a.string(),
+                // Dispatch Instructions
+                dispatchInstructions_partyId: a.string(),
+                dispatchInstructions_partyName: a.string(),
+                dispatchInstructions_instructions: a.string(),
+                dispatchInstructions_responsiblePersonId: a.string(),
+                dispatchInstructions_responsiblePersonName: a.string(),
+                dispatchInstructions_remarks: a.string()
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [
