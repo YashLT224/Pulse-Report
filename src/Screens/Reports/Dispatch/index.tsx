@@ -9,6 +9,7 @@ import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import SelectSearch from 'react-select-search';
+import eyeIcon from '../../../assets/eye.svg';
 import { ModalButton, Heading } from '../../../style';
 
 const LIMIT = 10; // Number of items to display per page
@@ -53,17 +54,19 @@ const Dispatch = () => {
                             ? '...'
                             : ''}
                     </div>
-                    <div
+                    <img
                         className="pointer"
+                        src={eyeIcon}
+                        alt="View"
+                        width="30"
+                        height="30"
                         onClick={() =>
                             setViewDescription({
                                 value: item.dispatchInstructions_instructions,
                                 isOpen: true
                             })
                         }
-                    >
-                        👁️
-                    </div>
+                    />
                 </div>
             )
         },
