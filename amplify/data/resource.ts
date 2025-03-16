@@ -10,9 +10,9 @@ specifies that any user authenticated via an API key can "create", "read",
 const schema = a
     .schema({
         File: a.customType({
-            fileType: a.string(),
-            fileName: a.string(),
-            fileKey: a.string()
+            key: a.string(),
+            type: a.string(),
+            name: a.string()
         }),
         UserProfile: a
             .model({
