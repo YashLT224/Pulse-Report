@@ -18,7 +18,7 @@ const FORM_TYPE = 'toDoList';
 
 type Form = Schema['Form']['type'];
 
-const BuildingMCLTax = () => {
+const ToDoList = () => {
     const { userProfile, client } = useAuth();
     const personsList = useSelector(
         (state: any) => state.globalReducer.persons
@@ -449,4 +449,4 @@ const BuildingMCLTax = () => {
     );
 };
 
-export default BuildingMCLTax;
+export default ToDoList;
