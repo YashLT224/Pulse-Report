@@ -49,12 +49,12 @@ const Dispatch = () => {
             header: 'Instructions',
             render: (item: Form) => (
                 <div className="flexbox-between">
-                    <div>
+                    <p>
                         {item.dispatchInstructions_instructions.slice(0, 40)}
                         {item.dispatchInstructions_instructions.length > 40
                             ? '...'
                             : ''}
-                    </div>
+                    </p>
                     <img
                         className="pointer"
                         src={eyeIcon}

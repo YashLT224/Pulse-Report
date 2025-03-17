@@ -9,6 +9,7 @@ import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
+import eyeIcon from '../../../assets/eye.svg';
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Vechile Insurance';
@@ -30,6 +31,11 @@ const VechileInsurance = () => {
     const [isUpdateMode, setUpdateMode] = useState(false);
     const [files, setFiles] = useState({});
     const [defaultFiles, setDefaultFiles] = useState([]);
+    const [viewImage, setViewImage] = useState({
+        isOpen: false,
+        key: '',
+        name: ''
+    });
 
     const itemsColumns = [
         {
@@ -66,20 +72,29 @@ const VechileInsurance = () => {
             header: 'Insurance Copy',
             render: (item: Form) => {
                 return (
-                    <div style={{ display: 'flex', gap: '5px' }}>
-                        {item.vehicleInsurance_insuranceCopy?.map(
-                            ({ key, name }) => (
-                                <StorageImage
-                                    alt={name}
-                                    path={key}
-                                    style={{
-                                        width: '50px',
-                                        height: '50px',
-                                        objectFit: 'cover'
+                    <div>
+                        {item.vehicleInsurance_insuranceCopy.map(insurance => (
+                            <div
+                                key={insurance.key}
+                                className="flexbox-between"
+                            >
+                                <p>{insurance.name}</p>
+                                <img
+                                    className="pointer"
+                                    src={eyeIcon}
+                                    alt="View"
+                                    width="30"
+                                    height="30"
+                                    onClick={() => {
+                                        setViewImage({
+                                            isOpen: true,
+                                            key: insurance.key,
+                                            name: insurance.name
+                                        });
                                     }}
                                 />
-                            )
-                        )}
+                            </div>
+                        ))}
                     </div>
                 );
             }
@@ -266,6 +281,8 @@ const VechileInsurance = () => {
         }
     };
 
+    const filesData = Object.values(files).filter(Boolean);
+
     const isSubmitDisabled =
         !selectedItem.vehicleInsurance_vehicleNo ||
         !selectedItem.vehicleInsurance_insuranceCompany ||
@@ -273,10 +290,8 @@ const VechileInsurance = () => {
         selectedItem.vehicleInsurance_insuranceAmount === '' ||
         !selectedItem.vehicleInsurance_vehicleType ||
         !selectedItem.vehicleInsurance_remarks ||
-        Object.keys(files).filter(Boolean).length === 0 ||
-        !Object.values(files)
-            .filter(Boolean)
-            .every((file: any) => file?.status === 'success');
+        filesData.length === 0 ||
+        !filesData.every((file: any) => file?.status === 'success');
 
     return (
         <>
@@ -322,6 +337,41 @@ const VechileInsurance = () => {
                 hasPrevious={hasPrevious}
                 hasNext={hasNext}
             />
+
+            {viewImage.isOpen && (
+                <Modal heading={`Insurance Copy: ${viewImage.name}`} isViewMode={true}>
+                    <div className="mb-8px">
+                        <StorageImage
+                            loading="lazy"
+                            alt={viewImage.name}
+                            path={viewImage.key}
+                            style={{
+                                width: '100%'
+                            }}
+                        />
+                    </div>
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '10px',
+                            marginTop: '15px'
+                        }}
+                    >
+                        <ModalButton
+                            onClick={() =>
+                                setViewImage({
+                                    isOpen: false,
+                                    key: '',
+                                    name: ''
+                                })
+                            }
+                        >
+                            Close
+                        </ModalButton>
+                    </div>
+                </Modal>
+            )}
 
             {isModalOpen && (
                 <Modal heading={heading} isUpdateMode={isUpdateMode}>

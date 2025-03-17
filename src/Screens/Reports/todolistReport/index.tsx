@@ -18,6 +18,12 @@ const FORM_TYPE = 'toDoList';
 
 type Form = Schema['Form']['type'];
 
+const workStatusMap = {
+    pending: 'Pending',
+    inprogress: 'In Progress',
+    completed: 'Completed'
+};
+
 const ToDoList = () => {
     const { userProfile, client } = useAuth();
     const personsList = useSelector(
@@ -62,7 +68,10 @@ const ToDoList = () => {
         },
         {
             key: 'toDoList_workStatus',
-            header: 'Work Status'
+            header: 'Work Status',
+            render: (item: Form) =>
+                workStatusMap[item.toDoList_workStatus] ||
+                item.toDoList_workStatus
         },
         {
             key: 'toDoList_nextDate',
@@ -384,7 +393,7 @@ const ToDoList = () => {
                                 }
                             >
                                 <option value="pending">Pending</option>
-                                <option value="inprogress">InProgress</option>
+                                <option value="inprogress">In Progress</option>
                                 <option value="completed">Completed</option>
                             </SelectField>
                         </div>
