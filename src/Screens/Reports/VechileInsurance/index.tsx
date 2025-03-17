@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { ulid } from 'ulid';
-import { FileUploader, StorageImage } from '@aws-amplify/ui-react-storage';
+import { getUrl } from 'aws-amplify/storage';
+import { FileUploader } from '@aws-amplify/ui-react-storage';
 import { Loader, Input } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
@@ -9,6 +10,7 @@ import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
+import eyeIcon from '../../../assets/eye.svg';
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Vechile Insurance';
@@ -66,20 +68,50 @@ const VechileInsurance = () => {
             header: 'Insurance Copy',
             render: (item: Form) => {
                 return (
-                    <div style={{ display: 'flex', gap: '5px' }}>
-                        {item.vehicleInsurance_insuranceCopy?.map(
-                            ({ key, name }) => (
-                                <StorageImage
-                                    alt={name}
-                                    path={key}
-                                    style={{
-                                        width: '50px',
-                                        height: '50px',
-                                        objectFit: 'cover'
+                    <div>
+                        {item.vehicleInsurance_insuranceCopy.map(insurance => (
+                            <div
+                                key={insurance.key}
+                                className="flexbox-between"
+                            >
+                                <p>{insurance.name}</p>
+                                <img
+                                    className="pointer"
+                                    src={eyeIcon}
+                                    alt="View"
+                                    width="30"
+                                    height="30"
+                                    onClick={async () => {
+                                        try {
+                                            const linkToStorageFile = await getUrl(
+                                                {
+                                                    path: insurance.key
+                                                }
+                                            );
+                                            const url = linkToStorageFile.url.toString();
+                                            // Create an anchor element and trigger a download
+                                            const a = document.createElement(
+                                                'a'
+                                            );
+                                            a.href = url;
+                                            a.target = '_blank';
+                                            a.rel = 'noopener noreferrer';
+                                            a.download =
+                                                insurance.name ||
+                                                'downloaded-file'; // Ensure a valid filename
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            document.body.removeChild(a);
+                                        } catch (error) {
+                                            console.error(
+                                                'Error fetching URL:',
+                                                error
+                                            );
+                                        }
                                     }}
                                 />
-                            )
-                        )}
+                            </div>
+                        ))}
                     </div>
                 );
             }
@@ -183,8 +215,10 @@ const VechileInsurance = () => {
         setSelectedItem(item);
         setFiles({});
         setDefaultFiles(
-            item.vehicleInsurance_insuranceCopy?.map(({ key: _, name }) => ({
-                key: name,
+            item.vehicleInsurance_insuranceCopy?.map((data: any) => ({
+                ...data,
+                path: data.key,
+                key: data.name,
                 status: 'uploaded'
             })) || []
         );
@@ -203,14 +237,15 @@ const VechileInsurance = () => {
             ...restForm
         } = editedForm;
 
-        const vehicleInsurance_insuranceCopy = Object.keys(files).reduce(
-            (acc, key) => {
-                const { status, ...fileData } = files[key] || {};
-                if (status !== 'success') return acc;
-                return [...acc, fileData];
-            },
-            []
-        );
+        const vehicleInsurance_insuranceCopy = defaultFiles
+            .map(({ path: key, name, type }) => ({ key, name, type }))
+            .concat(
+                Object.keys(files).reduce((acc, key) => {
+                    const { status, ...fileData } = files[key] || {};
+                    if (status !== 'success') return acc;
+                    return [...acc, fileData];
+                }, [])
+            );
 
         if (isUpdateMode) {
             const params: any = {
@@ -219,7 +254,10 @@ const VechileInsurance = () => {
                 updatedBy: userProfile.userId,
                 vehicleInsurance_insuranceCopy
             };
-            updateItem(editedForm);
+            updateItem({
+                ...editedForm,
+                vehicleInsurance_insuranceCopy
+            } as any);
 
             client.models.Form.update(params).catch(error => {
                 console.error(`Failed to update ${heading}:`, error);
@@ -266,6 +304,8 @@ const VechileInsurance = () => {
         }
     };
 
+    const filesData = Object.values(files).filter(Boolean);
+
     const isSubmitDisabled =
         !selectedItem.vehicleInsurance_vehicleNo ||
         !selectedItem.vehicleInsurance_insuranceCompany ||
@@ -273,10 +313,11 @@ const VechileInsurance = () => {
         selectedItem.vehicleInsurance_insuranceAmount === '' ||
         !selectedItem.vehicleInsurance_vehicleType ||
         !selectedItem.vehicleInsurance_remarks ||
-        Object.keys(files).filter(Boolean).length === 0 ||
-        !Object.values(files)
-            .filter(Boolean)
-            .every((file: any) => file?.status === 'success');
+        (defaultFiles.length === 0 &&
+            (filesData.length === 0 ||
+                !filesData.every((file: any) => file?.status === 'success')));
+
+    console.dir({ files, defaultFiles });
 
     return (
         <>
@@ -457,6 +498,11 @@ const VechileInsurance = () => {
                                             ...prevFiles,
                                             [fileNameHash]: undefined
                                         };
+                                    });
+                                    setDefaultFiles(prevFiles => {
+                                        return prevFiles.filter(
+                                            file => file.key !== key
+                                        );
                                     });
                                 }}
                                 onUploadError={(error, { key }) => {
