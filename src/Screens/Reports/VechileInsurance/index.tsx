@@ -317,8 +317,6 @@ const VechileInsurance = () => {
             (filesData.length === 0 ||
                 !filesData.every((file: any) => file?.status === 'success')));
 
-    console.dir({ files, defaultFiles });
-
     return (
         <>
             <div style={{ position: 'relative' }}>
