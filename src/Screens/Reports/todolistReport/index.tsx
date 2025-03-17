@@ -12,7 +12,7 @@ import { ModalButton, Heading } from '../../../style';
 import SelectSearch from 'react-select-search';
 
 const LIMIT = 10; // Number of items to display per page
-const heading = 'TodoList';
+const heading = 'Todo List';
 const idField = 'formId';
 const FORM_TYPE = 'toDoList';
 
@@ -21,9 +21,8 @@ type Form = Schema['Form']['type'];
 const BuildingMCLTax = () => {
     const { userProfile, client } = useAuth();
     const personsList = useSelector(
-      (state: any) => state.globalReducer.persons
-  );
-
+        (state: any) => state.globalReducer.persons
+    );
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
@@ -31,11 +30,11 @@ const BuildingMCLTax = () => {
 
     // Define columns for the People | Party list
     const itemsColumns = [
-      {
-        key: 'createdAt',
-        header: 'Created At',
-        render: (item: Form) => new Date(item.createdAt).toLocaleString()
-    },
+        {
+            key: 'createdAt',
+            header: 'Created At',
+            render: (item: Form) => new Date(item.createdAt).toLocaleString()
+        },
         {
             key: 'toDoList_assignName',
             header: 'Assign'
@@ -49,14 +48,10 @@ const BuildingMCLTax = () => {
             header: 'Joint work'
         },
         {
-            key: 'buildingMclTax_taxType',
-            header: 'Tax Type'
-        },
-        {
             key: 'toDoList_work',
             header: 'Work'
         },
-         {
+        {
             key: 'expirationDate',
             header: 'Dead Line'
         },
@@ -70,14 +65,13 @@ const BuildingMCLTax = () => {
             header: 'Work Status'
         },
         {
-          key: 'toDoList_nexttDate',
-          header: 'Next Date'
-      },
-      {
-        key: 'toDoList_remarks',
-        header: 'Remarks'
-    },
-       
+            key: 'toDoList_nextDate',
+            header: 'Next Date'
+        },
+        {
+            key: 'toDoList_remarks',
+            header: 'Remarks'
+        }
     ];
 
     // fetch function for usePagination
@@ -124,18 +118,18 @@ const BuildingMCLTax = () => {
         setUpdateMode(false);
         setIsModalOpen(true);
         setSelectedItem({
-          toDoList_assignName: '',
-          toDoList_assignId:'',
-          toDoList_jointAssignName:'',
-          toDoList_jointAssignId:'',
-          toDoList_jointWork:'',
-          toDoList_work:'',
-          expirationDate: formatDateForInput(new Date()),
-          toDoList_reportToName:'',
-          toDoList_reportToId:'',
-          toDoList_workStatus:'pending',
-          toDoList_nexttDate: formatDateForInput(new Date()),
-          toDoList_remarks:'',
+            toDoList_assignName: '',
+            toDoList_assignId: '',
+            toDoList_jointAssignName: '',
+            toDoList_jointAssignId: '',
+            toDoList_jointWork: 'yes',
+            toDoList_work: '',
+            expirationDate: formatDateForInput(new Date()),
+            toDoList_reportToName: '',
+            toDoList_reportToId: '',
+            toDoList_workStatus: 'pending',
+            toDoList_nextDate: formatDateForInput(new Date()),
+            toDoList_remarks: ''
         });
     };
 
@@ -221,8 +215,8 @@ const BuildingMCLTax = () => {
         !selectedItem.toDoList_reportToName ||
         !selectedItem.toDoList_reportToId ||
         !selectedItem.toDoList_workStatus ||
-        !selectedItem.toDoList_nexttDate ||
-        !selectedItem.toDoList_remarks 
+        !selectedItem.toDoList_nextDate ||
+        !selectedItem.toDoList_remarks;
 
     return (
         <>
@@ -271,7 +265,7 @@ const BuildingMCLTax = () => {
             {isModalOpen && (
                 <Modal heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
-                    <div className="mb-8px selectSearch">
+                        <div className="mb-8px selectSearch">
                             <Heading>Assign</Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
@@ -291,7 +285,7 @@ const BuildingMCLTax = () => {
                         </div>
 
                         <div className="mb-8px selectSearch">
-                            <Heading>Assign</Heading>
+                            <Heading>Joint Assign</Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
@@ -311,11 +305,8 @@ const BuildingMCLTax = () => {
 
                         <div className="mb-8px">
                             <Heading>Joint Work</Heading>
-                            <Input
-                                variation="quiet"
-                                size="small"
-                                isRequired={true}
-                                placeholder="Joint Work"
+                            <SelectField
+                                label=""
                                 value={selectedItem.toDoList_jointWork}
                                 onChange={e =>
                                     updateField(
@@ -323,7 +314,10 @@ const BuildingMCLTax = () => {
                                         'toDoList_jointWork'
                                     )
                                 }
-                            />
+                            >
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </SelectField>
                         </div>
 
                         <div className="mb-8px">
@@ -335,14 +329,10 @@ const BuildingMCLTax = () => {
                                 placeholder="Work"
                                 value={selectedItem.toDoList_work}
                                 onChange={e =>
-                                    updateField(
-                                        e.target.value,
-                                        'toDoList_work'
-                                    )
+                                    updateField(e.target.value, 'toDoList_work')
                                 }
                             />
                         </div>
-
 
                         <div className="mb-8px">
                             <Heading>Due Date</Heading>
@@ -394,7 +384,7 @@ const BuildingMCLTax = () => {
                                 }
                             >
                                 <option value="pending">Pending</option>
-                                <option value="inProgress">InProgress</option>
+                                <option value="inprogress">InProgress</option>
                                 <option value="completed">Completed</option>
                             </SelectField>
                         </div>
@@ -406,16 +396,15 @@ const BuildingMCLTax = () => {
                                 size="small"
                                 placeholder="Next Date"
                                 isRequired={true}
-                                value={selectedItem.toDoList_nexttDate}
+                                value={selectedItem.toDoList_nextDate}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'toDoList_nexttDate'
+                                        'toDoList_nextDate'
                                     )
                                 }
                             />
                         </div>
-
 
                         <div className="mb-8px">
                             <Heading>Remarks</Heading>
@@ -425,9 +414,7 @@ const BuildingMCLTax = () => {
                                 size="small"
                                 placeholder="Remarks"
                                 isRequired={true}
-                                value={
-                                    selectedItem.toDoList_remarks
-                                }
+                                value={selectedItem.toDoList_remarks}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
@@ -436,14 +423,7 @@ const BuildingMCLTax = () => {
                                 }
                             />
                         </div>
-                       
-                        
 
-                         
-                        
-                        
-
-                        
                         <div
                             style={{
                                 display: 'flex',
