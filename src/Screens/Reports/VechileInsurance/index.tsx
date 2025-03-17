@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { ulid } from 'ulid';
-import { FileUploader, StorageImage } from '@aws-amplify/ui-react-storage';
+import { getUrl } from 'aws-amplify/storage';
+import { FileUploader } from '@aws-amplify/ui-react-storage';
 import { Loader, Input } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
@@ -31,11 +32,6 @@ const VechileInsurance = () => {
     const [isUpdateMode, setUpdateMode] = useState(false);
     const [files, setFiles] = useState({});
     const [defaultFiles, setDefaultFiles] = useState([]);
-    const [viewImage, setViewImage] = useState({
-        isOpen: false,
-        key: '',
-        name: ''
-    });
 
     const itemsColumns = [
         {
@@ -85,12 +81,33 @@ const VechileInsurance = () => {
                                     alt="View"
                                     width="30"
                                     height="30"
-                                    onClick={() => {
-                                        setViewImage({
-                                            isOpen: true,
-                                            key: insurance.key,
-                                            name: insurance.name
-                                        });
+                                    onClick={async () => {
+                                        try {
+                                            const linkToStorageFile = await getUrl(
+                                                {
+                                                    path: insurance.key
+                                                }
+                                            );
+                                            const url = linkToStorageFile.url.toString();
+                                            // Create an anchor element and trigger a download
+                                            const a = document.createElement(
+                                                'a'
+                                            );
+                                            a.href = url;
+                                            a.target = '_blank';
+                                            a.rel = 'noopener noreferrer';
+                                            a.download =
+                                                insurance.name ||
+                                                'downloaded-file'; // Ensure a valid filename
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            document.body.removeChild(a);
+                                        } catch (error) {
+                                            console.error(
+                                                'Error fetching URL:',
+                                                error
+                                            );
+                                        }
                                     }}
                                 />
                             </div>
@@ -198,8 +215,10 @@ const VechileInsurance = () => {
         setSelectedItem(item);
         setFiles({});
         setDefaultFiles(
-            item.vehicleInsurance_insuranceCopy?.map(({ key: _, name }) => ({
-                key: name,
+            item.vehicleInsurance_insuranceCopy?.map((data: any) => ({
+                ...data,
+                path: data.key,
+                key: data.name,
                 status: 'uploaded'
             })) || []
         );
@@ -218,14 +237,15 @@ const VechileInsurance = () => {
             ...restForm
         } = editedForm;
 
-        const vehicleInsurance_insuranceCopy = Object.keys(files).reduce(
-            (acc, key) => {
-                const { status, ...fileData } = files[key] || {};
-                if (status !== 'success') return acc;
-                return [...acc, fileData];
-            },
-            []
-        );
+        const vehicleInsurance_insuranceCopy = defaultFiles
+            .map(({ path: key, name, type }) => ({ key, name, type }))
+            .concat(
+                Object.keys(files).reduce((acc, key) => {
+                    const { status, ...fileData } = files[key] || {};
+                    if (status !== 'success') return acc;
+                    return [...acc, fileData];
+                }, [])
+            );
 
         if (isUpdateMode) {
             const params: any = {
@@ -234,7 +254,10 @@ const VechileInsurance = () => {
                 updatedBy: userProfile.userId,
                 vehicleInsurance_insuranceCopy
             };
-            updateItem(editedForm);
+            updateItem({
+                ...editedForm,
+                vehicleInsurance_insuranceCopy
+            } as any);
 
             client.models.Form.update(params).catch(error => {
                 console.error(`Failed to update ${heading}:`, error);
@@ -290,8 +313,11 @@ const VechileInsurance = () => {
         selectedItem.vehicleInsurance_insuranceAmount === '' ||
         !selectedItem.vehicleInsurance_vehicleType ||
         !selectedItem.vehicleInsurance_remarks ||
-        filesData.length === 0 ||
-        !filesData.every((file: any) => file?.status === 'success');
+        (defaultFiles.length === 0 &&
+            (filesData.length === 0 ||
+                !filesData.every((file: any) => file?.status === 'success')));
+
+    console.dir({ files, defaultFiles });
 
     return (
         <>
@@ -337,41 +363,6 @@ const VechileInsurance = () => {
                 hasPrevious={hasPrevious}
                 hasNext={hasNext}
             />
-
-            {viewImage.isOpen && (
-                <Modal heading={`Insurance Copy: ${viewImage.name}`} isViewMode={true}>
-                    <div className="mb-8px">
-                        <StorageImage
-                            loading="lazy"
-                            alt={viewImage.name}
-                            path={viewImage.key}
-                            style={{
-                                width: '100%'
-                            }}
-                        />
-                    </div>
-                    <div
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            marginTop: '15px'
-                        }}
-                    >
-                        <ModalButton
-                            onClick={() =>
-                                setViewImage({
-                                    isOpen: false,
-                                    key: '',
-                                    name: ''
-                                })
-                            }
-                        >
-                            Close
-                        </ModalButton>
-                    </div>
-                </Modal>
-            )}
 
             {isModalOpen && (
                 <Modal heading={heading} isUpdateMode={isUpdateMode}>
@@ -507,6 +498,11 @@ const VechileInsurance = () => {
                                             ...prevFiles,
                                             [fileNameHash]: undefined
                                         };
+                                    });
+                                    setDefaultFiles(prevFiles => {
+                                        return prevFiles.filter(
+                                            file => file.key !== key
+                                        );
                                     });
                                 }}
                                 onUploadError={(error, { key }) => {
