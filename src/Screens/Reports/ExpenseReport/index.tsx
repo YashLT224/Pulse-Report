@@ -271,25 +271,7 @@ const ExpenseReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Balance B/F</Heading>
-                            <Input
-                                type="number"
-                                variation="quiet"
-                                size="small"
-                                placeholder="Balance b/f"
-                                isRequired={true}
-                                value={selectedItem.expenseReport_balanceBF}
-                                onChange={e =>
-                                    updateField(
-                                        e.target.value,
-                                        'expenseReport_balanceBF'
-                                    )
-                                }
-                            />
-                        </div>
-
-                        <div className="mb-8px">
-                            <Heading>Payment</Heading>
+                            <Heading>Payment(Petty Cash)</Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -325,20 +307,42 @@ const ExpenseReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Balance</Heading>
+                            <Heading>Balance B/F</Heading>
+                            <Input
+                                type="number"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Balance b/f"
+                                isRequired={true}
+                                value={selectedItem.expenseReport_balanceBF}
+                                // onChange={e =>
+                                //     updateField(
+                                //         e.target.value,
+                                //         'expenseReport_balanceBF'
+                                //     )
+                                // }
+                            />
+                        </div>
+
+                       
+
+                       
+
+                        <div className="mb-8px">
+                            <Heading>Balance C/F</Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
                                 size="small"
                                 placeholder="Balance"
                                 isRequired={true}
-                                value={selectedItem.expenseReport_balance}
-                                onChange={e =>
-                                    updateField(
-                                        e.target.value,
-                                        'expenseReport_balance'
-                                    )
-                                }
+                                value={selectedItem.expenseReport_balanceBF+(selectedItem.expenseReport_payment - selectedItem.expenseReport_expense)}
+                                // onChange={e =>
+                                //     updateField(
+                                //         e.target.value,
+                                //         'expenseReport_balance'
+                                //     )
+                                // }
                             />
                         </div>
 
