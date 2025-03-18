@@ -198,7 +198,9 @@ const schema = a
                 // Allow owner to perform create, read, and update operations
                 allow
                     .ownerDefinedIn('createdBy')
-                    .to(['create', 'read', 'update'])
+                    .to(['create', 'read', 'update']),
+                // Allow authenticated users to just read form records
+                allow.authenticated().to(['read'])
             ])
     })
     .authorization(allow => [allow.resource(postConfirmation)]);
