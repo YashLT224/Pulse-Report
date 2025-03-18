@@ -98,7 +98,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<ExpenseReport />}
-                        requiredRole="admin"
+                        requiredFormId="expenseReport"
                     />
                 }
             />
@@ -108,7 +108,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<VechileInsurance />}
-                        requiredRole="admin"
+                        requiredFormId="vehicleInsurance"
                     />
                 }
             />
@@ -118,7 +118,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<VechileReport />}
-                        requiredRole="admin"
+                        requiredFormId="vehicleReport"
                     />
                 }
             />
@@ -127,7 +127,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<BuildingInsurance />}
-                        requiredRole="admin"
+                        requiredFormId="buildingInsurance"
                     />
                 }
             />
@@ -137,7 +137,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<BuildingMclTax />}
-                        requiredRole="admin"
+                        requiredFormId="buildingMclTax"
                     />
                 }
             />
@@ -147,7 +147,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<DocumentFileStatus />}
-                        requiredRole="admin"
+                        requiredFormId="documentFileStatus"
                     />
                 }
             />
@@ -157,7 +157,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<Todolist />}
-                        requiredRole="admin"
+                        requiredFormId="toDoList"
                     />
                 }
             />
@@ -167,7 +167,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<Requirements />}
-                        requiredRole="admin"
+                        requiredFormId="requirement"
                     />
                 }
             />
@@ -177,7 +177,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<Dispatch />}
-                        requiredRole="admin"
+                        requiredFormId="dispatchInstructions"
                     />
                 }
             />
@@ -187,7 +187,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<Performance />}
-                        requiredRole="admin"
+                        requiredFormId="salesManPerformance"
                     />
                 }
             />
