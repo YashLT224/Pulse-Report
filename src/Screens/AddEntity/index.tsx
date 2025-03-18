@@ -11,7 +11,6 @@ import { usePagination } from '../../Hooks/usePagination';
 import PaginationControls from '../../components/PaginationControls';
 import Modal from '../../components/Modal';
 import { ModalButton, Heading } from '../../style';
-import { render } from 'react-dom';
 
 const LIMIT = 10; // Number of items to display per page
 
