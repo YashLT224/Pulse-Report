@@ -131,6 +131,7 @@ const ExpenseReport = () => {
 
     const onEdit = async (editedForm: Form) => {
         const { createdAt, updatedAt, ...restForm } = editedForm;
+        // TODO: Balance in people list might be stale, consider fetching fresh data
         const expenseReport_balanceBF = isUpdateMode
             ? selectedItem.expenseReport_balanceBF
             : personsList.find(
