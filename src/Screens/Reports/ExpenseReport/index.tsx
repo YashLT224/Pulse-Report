@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { ulid } from 'ulid';
 import { Loader, Input } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
@@ -10,6 +10,8 @@ import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
 import SelectSearch from 'react-select-search';
+import { AppDispatch } from '../../../Redux/store';
+import { fetchPeople } from '../../../Redux/slices/globalDataSlice';
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Expense Report';
@@ -19,6 +21,7 @@ const FORM_TYPE = 'expenseReport';
 type Form = Schema['Form']['type'];
 
 const ExpenseReport = () => {
+    const dispatch = useDispatch<AppDispatch>();
     const { userProfile, client } = useAuth();
 
     const personsList = useSelector(
@@ -168,11 +171,12 @@ const ExpenseReport = () => {
                 .then(() => {
                     client.models.People.update({
                         personId: selectedItem.expenseReport_personId,
-                        balanceBF: expenseReport_balanceBF
+                        balanceBF: expenseReport_balance
                     })
                         .then(() => {
                             console.log('Balance updated');
                             refreshList();
+                            dispatch(fetchPeople());
                         })
                         .catch(error => {
                             console.error(`Failed to update balance:`, error);
