@@ -49,7 +49,7 @@ const ExpenseReport = () => {
         },
         {
             key: 'expenseReport_payment',
-            header: 'Payment'
+            header: 'Payment (Petty Cash)'
         },
         {
             key: 'expenseReport_expense',
@@ -57,7 +57,7 @@ const ExpenseReport = () => {
         },
         {
             key: 'expenseReport_balance',
-            header: 'Balance'
+            header: 'Balance C/F'
         },
         {
             key: 'expenseReport_remarks',
@@ -127,11 +127,24 @@ const ExpenseReport = () => {
 
     const onEdit = async (editedForm: Form) => {
         const { createdAt, updatedAt, ...restForm } = editedForm;
+        const expenseReport_balanceBF = isUpdateMode
+            ? selectedItem.expenseReport_balanceBF
+            : personsList.find(
+                  (person: any) =>
+                      person.personId === selectedItem.expenseReport_personId
+              )?.balanceBF || 0;
+        const expenseReport_balance =
+            expenseReport_balanceBF +
+            (selectedItem.expenseReport_payment -
+                selectedItem.expenseReport_expense);
+
         if (isUpdateMode) {
             const params: any = {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
-                updatedBy: userProfile.userId
+                updatedBy: userProfile.userId,
+                expenseReport_balanceBF,
+                expenseReport_balance
             };
             updateItem(editedForm);
 
@@ -145,12 +158,24 @@ const ExpenseReport = () => {
                 createdAt: new Date().toISOString(),
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
-                createdBy: userProfile.userId
+                createdBy: userProfile.userId,
+                expenseReport_balanceBF,
+                expenseReport_balance
             };
             initiateLoding();
             client.models.Form.create(params)
                 .then(() => {
-                    refreshList();
+                    client.models.People.update({
+                        personId: selectedItem.expenseReport_personId,
+                        balanceBF: expenseReport_balanceBF
+                    })
+                        .then(() => {
+                            console.log('Balance updated');
+                            refreshList();
+                        })
+                        .catch(error => {
+                            console.error(`Failed to update balance:`, error);
+                        });
                 })
                 .catch(error => {
                     console.error(`Failed to create ${heading}:`, error);
@@ -182,11 +207,17 @@ const ExpenseReport = () => {
         !selectedItem.expenseReport_personId ||
         !selectedItem.expenseReport_personName ||
         !selectedItem.expenseReport_workAssign ||
-        selectedItem.expenseReport_balanceBF === '' ||
         selectedItem.expenseReport_payment === '' ||
         selectedItem.expenseReport_expense === '' ||
-        selectedItem.expenseReport_balance === '' ||
         !selectedItem.expenseReport_remarks;
+
+    const expenseReport_balanceBF = isUpdateMode
+        ? selectedItem.expenseReport_balanceBF
+        : personsList.find(
+              (person: any) =>
+                  person.personId === selectedItem.expenseReport_personId
+          )?.balanceBF || 0;
+
     return (
         <>
             <div style={{ position: 'relative' }}>
@@ -271,7 +302,7 @@ const ExpenseReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Payment(Petty Cash)</Heading>
+                            <Heading>Payment (Petty Cash)</Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -279,12 +310,13 @@ const ExpenseReport = () => {
                                 placeholder="Payment"
                                 isRequired={true}
                                 value={selectedItem.expenseReport_payment}
-                                onChange={e =>
+                                onChange={e => {
+                                    if (isUpdateMode) return;
                                     updateField(
                                         e.target.value,
                                         'expenseReport_payment'
-                                    )
-                                }
+                                    );
+                                }}
                             />
                         </div>
 
@@ -297,12 +329,13 @@ const ExpenseReport = () => {
                                 placeholder="Expense"
                                 isRequired={true}
                                 value={selectedItem.expenseReport_expense}
-                                onChange={e =>
+                                onChange={e => {
+                                    if (isUpdateMode) return;
                                     updateField(
                                         e.target.value,
                                         'expenseReport_expense'
-                                    )
-                                }
+                                    );
+                                }}
                             />
                         </div>
 
@@ -314,7 +347,7 @@ const ExpenseReport = () => {
                                 size="small"
                                 placeholder="Balance b/f"
                                 isRequired={true}
-                                value={selectedItem.expenseReport_balanceBF}
+                                value={expenseReport_balanceBF}
                                 // onChange={e =>
                                 //     updateField(
                                 //         e.target.value,
@@ -324,10 +357,6 @@ const ExpenseReport = () => {
                             />
                         </div>
 
-                       
-
-                       
-
                         <div className="mb-8px">
                             <Heading>Balance C/F</Heading>
                             <Input
@@ -336,7 +365,11 @@ const ExpenseReport = () => {
                                 size="small"
                                 placeholder="Balance"
                                 isRequired={true}
-                                value={selectedItem.expenseReport_balanceBF+(selectedItem.expenseReport_payment - selectedItem.expenseReport_expense)}
+                                value={
+                                    expenseReport_balanceBF +
+                                    (selectedItem.expenseReport_payment -
+                                        selectedItem.expenseReport_expense)
+                                }
                                 // onChange={e =>
                                 //     updateField(
                                 //         e.target.value,

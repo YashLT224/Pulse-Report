@@ -11,6 +11,7 @@ import { usePagination } from '../../Hooks/usePagination';
 import PaginationControls from '../../components/PaginationControls';
 import Modal from '../../components/Modal';
 import { ModalButton, Heading } from '../../style';
+import { render } from 'react-dom';
 
 const LIMIT = 10; // Number of items to display per page
 
@@ -80,7 +81,14 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         { key: nameField, header: 'Name' },
         { key: 'phoneNumber', header: 'Phone Number' },
         ...(type === 'PEOPLE'
-            ? [{ key: 'designation', header: 'Designation' }]
+            ? [
+                  { key: 'designation', header: 'Designation' }
+                  //   {
+                  //       key: 'balanceBF',
+                  //       header: 'Balance B/F',
+                  //       render: (item: Entity) => item.balanceBF || 0
+                  //   }
+              ]
             : []),
         ...(type === 'PARTY'
             ? [

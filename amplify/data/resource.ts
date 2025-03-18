@@ -48,7 +48,8 @@ const schema = a
                 phoneNumber: a.phone().required(), // Enforce uniqueness using the PhoneIndex
                 designation: a.string().required(),
                 status: a.enum(['active', 'inactive']),
-                entityType: a.string().default('PERSON') // Constant attribute, e.g., "PERSON"
+                entityType: a.string().default('PERSON'), // Constant attribute, e.g., "PERSON"
+                balanceBF: a.float().default(0)
             })
             .identifier(['personId'])
             .secondaryIndexes(index => [
@@ -70,7 +71,7 @@ const schema = a
                     .groups(['ADMINS'])
                     .to(['create', 'read', 'update', 'delete']),
                 // Allow authenticated users to just read people records
-                allow.authenticated().to(['read'])
+                allow.authenticated().to(['read', 'update'])
             ]),
         Party: a
             .model({
