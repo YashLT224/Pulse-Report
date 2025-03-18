@@ -2,12 +2,17 @@ import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Loader } from '@aws-amplify/ui-react';
 
-const ProtectedRoute = ({ element, requiredRole }) => {
+const ProtectedRoute = ({
+    element,
+    requiredRole = null,
+    requiredFormId = ''
+}) => {
     const userProfile = useSelector(
         (state: any) => state.authReducer.userProfile
     );
     const isLoading = useSelector((state: any) => state.authReducer.isLoading);
-    const Role = userProfile?.role;
+    const userProfileRole = userProfile?.role;
+    const allowedForms = userProfile?.allowedForms || [];
 
     // Show loading indicator while checking permissions
     if (isLoading) {
@@ -24,8 +29,16 @@ const ProtectedRoute = ({ element, requiredRole }) => {
     }
 
     // Allow access if role matches
-    if (userProfile && Role === requiredRole) {
-        return element;
+    if (requiredRole) {
+        if (userProfileRole === requiredRole) {
+            return element;
+        }
+    }
+
+    if (requiredFormId) {
+        if (allowedForms.includes(requiredFormId)) {
+            return element;
+        }
     }
 
     // Redirect if not authorized
