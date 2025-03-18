@@ -82,12 +82,12 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         { key: 'phoneNumber', header: 'Phone Number' },
         ...(type === 'PEOPLE'
             ? [
-                  { key: 'designation', header: 'Designation' }
-                  //   {
-                  //       key: 'balanceBF',
-                  //       header: 'Balance B/F',
-                  //       render: (item: Entity) => item.balanceBF || 0
-                  //   }
+                  { key: 'designation', header: 'Designation' },
+                  {
+                      key: 'balanceBF',
+                      header: 'Balance B/F',
+                      render: (item: Entity) => item.balanceBF || 0
+                  }
               ]
             : []),
         ...(type === 'PARTY'
