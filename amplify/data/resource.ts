@@ -143,6 +143,7 @@ const schema = a
                 buildingInsurance_status: a.enum(['PENDING', 'PAID']),
                 buildingInsurance_markToId: a.string(),
                 buildingInsurance_markToName: a.string(),
+                buildingInsurance_documentNo: a.string(),
 
                 // Dispatch Instructions
                 dispatchInstructions_partyId: a.string(),

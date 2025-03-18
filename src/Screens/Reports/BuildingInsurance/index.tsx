@@ -22,6 +22,21 @@ const formatDateForInput = (date: Date) => {
     return d.toISOString().split('T')[0];
 };
 
+const getNextYearExpirationDate = () => {
+    const today = new Date();
+    const nextYear = new Date(today);
+    
+    // Add one year
+    nextYear.setFullYear(today.getFullYear() + 1);
+    
+    // Subtract one day
+    nextYear.setDate(nextYear.getDate() - 1);
+    
+    return formatDateForInput(nextYear);
+  };
+
+  
+
 const BuildingInsurance = () => {
     const { userProfile, client } = useAuth();
 
@@ -51,13 +66,20 @@ const BuildingInsurance = () => {
             key: 'buildingInsurance_insuranceAmount',
             header: 'Insurance Amount'
         },
+
         {
             key: 'expirationDate',
             header: 'Due Date'
         },
         {
             key: 'buildingInsurance_status',
-            header: 'Status'
+            header: 'Status',
+            render: (item) =>(<div style={{color:item.buildingInsurance_status==='PAID'?'green':'red'}}>{item.buildingInsurance_status}</div>)
+            
+        },
+        {
+            key: 'buildingInsurance_documentNo',
+            header: 'Document No.'
         },
         {
             key: 'buildingInsurance_markToName',
@@ -116,7 +138,8 @@ const BuildingInsurance = () => {
             buildingInsurance_markToName: '',
             buildingInsurance_markToId: '',
             buildingInsurance_status: 'PENDING',
-            expirationDate: formatDateForInput(new Date())
+            expirationDate:getNextYearExpirationDate(),
+            buildingInsurance_documentNo:''
         });
     };
     const handleCloseModal = () => {
@@ -195,7 +218,9 @@ const BuildingInsurance = () => {
         !selectedItem.buildingInsurance_markToId ||
         selectedItem.buildingInsurance_insureAmount === '' ||
         selectedItem.buildingInsurance_insuranceAmount === '' ||
-        !selectedItem.buildingInsurance_status;
+        (selectedItem.buildingInsurance_status==='PAID'&& !selectedItem.buildingInsurance_documentNo?.trim());
+
+        
 
     return (
         <>
@@ -344,14 +369,33 @@ const BuildingInsurance = () => {
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'buildingMclTax_status'
+                                        'buildingInsurance_status'
                                     )
                                 }
                             >
-                                <option value="pending">Pending</option>
-                                <option value="paid">Paid</option>
+                                <option value="PENDING">Pending</option>
+                                <option value="PAID">Paid</option>
                             </SelectField>
                         </div>
+
+                        <div className="mb-8px">
+                            <Heading>Document No.</Heading>
+                            <Input
+                                type="text"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Due Date"
+                                isRequired={true}
+                                value={selectedItem.buildingInsurance_documentNo}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'buildingInsurance_documentNo'
+                                    )
+                                }
+                            />
+                        </div>
+
                         <div className="mb-8px selectSearch">
                             <Heading>Mark To</Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
