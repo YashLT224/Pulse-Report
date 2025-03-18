@@ -168,7 +168,7 @@ const ExpenseReport = () => {
                 .then(() => {
                     client.models.People.update({
                         personId: selectedItem.expenseReport_personId,
-                        balanceBF: expenseReport_balanceBF
+                        balanceBF: expenseReport_balance
                     })
                         .then(() => {
                             console.log('Balance updated');
