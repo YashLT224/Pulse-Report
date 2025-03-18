@@ -92,6 +92,7 @@ const ExpenseReport = () => {
         goToNext,
         goToPrevious,
         initiateLoding,
+        stopLoding,
         updateItem,
         refreshList
     } = usePagination<Form>({
@@ -175,10 +176,12 @@ const ExpenseReport = () => {
                         })
                         .catch(error => {
                             console.error(`Failed to update balance:`, error);
+                            stopLoding();
                         });
                 })
                 .catch(error => {
                     console.error(`Failed to create ${heading}:`, error);
+                    stopLoding();
                 });
         }
     };

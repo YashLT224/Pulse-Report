@@ -20,6 +20,7 @@ interface PaginationState<T> {
     goToNext: () => Promise<void>;
     goToPrevious: () => Promise<void>;
     initiateLoding: () => void;
+    stopLoding: () => void;
     refreshList: () => Promise<void>;
     updateItem: (updatedItem: T) => void; // New function to update a specific item
     deleteItem: (deletedItem: T) => void; // New function to delete a specific item
@@ -105,6 +106,10 @@ export function usePagination<T>({
         setIsLoading(true);
     }, []);
 
+    const stopLoding = useCallback(() => {
+        setIsLoading(false);
+    }, []);
+
     const refreshList = useCallback(async () => {
         fetchItems();
     }, [fetchItems]);
@@ -155,6 +160,7 @@ export function usePagination<T>({
         goToNext,
         goToPrevious,
         initiateLoding,
+        stopLoding,
         refreshList,
         updateItem,
         deleteItem
