@@ -1,16 +1,17 @@
 import { useCallback, useState } from 'react';
-import { Loader } from '@aws-amplify/ui-react';
+import { Loader,SelectField } from '@aws-amplify/ui-react';
 import UserListItems from '../../components/UserList';
 import useAuth from '../../Hooks/useAuth';
 import { usePagination } from '../../Hooks/usePagination';
 import PaginationControls from '../../components/PaginationControls';
 import { formTypes, formLabelMap } from '../../data/forms';
 import Modal from '../../components/Modal';
+
 import {
     ModalButton,
     CheckboxContainer,
     CheckboxLabel,
-    CheckboxInput
+    CheckboxInput,Heading
 } from './style';
 
 const LIMIT = 10; // Number of items to display per page
@@ -71,6 +72,14 @@ const UserList = () => {
                     .join(', ') || 'None 🚫'
         },
         {
+            key: 'status',
+            header: 'Status',
+            render: (item: any) =><div style={{color: item.status==='active'?'green':'red'}}>
+           { item.status==='active'? 'Active':`InActive 🚫`}
+            </div>
+            
+        },
+        {
             key: 'createdAt',
             header: 'Created At',
             render: (item: any) =>
@@ -79,13 +88,14 @@ const UserList = () => {
     ];
 
     const onEdit = (editedUser: any) => {
-        const { userId, allowedForms = [] } = editedUser;
+        const { userId, allowedForms = [] ,status} = editedUser;
         updateItem(editedUser);
 
         const params: any = {
             userId,
             allowedForms,
-            access: !editedUser.allowedForms?.length ? 'none' : null
+            access: !editedUser.allowedForms?.length ? 'none' : null,
+            status
         };
 
         client.models.UserProfile.update(params).catch(error => {
@@ -102,7 +112,7 @@ const UserList = () => {
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
-
+console.log(selectedItem)
     const handleFormChange = formLabel => {
         setSelectedForms(
             prevSelectedForms =>
@@ -163,6 +173,22 @@ const UserList = () => {
 
             {isModalOpen && selectedItem && (
                 <Modal heading={`User: ${selectedItem['userName']}`}>
+                     <div className="mb-8px">
+                            <Heading>Status: </Heading>
+                            <SelectField
+                                label=""
+                                value={selectedItem.status}
+                                onChange={e =>
+                                    setSelectedItem((prev)=>({...prev,status:  e.target.value})
+                                    )
+                                }
+                            >
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </SelectField>
+                        </div>
+                    <div>
+                    <Heading>Allowed Forms: </Heading>
                     {formTypes.map(form => (
                         <CheckboxContainer key={form.id}>
                             <CheckboxLabel>
@@ -177,6 +203,8 @@ const UserList = () => {
                             </CheckboxLabel>
                         </CheckboxContainer>
                     ))}
+                    </div>
+                    
 
                     <div
                         style={{

@@ -26,3 +26,10 @@ export const CheckboxLabel = styled.label`
 export const CheckboxInput = styled.input`
     margin-right: 10px;
 `;
+
+export const Heading = styled.h3`
+    width: 30vw;
+    margin-bottom: 6px;
+    font-weight: 400;
+    font-size: 16px;
+`;
