@@ -57,6 +57,17 @@ const globalSlice = createSlice({
         setPersons: (state, action) => {
             state.persons = action.payload;
         },
+        setPersonBalanceBF: (state, action) => {
+            state.persons = state.persons.map(person => {
+                if (person.personId === action.payload.personId) {
+                    return {
+                        ...person,
+                        balanceBF: action.payload.balanceBF
+                    };
+                }
+                return person;
+            });
+        },
         setParties: (state, action) => {
             state.parties = action.payload;
         }
@@ -78,5 +89,9 @@ const globalSlice = createSlice({
     }
 });
 
-export const { setPersons, setParties } = globalSlice.actions;
+export const {
+    setPersons,
+    setParties,
+    setPersonBalanceBF
+} = globalSlice.actions;
 export default globalSlice.reducer;

@@ -110,6 +110,7 @@ const ToDoList = () => {
         goToNext,
         goToPrevious,
         initiateLoding,
+        stopLoding,
         updateItem,
         refreshList
     } = usePagination<Form>({
@@ -118,13 +119,12 @@ const ToDoList = () => {
         idField
     });
 
-
-    const formatDateForInput = (date) => {
+    const formatDateForInput = date => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
-      };
+    };
 
     const addNewItemHandler = () => {
         setUpdateMode(false);
@@ -193,6 +193,7 @@ const ToDoList = () => {
                 })
                 .catch(error => {
                     console.error(`Failed to create ${heading}:`, error);
+                    stopLoding();
                 });
         }
     };
