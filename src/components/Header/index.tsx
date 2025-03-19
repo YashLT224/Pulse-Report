@@ -28,6 +28,12 @@ const Header = () => {
         return () => clearTimeout(timer);
     }, [user, dispatch]);
 
+    useEffect(() => {
+        if (userProfile?.status === 'inactive') {
+            handleLogout();
+        }
+    }, [userProfile]);
+
     const handleAlerts = () => {
         dispatch(resetActiveTile());
         navigate('/alerts');
