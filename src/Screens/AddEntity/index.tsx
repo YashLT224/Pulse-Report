@@ -67,6 +67,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         goToNext,
         goToPrevious,
         initiateLoding,
+        stopLoding,
         updateItem,
         refreshList
     } = usePagination<Entity>({
@@ -145,6 +146,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
                 })
                 .catch(error => {
                     console.error(`Failed to create ${type}:`, error);
+                    stopLoding();
                 });
         }
     };

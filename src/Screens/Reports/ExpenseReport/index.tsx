@@ -11,7 +11,7 @@ import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
 import SelectSearch from 'react-select-search';
 import { AppDispatch } from '../../../Redux/store';
-import { fetchPeople } from '../../../Redux/slices/globalDataSlice';
+import { setPersonBalanceBF } from '../../../Redux/slices/globalDataSlice';
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Expense Report';
@@ -19,6 +19,22 @@ const idField = 'formId';
 const FORM_TYPE = 'expenseReport';
 
 type Form = Schema['Form']['type'];
+
+function getExpenseReportBalanceBF(
+    isUpdateMode: boolean,
+    selectedReport: any,
+    personsList: Schema['People']['type'][]
+): number {
+    if (isUpdateMode) return selectedReport.expenseReport_balanceBF;
+
+    if (!selectedReport.expenseReport_personId) return 0;
+
+    return (
+        personsList.find(
+            person => person.personId === selectedReport.expenseReport_personId
+        )?.balanceBF ?? 0
+    );
+}
 
 const ExpenseReport = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -130,26 +146,27 @@ const ExpenseReport = () => {
     };
 
     const onEdit = async (editedForm: Form) => {
-        const { createdAt, updatedAt, ...restForm } = editedForm;
-        // TODO: Balance in people list might be stale, consider fetching fresh data
-        const expenseReport_balanceBF = isUpdateMode
-            ? selectedItem.expenseReport_balanceBF
-            : personsList.find(
-                  (person: any) =>
-                      person.personId === selectedItem.expenseReport_personId
-              )?.balanceBF || 0;
-        const expenseReport_balance =
-            expenseReport_balanceBF +
-            (selectedItem.expenseReport_payment -
-                selectedItem.expenseReport_expense);
+        const {
+            createdAt,
+            updatedAt,
+            formType,
+            state,
+            createdBy,
+            updatedBy,
+            expenseReport_personId,
+            expenseReport_personName,
+            expenseReport_payment,
+            expenseReport_expense,
+            expenseReport_balanceBF: _balanceBF,
+            expenseReport_balance: _balance,
+            ...restForm
+        } = editedForm;
 
         if (isUpdateMode) {
             const params: any = {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
-                updatedBy: userProfile.userId,
-                expenseReport_balanceBF,
-                expenseReport_balance
+                updatedBy: userProfile.userId
             };
             updateItem(editedForm);
 
@@ -157,6 +174,16 @@ const ExpenseReport = () => {
                 console.error(`Failed to update ${heading}:`, error);
             });
         } else {
+            // TODO: Balance in people list might be stale, consider fetching fresh balance
+            const expenseReport_balanceBF = getExpenseReportBalanceBF(
+                false,
+                { expenseReport_personId },
+                personsList
+            );
+            const expenseReport_balance =
+                expenseReport_balanceBF +
+                (expenseReport_payment - expenseReport_expense);
+
             const params: any = {
                 ...restForm,
                 [idField]: ulid(),
@@ -164,6 +191,10 @@ const ExpenseReport = () => {
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,
+                expenseReport_personId,
+                expenseReport_personName,
+                expenseReport_payment,
+                expenseReport_expense,
                 expenseReport_balanceBF,
                 expenseReport_balance
             };
@@ -171,13 +202,18 @@ const ExpenseReport = () => {
             client.models.Form.create(params)
                 .then(() => {
                     client.models.People.update({
-                        personId: selectedItem.expenseReport_personId,
-                        balanceBF: expenseReport_balance
+                        personId: expenseReport_personId as any,
+                        balanceBF: expenseReport_balance as any
                     })
                         .then(() => {
                             console.log('Balance updated');
                             refreshList();
-                            dispatch(fetchPeople());
+                            dispatch(
+                                setPersonBalanceBF({
+                                    personId: expenseReport_personId,
+                                    balanceBF: expenseReport_balance
+                                })
+                            );
                         })
                         .catch(error => {
                             console.error(`Failed to update balance:`, error);
@@ -219,12 +255,11 @@ const ExpenseReport = () => {
         selectedItem.expenseReport_expense === '' ||
         !selectedItem.expenseReport_remarks;
 
-    const expenseReport_balanceBF = isUpdateMode
-        ? selectedItem.expenseReport_balanceBF
-        : personsList.find(
-              (person: any) =>
-                  person.personId === selectedItem.expenseReport_personId
-          )?.balanceBF || 0;
+    const expenseReport_balanceBF = getExpenseReportBalanceBF(
+        isUpdateMode,
+        selectedItem,
+        personsList
+    );
 
     return (
         <>
@@ -284,6 +319,8 @@ const ExpenseReport = () => {
                                 // name="Person Name"
                                 placeholder="Choose Person"
                                 onChange={selectedValue => {
+                                    // Cannot reassign person after selection
+                                    if (isUpdateMode) return;
                                     updateField(
                                         selectedValue,
                                         'expenseReport_personName#expenseReport_personId',
@@ -319,6 +356,7 @@ const ExpenseReport = () => {
                                 isRequired={true}
                                 value={selectedItem.expenseReport_payment}
                                 onChange={e => {
+                                    // Cannot change payment after selection
                                     if (isUpdateMode) return;
                                     updateField(
                                         e.target.value,
@@ -338,6 +376,7 @@ const ExpenseReport = () => {
                                 isRequired={true}
                                 value={selectedItem.expenseReport_expense}
                                 onChange={e => {
+                                    // Cannot change expense after selection
                                     if (isUpdateMode) return;
                                     updateField(
                                         e.target.value,

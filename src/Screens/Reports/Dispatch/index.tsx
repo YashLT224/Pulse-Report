@@ -108,6 +108,7 @@ const Dispatch = () => {
         goToNext,
         goToPrevious,
         initiateLoding,
+        stopLoding,
         updateItem,
         refreshList
     } = usePagination<Form>({
@@ -139,10 +140,10 @@ const Dispatch = () => {
         const {
             createdAt,
             updatedAt,
-            hasExpiration,
             formType,
             state,
             createdBy,
+            updatedBy,
             ...restForm
         } = editedForm;
         if (isUpdateMode) {
@@ -172,6 +173,7 @@ const Dispatch = () => {
                 })
                 .catch(error => {
                     console.error(`Failed to create ${heading}:`, error);
+                    stopLoding();
                 });
         }
     };

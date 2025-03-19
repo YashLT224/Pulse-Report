@@ -122,6 +122,7 @@ const BuildingInsurance = () => {
         goToNext,
         goToPrevious,
         initiateLoding,
+        stopLoding,
         updateItem,
         refreshList
     } = usePagination<Form>({
@@ -192,6 +193,7 @@ const BuildingInsurance = () => {
                 })
                 .catch(error => {
                     console.error(`Failed to create ${heading}:`, error);
+                    stopLoding();
                 });
         }
     };
@@ -387,7 +389,7 @@ const BuildingInsurance = () => {
                                 type="text"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Due Date"
+                                placeholder="Document No."
                                 isRequired={true}
                                 value={selectedItem.buildingInsurance_documentNo}
                                 onChange={e =>

@@ -90,7 +90,8 @@ const BuildingMCLTax = () => {
         goToPrevious,
         initiateLoding,
         updateItem,
-        refreshList
+        refreshList,
+        stopLoding
     } = usePagination<Form>({
         limit: LIMIT,
         fetchFn: fetchForm as any,
@@ -167,6 +168,7 @@ const BuildingMCLTax = () => {
                 })
                 .catch(error => {
                     console.error(`Failed to create ${heading}:`, error);
+                    stopLoding();
                 });
         }
     };
