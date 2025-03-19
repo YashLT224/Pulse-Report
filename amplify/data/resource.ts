@@ -22,7 +22,8 @@ const schema = a
                 userName: a.string().required(),
                 phoneNumber: a.string().required(),
                 allowedForms: a.string().array(),
-                access: a.string() // undefined or 'none'
+                access: a.string(), // undefined or 'none'
+                status:a.enum(['active', 'inactive']),
             })
             .identifier(['userId'])
             .secondaryIndexes(index => [
