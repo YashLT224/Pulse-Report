@@ -48,7 +48,7 @@ export const handler: PostConfirmationTriggerHandler = async event => {
         phoneNumber,
         allowedForms: [],
         access: 'none',
-        status:'active'
+        status:'active' as const
     };
 
     try {
