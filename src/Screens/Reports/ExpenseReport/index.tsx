@@ -174,12 +174,9 @@ const ExpenseReport = () => {
                 console.error(`Failed to update ${heading}:`, error);
             });
         } else {
-            // TODO: Balance in people list might be stale, consider fetching fresh balance
-            const expenseReport_balanceBF = getExpenseReportBalanceBF(
-                false,
-                { expenseReport_personId },
-                personsList
-            );
+              const updatedPersonData = await client.models.People.get({personId:expenseReport_personId});      
+            const expenseReport_balanceBF =updatedPersonData?.data?.balanceBF||0
+            
             const expenseReport_balance =
                 expenseReport_balanceBF +
                 (expenseReport_payment - expenseReport_expense);
