@@ -7,6 +7,11 @@ export const storage = defineStorage({
             allow.groups(['ADMINS']).to(['read', 'write', 'delete']),
             allow.entity('identity').to(['read', 'write', 'delete']),
             allow.authenticated.to(['read'])
+        ],
+        'forms/vehicleReport/{entity_id}/*': [
+            allow.groups(['ADMINS']).to(['read', 'write', 'delete']),
+            allow.entity('identity').to(['read', 'write', 'delete']),
+            allow.authenticated.to(['read'])
         ]
     })
 });
