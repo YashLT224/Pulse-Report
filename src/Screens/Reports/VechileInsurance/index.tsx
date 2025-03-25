@@ -9,6 +9,7 @@ import useAuth from '../../../Hooks/useAuth';
 import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
+import { getNextYearExpirationDate,formatDateForInput } from '../../../utils/helpers';
 import { ModalButton, Heading } from '../../../style';
 import eyeIcon from '../../../assets/eye.svg';
 
@@ -19,12 +20,8 @@ const FORM_TYPE = 'vehicleInsurance';
 
 type Form = Schema['Form']['type'];
 
-const formatDateForInput = date => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
+ 
+
 
 const VechileInsurance = () => {
     const { userProfile, client } = useAuth();
@@ -200,7 +197,7 @@ const VechileInsurance = () => {
         setSelectedItem({
             vehicleInsurance_vehicleNo: '',
             vehicleInsurance_insuranceDate: formatDateForInput(new Date()),
-            expirationDate: formatDateForInput(new Date()),
+            expirationDate:getNextYearExpirationDate(),
             vehicleInsurance_insuranceCompany: '',
             vehicleInsurance_insureAmount: 0,
             vehicleInsurance_insuranceAmount: 0,
@@ -367,7 +364,7 @@ const VechileInsurance = () => {
             />
 
             {isModalOpen && (
-                <Modal heading={heading} isUpdateMode={isUpdateMode}>
+                <Modal onCloseHander={handleCloseModal} heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
                             <Heading>Vehicle No.</Heading>

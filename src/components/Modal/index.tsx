@@ -4,11 +4,20 @@ const Modal = ({
     children,
     isViewMode = false,
     isUpdateMode = true,
-    heading
+    heading,
+    onCloseHander = () => {}
 }) => {
     return (
-        <ModalOverlay>
-            <ModalContent>
+        <ModalOverlay
+            onClick={e => {
+                onCloseHander();
+            }}
+        >
+            <ModalContent
+                onClick={e => {
+                    e.stopPropagation();
+                }}
+            >
                 <ModalHeader>
                     {isViewMode ? 'View' : isUpdateMode ? 'Edit' : 'Add'}{' '}
                     {heading}
