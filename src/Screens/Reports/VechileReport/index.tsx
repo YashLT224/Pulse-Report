@@ -85,7 +85,56 @@ const VechileReport = () => {
         },
         {
             key: 'vehicleReport_billPhoto',
-            header: 'Bill Photo'
+            header: 'Bill Photo',
+            render: (item: Form) => {
+                return (
+                    <div>
+                        {item.vehicleReport_billPhoto?.map(insurance => (
+                            <div
+                                key={insurance.key}
+                                className="flexbox-between"
+                            >
+                                <p>{insurance.name}</p>
+                                <img
+                                    className="pointer"
+                                    src={eyeIcon}
+                                    alt="View"
+                                    width="30"
+                                    height="30"
+                                    onClick={async () => {
+                                        try {
+                                            const linkToStorageFile = await getUrl(
+                                                {
+                                                    path: insurance.key
+                                                }
+                                            );
+                                            const url = linkToStorageFile.url.toString();
+                                            // Create an anchor element and trigger a download
+                                            const a = document.createElement(
+                                                'a'
+                                            );
+                                            a.href = url;
+                                            a.target = '_blank';
+                                            a.rel = 'noopener noreferrer';
+                                            a.download =
+                                                insurance.name ||
+                                                'downloaded-file'; // Ensure a valid filename
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            document.body.removeChild(a);
+                                        } catch (error) {
+                                            console.error(
+                                                'Error fetching URL:',
+                                                error
+                                            );
+                                        }
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                );
+            }
         },
         {
             key: 'vehicleReport_status',
@@ -188,16 +237,16 @@ const handleCloseModal = () => {
 };
 
 const handleEdit = (item: any) => {
-    // setSelectedItem(item);
-    // setFiles({});
-    // setDefaultFiles(
-    //     item.vehicleInsurance_insuranceCopy?.map((data: any) => ({
-    //         ...data,
-    //         path: data.key,
-    //         key: data.name,
-    //         status: 'uploaded'
-    //     })) || []
-    // );
+    setSelectedItem(item);
+    setFiles({});
+    setDefaultFiles(
+        item.vehicleReport_billPhoto?.map((data: any) => ({
+            ...data,
+            path: data.key,
+            key: data.name,
+            status: 'uploaded'
+        })) || []
+    );
     setUpdateMode(true);
     setIsModalOpen(true);
 };
@@ -215,7 +264,7 @@ const onEdit = async (editedForm: Form) => {
         ...restForm
     } = editedForm;
 
-    const vehicleInsurance_insuranceCopy = defaultFiles
+    const vehicleReport_billPhoto = defaultFiles
         .map(({ path: key, name, type }) => ({ key, name, type }))
         .concat(
             Object.keys(files).reduce((acc, key) => {
@@ -230,11 +279,11 @@ const onEdit = async (editedForm: Form) => {
             ...restForm,
             updatedAt: new Date().toISOString(),
             updatedBy: userProfile.userId,
-            vehicleInsurance_insuranceCopy
+            vehicleReport_billPhoto
         };
         updateItem({
             ...editedForm,
-            vehicleInsurance_insuranceCopy
+            vehicleReport_billPhoto
         } as any);
 
         client.models.Form.update(params).catch(error => {
@@ -249,7 +298,7 @@ const onEdit = async (editedForm: Form) => {
             formType: `${FORM_TYPE}#active`,
             state: 'active',
             createdBy: userProfile.userId,
-            vehicleInsurance_insuranceCopy
+            vehicleReport_billPhoto
         };
         initiateLoding();
         client.models.Form.create(params)
