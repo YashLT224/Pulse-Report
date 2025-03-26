@@ -40,11 +40,11 @@ const VechileReport = () => {
         },
         {
             key: 'vehicleReport_roadTaxDue',
-            header: 'Road Tax Due.'
+            header: 'Road Tax Due'
         },
         {
             key: 'vehicleReport_stateTaxDue',
-            header: 'State Tax Due.'
+            header: 'State Tax Due'
         },
         {
             key: 'vehicleReport_fitnessDue',
@@ -61,12 +61,12 @@ const VechileReport = () => {
         },
         {
             key: 'vehicleReport_challanDue',
-            header: 'Challan Due Date'
+            header: 'Challan Due'
         },
 
         {
             key: 'vehicleReport_batterySNO',
-            header: 'Battery No.'
+            header: 'Battery S.No.'
         },
 
         {
@@ -76,7 +76,7 @@ const VechileReport = () => {
 
         {
             key: 'vehicleReport_billNo',
-            header: 'Battery No.'
+            header: 'Bill No.'
         },
         {
             key: 'vehicleReport_billDate',
@@ -88,12 +88,9 @@ const VechileReport = () => {
             render: (item: Form) => {
                 return (
                     <div>
-                        {item.vehicleReport_billPhoto?.map(insurance => (
-                            <div
-                                key={insurance.key}
-                                className="flexbox-between"
-                            >
-                                <p>{insurance.name}</p>
+                        {item.vehicleReport_billPhoto?.map(fileItem => (
+                            <div key={fileItem.key} className="flexbox-between">
+                                <p>{fileItem.name}</p>
                                 <img
                                     className="pointer"
                                     src={eyeIcon}
@@ -104,7 +101,7 @@ const VechileReport = () => {
                                         try {
                                             const linkToStorageFile = await getUrl(
                                                 {
-                                                    path: insurance.key
+                                                    path: fileItem.key
                                                 }
                                             );
                                             const url = linkToStorageFile.url.toString();
@@ -116,7 +113,7 @@ const VechileReport = () => {
                                             a.target = '_blank';
                                             a.rel = 'noopener noreferrer';
                                             a.download =
-                                                insurance.name ||
+                                                fileItem.name ||
                                                 'downloaded-file'; // Ensure a valid filename
                                             document.body.appendChild(a);
                                             a.click();
@@ -215,9 +212,9 @@ const VechileReport = () => {
             vehicleReport_roadTaxDue: formatDateForInput(new Date()),
             vehicleReport_stateTaxDue: formatDateForInput(new Date()),
             vehicleReport_fitnessDue: formatDateForInput(new Date()),
-            vehicleReport_challan: 'No',
+            vehicleReport_challan: 'NO',
             vehicleReport_challanDate: formatDateForInput(new Date()),
-            vehicleReport_challanDue: 'No',
+            vehicleReport_challanDue: 'NO',
             vehicleReport_batterySNO: '',
             vehicleReport_batteryWarranty: formatDateForInput(new Date()),
             vehicleReport_billNo: '',

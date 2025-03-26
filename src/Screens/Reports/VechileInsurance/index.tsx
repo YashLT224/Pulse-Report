@@ -9,7 +9,10 @@ import useAuth from '../../../Hooks/useAuth';
 import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
-import { getNextYearExpirationDate,formatDateForInput } from '../../../utils/helpers';
+import {
+    getNextYearExpirationDate,
+    formatDateForInput
+} from '../../../utils/helpers';
 import { ModalButton, Heading } from '../../../style';
 import eyeIcon from '../../../assets/eye.svg';
 
@@ -19,9 +22,6 @@ const idField = 'formId';
 const FORM_TYPE = 'vehicleInsurance';
 
 type Form = Schema['Form']['type'];
-
- 
-
 
 const VechileInsurance = () => {
     const { userProfile, client } = useAuth();
@@ -68,12 +68,9 @@ const VechileInsurance = () => {
             render: (item: Form) => {
                 return (
                     <div>
-                        {item.vehicleInsurance_insuranceCopy.map(insurance => (
-                            <div
-                                key={insurance.key}
-                                className="flexbox-between"
-                            >
-                                <p>{insurance.name}</p>
+                        {item.vehicleInsurance_insuranceCopy.map(fileItem => (
+                            <div key={fileItem.key} className="flexbox-between">
+                                <p>{fileItem.name}</p>
                                 <img
                                     className="pointer"
                                     src={eyeIcon}
@@ -84,7 +81,7 @@ const VechileInsurance = () => {
                                         try {
                                             const linkToStorageFile = await getUrl(
                                                 {
-                                                    path: insurance.key
+                                                    path: fileItem.key
                                                 }
                                             );
                                             const url = linkToStorageFile.url.toString();
@@ -96,7 +93,7 @@ const VechileInsurance = () => {
                                             a.target = '_blank';
                                             a.rel = 'noopener noreferrer';
                                             a.download =
-                                                insurance.name ||
+                                                fileItem.name ||
                                                 'downloaded-file'; // Ensure a valid filename
                                             document.body.appendChild(a);
                                             a.click();
@@ -197,7 +194,7 @@ const VechileInsurance = () => {
         setSelectedItem({
             vehicleInsurance_vehicleNo: '',
             vehicleInsurance_insuranceDate: formatDateForInput(new Date()),
-            expirationDate:getNextYearExpirationDate(),
+            expirationDate: getNextYearExpirationDate(),
             vehicleInsurance_insuranceCompany: '',
             vehicleInsurance_insureAmount: 0,
             vehicleInsurance_insuranceAmount: 0,
@@ -364,7 +361,11 @@ const VechileInsurance = () => {
             />
 
             {isModalOpen && (
-                <Modal onCloseHander={handleCloseModal} heading={heading} isUpdateMode={isUpdateMode}>
+                <Modal
+                    onCloseHander={handleCloseModal}
+                    heading={heading}
+                    isUpdateMode={isUpdateMode}
+                >
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
                             <Heading>Vehicle No.</Heading>
