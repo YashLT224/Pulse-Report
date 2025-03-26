@@ -336,6 +336,10 @@ const VechileReport = () => {
         !selectedItem.vehicleReport_vehicleNo ||
         !selectedItem.vehicleReport_batterySNO ||
         !selectedItem.vehicleReport_billNo ||
+        !selectedItem.vehicleReport_roadTaxDue ||
+        !selectedItem.vehicleReport_stateTaxDue ||
+        !selectedItem.vehicleReport_fitnessDue ||
+        !selectedItem.vehicleReport_batteryWarranty ||
         (defaultFiles.length === 0 &&
             (filesData.length === 0 ||
                 !filesData.every((file: any) => file?.status === 'success')));

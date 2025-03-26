@@ -174,7 +174,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<Requirements />}
-                        requiredFormId="requirement"
+                        requiredFormId="requirements"
                         requiredRole="admin"
                     />
                 }

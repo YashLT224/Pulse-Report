@@ -14,6 +14,11 @@ const schema = a
             type: a.string(),
             name: a.string()
         }),
+        ProductEntry: a.customType({
+            itemName: a.string(),
+            itemPrice: a.float(),
+            itemQuantity: a.float()
+        }),
         UserProfile: a
             .model({
                 userId: a.id().required(),
@@ -199,7 +204,15 @@ const schema = a
                     'completed'
                 ]),
                 toDoList_nextDate: a.string(),
-                toDoList_remarks: a.string()
+                toDoList_remarks: a.string(),
+
+                // Requirements
+                requirements_demandFromId: a.string(),
+                requirements_demandFromName: a.string(),
+                requirements_responsiblePersonId: a.string(),
+                requirements_responsiblePersonName: a.string(),
+                requirements_remarks: a.string(),
+                requirements_itemList: a.ref('ProductEntry').array()
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [

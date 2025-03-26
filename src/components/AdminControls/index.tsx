@@ -15,7 +15,7 @@ const tiles = [
         icon: Approval
     },
     { id: 2, name: 'Staff Members', link: '/staff-members', icon: List },
-    { id: 3, name: 'Workers', link: '/add-people', icon: addUser },
+    { id: 3, name: 'People', link: '/add-people', icon: addUser },
     { id: 4, name: ' Party', link: '/add-party', icon: addUser }
 ];
 

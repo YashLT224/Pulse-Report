@@ -229,7 +229,8 @@ const ToDoList = () => {
         !selectedItem.toDoList_reportToId ||
         !selectedItem.toDoList_workStatus ||
         !selectedItem.toDoList_nextDate ||
-        !selectedItem.toDoList_remarks;
+        !selectedItem.toDoList_remarks ||
+        !selectedItem.expirationDate;
 
     return (
         <>
