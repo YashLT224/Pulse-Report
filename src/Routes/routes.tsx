@@ -105,7 +105,7 @@ const AppRoutes = () => {
             />
 
             <Route
-                path="/vechile-insurance"
+                path="/vehicle-insurance"
                 element={
                     <ProtectedRoute
                         element={<VechileInsurance />}
@@ -116,7 +116,7 @@ const AppRoutes = () => {
             />
 
             <Route
-                path="/vechile-report"
+                path="/vehicle-report"
                 element={
                     <ProtectedRoute
                         element={<VechileReport />}

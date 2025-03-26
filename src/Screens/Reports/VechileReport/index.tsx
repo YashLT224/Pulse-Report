@@ -2,14 +2,14 @@ import { useCallback, useState } from 'react';
 import { ulid } from 'ulid';
 import { getUrl } from 'aws-amplify/storage';
 import { FileUploader } from '@aws-amplify/ui-react-storage';
-import { Loader, Input,SelectField } from '@aws-amplify/ui-react';
+import { Loader, Input, SelectField } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
 import useAuth from '../../../Hooks/useAuth';
 import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
-import { getNextYearExpirationDate,formatDateForInput } from '../../../utils/helpers';
+import { formatDateForInput } from '../../../utils/helpers';
 import { ModalButton, Heading } from '../../../style';
 import eyeIcon from '../../../assets/eye.svg';
 
@@ -20,7 +20,6 @@ const FORM_TYPE = 'vehicleReport';
 
 type Form = Schema['Form']['type'];
 
- 
 const VechileReport = () => {
     const { userProfile, client } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -139,212 +138,204 @@ const VechileReport = () => {
         {
             key: 'vehicleReport_status',
             header: 'Status'
-        },
+        }
     ];
 
-
-
-
-// fetch function for usePagination
-const fetchForm = useCallback(
-    async (limit: number, token?: string) => {
-        const params: any = {
-            formType: `${FORM_TYPE}#active`,
-            nextToken: token,
-            limit,
-            sortDirection: 'DESC'
-        };
-        const response = await client.models.Form.listFormByType(params);
-        return {
-            data: response.data,
-            nextToken: response.nextToken || null
-        };
-    },
-    [client.models.Form]
-);
-
-// Use the usePagination hook
-const {
-    items,
-    isLoading,
-    hasNext,
-    hasPrevious,
-    goToNext,
-    goToPrevious,
-    initiateLoding,
-    updateItem,
-    refreshList,
-    stopLoding
-} = usePagination<Form>({
-    limit: LIMIT,
-    fetchFn: fetchForm as any,
-    idField
-});
-
-const processFile = async ({ file }) => {
-    const fileName = file.name;
-    const fileType = file.type;
-    const fileExtension = file.name.split('.').pop();
-
-    return file
-        .arrayBuffer()
-        .then((filebuffer: Buffer) =>
-            window.crypto.subtle.digest('SHA-1', filebuffer)
-        )
-        .then((hashBuffer: Buffer) => {
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray
-                .map(a => a.toString(16).padStart(2, '0'))
-                .join('');
-            const key = `${hashHex}.${fileExtension}`;
-            setFiles(prevFiles => {
-                return {
-                    ...prevFiles,
-                    [key]: {
-                        status: 'uploading',
-                        type: fileType,
-                        name: fileName
-                    }
-                };
-            });
-            return { file, key };
-        });
-};
-
-const addNewItemHandler = () => {
-    setUpdateMode(false);
-    setIsModalOpen(true);
-    setSelectedItem({
-        vehicleReport_vehicleNo: '',
-        vehicleReport_roadTaxDue:formatDateForInput(new Date()),
-        vehicleReport_stateTaxDue: formatDateForInput(new Date()),
-        vehicleReport_fitnessDue:formatDateForInput(new Date()),
-        vehicleReport_challan:'No',
-        vehicleReport_challanDate:formatDateForInput(new Date()),
-        vehicleReport_challanDue: 'No',
-        vehicleReport_batterySNO: '',
-        vehicleReport_batteryWarranty: formatDateForInput(new Date()),
-        vehicleReport_billNo: '',
-        vehicleReport_billDate: formatDateForInput(new Date()),
-        vehicleReport_status:'PENDING',
-
-    });
-    setFiles({});
-};
-
-const handleCloseModal = () => {
-    setIsModalOpen(false);
-};
-
-const handleEdit = (item: any) => {
-    setSelectedItem(item);
-    setFiles({});
-    setDefaultFiles(
-        item.vehicleReport_billPhoto?.map((data: any) => ({
-            ...data,
-            path: data.key,
-            key: data.name,
-            status: 'uploaded'
-        })) || []
+    // fetch function for usePagination
+    const fetchForm = useCallback(
+        async (limit: number, token?: string) => {
+            const params: any = {
+                formType: `${FORM_TYPE}#active`,
+                nextToken: token,
+                limit,
+                sortDirection: 'DESC'
+            };
+            const response = await client.models.Form.listFormByType(params);
+            return {
+                data: response.data,
+                nextToken: response.nextToken || null
+            };
+        },
+        [client.models.Form]
     );
-    setUpdateMode(true);
-    setIsModalOpen(true);
-};
 
-
- 
-const onEdit = async (editedForm: Form) => {
+    // Use the usePagination hook
     const {
-        createdAt,
-        updatedAt,
-        hasExpiration,
-        formType,
-        state,
-        createdBy,
-        ...restForm
-    } = editedForm;
+        items,
+        isLoading,
+        hasNext,
+        hasPrevious,
+        goToNext,
+        goToPrevious,
+        initiateLoding,
+        updateItem,
+        refreshList,
+        stopLoding
+    } = usePagination<Form>({
+        limit: LIMIT,
+        fetchFn: fetchForm as any,
+        idField
+    });
 
-    const vehicleReport_billPhoto = defaultFiles
-        .map(({ path: key, name, type }) => ({ key, name, type }))
-        .concat(
-            Object.keys(files).reduce((acc, key) => {
-                const { status, ...fileData } = files[key] || {};
-                if (status !== 'success') return acc;
-                return [...acc, fileData];
-            }, [])
-        );
+    const processFile = async ({ file }) => {
+        const fileName = file.name;
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop();
 
-    if (isUpdateMode) {
-        const params: any = {
-            ...restForm,
-            updatedAt: new Date().toISOString(),
-            updatedBy: userProfile.userId,
-            vehicleReport_billPhoto
-        };
-        updateItem({
-            ...editedForm,
-            vehicleReport_billPhoto
-        } as any);
-
-        client.models.Form.update(params).catch(error => {
-            console.error(`Failed to update ${heading}:`, error);
-        });
-    } else {
-        const params: any = {
-            ...restForm,
-            [idField]: ulid(),
-            hasExpiration: 'yes#active',
-            createdAt: new Date().toISOString(),
-            formType: `${FORM_TYPE}#active`,
-            state: 'active',
-            createdBy: userProfile.userId,
-            vehicleReport_billPhoto
-        };
-        initiateLoding();
-        client.models.Form.create(params)
-            .then(() => {
-                refreshList();
-            })
-            .catch(error => {
-                console.error(`Failed to create ${heading}:`, error);
-                stopLoding();
+        return file
+            .arrayBuffer()
+            .then((filebuffer: Buffer) =>
+                window.crypto.subtle.digest('SHA-1', filebuffer)
+            )
+            .then((hashBuffer: Buffer) => {
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray
+                    .map(a => a.toString(16).padStart(2, '0'))
+                    .join('');
+                const key = `${hashHex}.${fileExtension}`;
+                setFiles(prevFiles => {
+                    return {
+                        ...prevFiles,
+                        [key]: {
+                            status: 'uploading',
+                            type: fileType,
+                            name: fileName
+                        }
+                    };
+                });
+                return { file, key };
             });
-    }
-};
-const handleSave = () => {
-    if (!selectedItem) return;
-    onEdit(selectedItem as Form);
-    setIsModalOpen(false);
-};
+    };
 
-const updateField = (value: any, key: string, isMultiValue = false) => {
-    if (!isMultiValue) {
-        setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
-    } else {
-        const keys = key.split('#');
-        const values = value.split('#');
-        setSelectedItem((prev: any) => ({
-            ...prev,
-            [keys[0]]: values[0],
-            [keys[1]]: values[1]
-        }));
-    }
-};
+    const addNewItemHandler = () => {
+        setUpdateMode(false);
+        setIsModalOpen(true);
+        setSelectedItem({
+            vehicleReport_vehicleNo: '',
+            vehicleReport_roadTaxDue: formatDateForInput(new Date()),
+            vehicleReport_stateTaxDue: formatDateForInput(new Date()),
+            vehicleReport_fitnessDue: formatDateForInput(new Date()),
+            vehicleReport_challan: 'No',
+            vehicleReport_challanDate: formatDateForInput(new Date()),
+            vehicleReport_challanDue: 'No',
+            vehicleReport_batterySNO: '',
+            vehicleReport_batteryWarranty: formatDateForInput(new Date()),
+            vehicleReport_billNo: '',
+            vehicleReport_billDate: formatDateForInput(new Date()),
+            vehicleReport_status: 'PENDING'
+        });
+        setFiles({});
+    };
 
-const filesData = Object.values(files).filter(Boolean);
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
+    const handleEdit = (item: any) => {
+        setSelectedItem(item);
+        setFiles({});
+        setDefaultFiles(
+            item.vehicleReport_billPhoto?.map((data: any) => ({
+                ...data,
+                path: data.key,
+                key: data.name,
+                status: 'uploaded'
+            })) || []
+        );
+        setUpdateMode(true);
+        setIsModalOpen(true);
+    };
 
-const isSubmitDisabled =false;
-// !selectedItem.buildingMclTax_buildingName ||
-// !selectedItem.buildingMclTax_taxType ||
-// selectedItem.buildingMclTax_buildingTax === '' ||
-// !selectedItem.buildingMclTax_status ||
-// !selectedItem.buildingMclTax_documentFileNo;
+    const onEdit = async (editedForm: Form) => {
+        const {
+            createdAt,
+            updatedAt,
+            hasExpiration,
+            formType,
+            state,
+            createdBy,
+            ...restForm
+        } = editedForm;
 
+        const vehicleReport_billPhoto = defaultFiles
+            .map(({ path: key, name, type }) => ({ key, name, type }))
+            .concat(
+                Object.keys(files).reduce((acc, key) => {
+                    const { status, ...fileData } = files[key] || {};
+                    if (status !== 'success') return acc;
+                    return [...acc, fileData];
+                }, [])
+            );
 
-    return <>
-    
-    <div style={{ position: 'relative' }}>
+        if (isUpdateMode) {
+            const params: any = {
+                ...restForm,
+                updatedAt: new Date().toISOString(),
+                updatedBy: userProfile.userId,
+                vehicleReport_billPhoto
+            };
+            updateItem({
+                ...editedForm,
+                vehicleReport_billPhoto
+            } as any);
+
+            client.models.Form.update(params).catch(error => {
+                console.error(`Failed to update ${heading}:`, error);
+            });
+        } else {
+            const params: any = {
+                ...restForm,
+                [idField]: ulid(),
+                hasExpiration: 'yes#active',
+                createdAt: new Date().toISOString(),
+                formType: `${FORM_TYPE}#active`,
+                state: 'active',
+                createdBy: userProfile.userId,
+                vehicleReport_billPhoto
+            };
+            initiateLoding();
+            client.models.Form.create(params)
+                .then(() => {
+                    refreshList();
+                })
+                .catch(error => {
+                    console.error(`Failed to create ${heading}:`, error);
+                    stopLoding();
+                });
+        }
+    };
+    const handleSave = () => {
+        if (!selectedItem) return;
+        onEdit(selectedItem as Form);
+        setIsModalOpen(false);
+    };
+
+    const updateField = (value: any, key: string, isMultiValue = false) => {
+        if (!isMultiValue) {
+            setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
+        } else {
+            const keys = key.split('#');
+            const values = value.split('#');
+            setSelectedItem((prev: any) => ({
+                ...prev,
+                [keys[0]]: values[0],
+                [keys[1]]: values[1]
+            }));
+        }
+    };
+
+    // const filesData = Object.values(files).filter(Boolean);
+
+    const isSubmitDisabled = false;
+    // !selectedItem.buildingMclTax_buildingName ||
+    // !selectedItem.buildingMclTax_taxType ||
+    // selectedItem.buildingMclTax_buildingTax === '' ||
+    // !selectedItem.buildingMclTax_status ||
+    // !selectedItem.buildingMclTax_documentFileNo;
+
+    return (
+        <>
+            <div style={{ position: 'relative' }}>
                 {/* Loader overlay */}
                 {isLoading && (
                     <div
@@ -374,20 +365,24 @@ const isSubmitDisabled =false;
                     items={items}
                     columns={itemsColumns}
                     addNewEntryAccess={true}
-                     addNewItemHandler={addNewItemHandler}
+                    addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
                 />
             </div>
-             {/* Pagination Controls */}
-             <PaginationControls
+            {/* Pagination Controls */}
+            <PaginationControls
                 onPrevious={goToPrevious}
                 onNext={goToNext}
                 hasPrevious={hasPrevious}
                 hasNext={hasNext}
             />
-    
-    {isModalOpen && (
-                <Modal onCloseHander={handleCloseModal} heading={heading} isUpdateMode={isUpdateMode}>
+
+            {isModalOpen && (
+                <Modal
+                    onCloseHander={handleCloseModal}
+                    heading={heading}
+                    isUpdateMode={isUpdateMode}
+                >
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
                             <Heading>Vehicle No.</Heading>
@@ -414,9 +409,7 @@ const isSubmitDisabled =false;
                                 size="small"
                                 placeholder="Road Tax Due Date"
                                 isRequired={true}
-                                value={
-                                    selectedItem.vehicleReport_roadTaxDue
-                                }
+                                value={selectedItem.vehicleReport_roadTaxDue}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
@@ -434,9 +427,7 @@ const isSubmitDisabled =false;
                                 size="small"
                                 placeholder="State Tax Due Date"
                                 isRequired={true}
-                                value={
-                                    selectedItem.vehicleReport_stateTaxDue
-                                }
+                                value={selectedItem.vehicleReport_stateTaxDue}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
@@ -454,9 +445,7 @@ const isSubmitDisabled =false;
                                 size="small"
                                 placeholder="Fitness Due Date"
                                 isRequired={true}
-                                value={
-                                    selectedItem.vehicleReport_fitnessDue
-                                }
+                                value={selectedItem.vehicleReport_fitnessDue}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
@@ -479,7 +468,7 @@ const isSubmitDisabled =false;
                                 }
                             >
                                 <option value="YES">Yes</option>
-                                <option value="No">No</option>
+                                <option value="NO">No</option>
                             </SelectField>
                         </div>
 
@@ -491,9 +480,7 @@ const isSubmitDisabled =false;
                                 size="small"
                                 placeholder="Fitness Due Date"
                                 isRequired={true}
-                                value={
-                                    selectedItem.vehicleReport_challanDate
-                                }
+                                value={selectedItem.vehicleReport_challanDate}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
@@ -502,8 +489,6 @@ const isSubmitDisabled =false;
                                 }
                             />
                         </div>
-
-
 
                         <div className="mb-8px">
                             <Heading>Challan Due</Heading>
@@ -518,11 +503,9 @@ const isSubmitDisabled =false;
                                 }
                             >
                                 <option value="YES">Yes</option>
-                                <option value="No">No</option>
+                                <option value="NO">No</option>
                             </SelectField>
                         </div>
-
-
 
                         <div className="mb-8px">
                             <Heading>Battery S.No.</Heading>
@@ -541,7 +524,6 @@ const isSubmitDisabled =false;
                                 }
                             />
                         </div>
-
 
                         <div className="mb-8px">
                             <Heading>Battery Warranty</Heading>
@@ -589,9 +571,7 @@ const isSubmitDisabled =false;
                                 size="small"
                                 placeholder="Fitness Due Date"
                                 isRequired={true}
-                                value={
-                                    selectedItem.vehicleReport_billDate
-                                }
+                                value={selectedItem.vehicleReport_billDate}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
@@ -601,7 +581,6 @@ const isSubmitDisabled =false;
                             />
                         </div>
 
-                        
                         <div className="mb-8px">
                             <Heading>Bill Photo</Heading>
                             <FileUploader
@@ -677,9 +656,6 @@ const isSubmitDisabled =false;
                             </SelectField>
                         </div>
 
-                        
- 
-
                         <div
                             style={{
                                 display: 'flex',
@@ -701,8 +677,8 @@ const isSubmitDisabled =false;
                     </form>
                 </Modal>
             )}
-    
-    </>
+        </>
+    );
 };
 
 export default VechileReport;

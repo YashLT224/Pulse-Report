@@ -22,14 +22,14 @@ export const formTypes = [
         label: 'vehicleReport',
         name: 'Vehicle Report',
         icon: vechileReport,
-        route: '/vechile-report'
+        route: '/vehicle-report'
     },
     {
         id: '2',
         label: 'vehicleInsurance',
         name: 'Vehicle Insurance',
         icon: vechileInsurance,
-        route: '/vechile-insurance'
+        route: '/vehicle-insurance'
     },
     {
         id: '3',

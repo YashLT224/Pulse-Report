@@ -23,7 +23,7 @@ const schema = a
                 phoneNumber: a.string().required(),
                 allowedForms: a.string().array(),
                 access: a.string(), // undefined or 'none'
-                status:a.enum(['active', 'inactive']),
+                status: a.enum(['active', 'inactive'])
             })
             .identifier(['userId'])
             .secondaryIndexes(index => [
@@ -165,22 +165,24 @@ const schema = a
                 vehicleInsurance_vehicleType: a.string(),
                 vehicleInsurance_remarks: a.string(),
 
-
-                 // vehicle Report
-                 vehicleReport_vehicleNo: a.string(),
-                 vehicleReport_roadTaxDue: a.date(),
-                 vehicleReport_stateTaxDue: a.date(),
-                 vehicleReport_fitnessDue: a.date(),
-                 vehicleReport_challan: a.string(),
-                 vehicleReport_challanDate: a.date(),
-                 vehicleReport_challanDue: a.string(),
-                 vehicleReport_batterySNO: a.string(),
-                 vehicleReport_batteryWarranty: a.string(),
-                 vehicleReport_billNo: a.string(),
-                 vehicleReport_billDate: a.date(),
-                 vehicleReport_billPhoto: a.ref('File').array(),
-                 vehicleReport_status: a.enum(['PENDING','INPROGRESS' ,'COMPLETED']),
-
+                // Vehicle Report
+                vehicleReport_vehicleNo: a.string(),
+                vehicleReport_roadTaxDue: a.date(),
+                vehicleReport_stateTaxDue: a.date(),
+                vehicleReport_fitnessDue: a.date(),
+                vehicleReport_challan: a.enum(['YES', 'NO']),
+                vehicleReport_challanDate: a.date(),
+                vehicleReport_challanDue: a.enum(['YES', 'NO']),
+                vehicleReport_batterySNO: a.string(),
+                vehicleReport_batteryWarranty: a.string(),
+                vehicleReport_billNo: a.string(),
+                vehicleReport_billDate: a.date(),
+                vehicleReport_billPhoto: a.ref('File').array(),
+                vehicleReport_status: a.enum([
+                    'PENDING',
+                    'INPROGRESS',
+                    'COMPLETED'
+                ]),
 
                 // ToDo List
                 toDoList_assignId: a.string(),
