@@ -248,7 +248,9 @@ const Dispatch = () => {
                 />
             </div>
             {viewDescription.isOpen && (
-                <Modal heading={'Instructions'} isViewMode={true}>
+                <Modal
+                onCloseHander={handleCloseModal}
+                heading={'Instructions'} isViewMode={true}>
                     <div className="mb-8px">
                         <TextAreaField
                             label=""

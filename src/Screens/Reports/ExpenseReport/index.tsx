@@ -304,7 +304,9 @@ const ExpenseReport = () => {
             />
 
             {isModalOpen && (
-                <Modal heading={heading} isUpdateMode={isUpdateMode}>
+                <Modal 
+                onCloseHander={handleCloseModal}
+                heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
                             <Heading>Person Name</Heading>
