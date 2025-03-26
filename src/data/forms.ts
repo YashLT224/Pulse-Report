@@ -61,7 +61,7 @@ export const formTypes = [
     },
     {
         id: '7',
-        label: 'requirement',
+        label: 'requirements',
         name: 'Requirement',
         icon: requirements,
         route: '/requirements'

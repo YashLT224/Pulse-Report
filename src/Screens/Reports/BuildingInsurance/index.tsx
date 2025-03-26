@@ -17,28 +17,25 @@ const idField = 'formId';
 type Form = Schema['Form']['type'];
 const FORM_TYPE = 'buildingInsurance';
 
-
-const formatDateForInput = (date) => {
+const formatDateForInput = date => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
-  };
+};
 
 const getNextYearExpirationDate = () => {
     const today = new Date();
     const nextYear = new Date(today);
-    
+
     // Add one year
     nextYear.setFullYear(today.getFullYear() + 1);
-    
+
     // Subtract one day
     nextYear.setDate(nextYear.getDate() - 1);
-    
-    return formatDateForInput(nextYear);
-  };
 
-  
+    return formatDateForInput(nextYear);
+};
 
 const BuildingInsurance = () => {
     const { userProfile, client } = useAuth();
@@ -51,8 +48,12 @@ const BuildingInsurance = () => {
         (state: any) => state.globalReducer.persons
     );
 
-    // Define columns for the People | Party list
     const itemsColumns = [
+        {
+            key: 'createdAt',
+            header: 'Created At',
+            render: (item: Form) => new Date(item.createdAt).toLocaleString()
+        },
         {
             key: 'buildingInsurance_buildingName',
             header: 'Building Name'
@@ -77,8 +78,18 @@ const BuildingInsurance = () => {
         {
             key: 'buildingInsurance_status',
             header: 'Status',
-            render: (item) =>(<div style={{color:item.buildingInsurance_status==='PAID'?'green':'red'}}>{item.buildingInsurance_status}</div>)
-            
+            render: item => (
+                <div
+                    style={{
+                        color:
+                            item.buildingInsurance_status === 'PAID'
+                                ? 'green'
+                                : 'red'
+                    }}
+                >
+                    {item.buildingInsurance_status}
+                </div>
+            )
         },
         {
             key: 'buildingInsurance_documentNo',
@@ -87,11 +98,6 @@ const BuildingInsurance = () => {
         {
             key: 'buildingInsurance_markToName',
             header: 'Mark To'
-        },
-        {
-            key: 'createdAt',
-            header: 'Created At',
-            render: (item: Form) => new Date(item.createdAt).toLocaleString()
         }
     ];
 
@@ -142,8 +148,8 @@ const BuildingInsurance = () => {
             buildingInsurance_markToName: '',
             buildingInsurance_markToId: '',
             buildingInsurance_status: 'PENDING',
-            expirationDate:getNextYearExpirationDate(),
-            buildingInsurance_documentNo:''
+            expirationDate: getNextYearExpirationDate(),
+            buildingInsurance_documentNo: ''
         });
     };
     const handleCloseModal = () => {
@@ -223,9 +229,9 @@ const BuildingInsurance = () => {
         !selectedItem.buildingInsurance_markToId ||
         selectedItem.buildingInsurance_insureAmount === '' ||
         selectedItem.buildingInsurance_insuranceAmount === '' ||
-        (selectedItem.buildingInsurance_status==='PAID'&& !selectedItem.buildingInsurance_documentNo?.trim());
-
-        
+        !selectedItem.expirationDate ||
+        (selectedItem.buildingInsurance_status === 'PAID' &&
+            !selectedItem.buildingInsurance_documentNo?.trim());
 
     return (
         <>
@@ -391,7 +397,9 @@ const BuildingInsurance = () => {
                                 size="small"
                                 placeholder="Document No."
                                 isRequired={true}
-                                value={selectedItem.buildingInsurance_documentNo}
+                                value={
+                                    selectedItem.buildingInsurance_documentNo
+                                }
                                 onChange={e =>
                                     updateField(
                                         e.target.value,

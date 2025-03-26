@@ -311,6 +311,7 @@ const VechileInsurance = () => {
         selectedItem.vehicleInsurance_insuranceAmount === '' ||
         !selectedItem.vehicleInsurance_vehicleType ||
         !selectedItem.vehicleInsurance_remarks ||
+        !selectedItem.expirationDate ||
         (defaultFiles.length === 0 &&
             (filesData.length === 0 ||
                 !filesData.every((file: any) => file?.status === 'success')));
