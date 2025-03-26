@@ -112,7 +112,7 @@ const UserList = () => {
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
-console.log(selectedItem)
+
     const handleFormChange = formLabel => {
         setSelectedForms(
             prevSelectedForms =>

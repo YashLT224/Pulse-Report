@@ -9,7 +9,7 @@ import useAuth from '../../../Hooks/useAuth';
 import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
-import { formatDateForInput } from '../../../utils/helpers';
+import { formatDateForInput, getEarliestDate } from '../../../utils/helpers';
 import { ModalButton, Heading } from '../../../style';
 import eyeIcon from '../../../assets/eye.svg';
 
@@ -254,6 +254,13 @@ const VechileReport = () => {
             ...restForm
         } = editedForm;
 
+        const expirationDate = getEarliestDate(
+            restForm.vehicleReport_roadTaxDue,
+            restForm.vehicleReport_stateTaxDue,
+            restForm.vehicleReport_fitnessDue,
+            restForm.vehicleReport_batteryWarranty
+        );
+
         const vehicleReport_billPhoto = defaultFiles
             .map(({ path: key, name, type }) => ({ key, name, type }))
             .concat(
@@ -269,6 +276,7 @@ const VechileReport = () => {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
                 updatedBy: userProfile.userId,
+                expirationDate,
                 vehicleReport_billPhoto
             };
             updateItem({
@@ -288,6 +296,7 @@ const VechileReport = () => {
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,
+                expirationDate,
                 vehicleReport_billPhoto
             };
             initiateLoding();
@@ -321,14 +330,15 @@ const VechileReport = () => {
         }
     };
 
-    // const filesData = Object.values(files).filter(Boolean);
+    const filesData = Object.values(files).filter(Boolean);
 
-    const isSubmitDisabled = false;
-    // !selectedItem.buildingMclTax_buildingName ||
-    // !selectedItem.buildingMclTax_taxType ||
-    // selectedItem.buildingMclTax_buildingTax === '' ||
-    // !selectedItem.buildingMclTax_status ||
-    // !selectedItem.buildingMclTax_documentFileNo;
+    const isSubmitDisabled =
+        !selectedItem.vehicleReport_vehicleNo ||
+        !selectedItem.vehicleReport_batterySNO ||
+        !selectedItem.vehicleReport_billNo ||
+        (defaultFiles.length === 0 &&
+            (filesData.length === 0 ||
+                !filesData.every((file: any) => file?.status === 'success')));
 
     return (
         <>
@@ -404,7 +414,7 @@ const VechileReport = () => {
                                 type="date"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Road Tax Due Date"
+                                placeholder="Road Tax Due"
                                 isRequired={true}
                                 value={selectedItem.vehicleReport_roadTaxDue}
                                 onChange={e =>
@@ -422,7 +432,7 @@ const VechileReport = () => {
                                 type="date"
                                 variation="quiet"
                                 size="small"
-                                placeholder="State Tax Due Date"
+                                placeholder="State Tax Due"
                                 isRequired={true}
                                 value={selectedItem.vehicleReport_stateTaxDue}
                                 onChange={e =>
@@ -440,7 +450,7 @@ const VechileReport = () => {
                                 type="date"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Fitness Due Date"
+                                placeholder="Fitness Due"
                                 isRequired={true}
                                 value={selectedItem.vehicleReport_fitnessDue}
                                 onChange={e =>
@@ -475,7 +485,7 @@ const VechileReport = () => {
                                 type="date"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Fitness Due Date"
+                                placeholder="Challan Date"
                                 isRequired={true}
                                 value={selectedItem.vehicleReport_challanDate}
                                 onChange={e =>
@@ -528,7 +538,7 @@ const VechileReport = () => {
                                 type="date"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Fitness Due Date"
+                                placeholder="Battery Warranty"
                                 isRequired={true}
                                 value={
                                     selectedItem.vehicleReport_batteryWarranty
@@ -548,7 +558,7 @@ const VechileReport = () => {
                             <Input
                                 variation="quiet"
                                 size="small"
-                                placeholder={'Battery S.No.'}
+                                placeholder="Bill No."
                                 value={selectedItem.vehicleReport_billNo}
                                 isRequired={true}
                                 onChange={e =>
@@ -566,7 +576,7 @@ const VechileReport = () => {
                                 type="date"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Fitness Due Date"
+                                placeholder="Bill Date"
                                 isRequired={true}
                                 value={selectedItem.vehicleReport_billDate}
                                 onChange={e =>
