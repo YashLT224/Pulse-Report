@@ -278,7 +278,9 @@ const BuildingInsurance = () => {
             </div>
 
             {isModalOpen && (
-                <Modal heading={heading} isUpdateMode={isUpdateMode}>
+                <Modal
+                onCloseHander={handleCloseModal}
+                heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
                             <Heading>Building Name</Heading>

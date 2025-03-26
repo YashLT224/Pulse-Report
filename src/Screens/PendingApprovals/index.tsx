@@ -169,7 +169,9 @@ const PendingApprovals = () => {
             />
 
             {isModalOpen && selectedItem && (
-                <Modal heading={`User: ${selectedItem['userName']}`}>
+                <Modal
+                onCloseHander={handleCloseModal}
+                heading={`User: ${selectedItem['userName']}`}>
                     {formTypes.map(form => (
                         <CheckboxContainer key={form.id}>
                             <CheckboxLabel>

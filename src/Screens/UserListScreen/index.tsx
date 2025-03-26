@@ -172,7 +172,9 @@ const UserList = () => {
             />
 
             {isModalOpen && selectedItem && (
-                <Modal heading={`User: ${selectedItem['userName']}`}>
+                <Modal
+                onCloseHander={handleCloseModal}
+                heading={`User: ${selectedItem['userName']}`}>
                      <div className="mb-8px">
                             <Heading>Status: </Heading>
                             <SelectField

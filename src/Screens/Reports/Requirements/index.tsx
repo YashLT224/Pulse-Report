@@ -50,7 +50,7 @@ const Requirements = () => {
                 <ul>
                     {item.requirements_itemList.map((req, index) => (
                         <li key={index}>
-                            {req.itemName} - ${req.itemPrice.toFixed(2)} x{' '}
+                            {req.itemName} - ₹{req.itemPrice.toFixed(2)} x{' '}
                             {req.itemQuantity}
                         </li>
                     ))}
@@ -115,6 +115,41 @@ const Requirements = () => {
             expirationDate: formatDateForInput(new Date()),
             requirements_itemList: []
         });
+    };
+
+    const handleAddItem = () => {
+        setSelectedItem(prev => ({
+            ...prev,
+            requirements_itemList: [
+                ...prev.requirements_itemList,
+                { itemName: '', itemQuantity: 0, itemPrice: 0 }
+            ]
+        }));
+    };
+
+    // Update a specific item in the list
+    const handleItemChange = (index, field, value) => {
+        setSelectedItem(prev => {
+            const updatedItems = [...prev.requirements_itemList];
+            updatedItems[index] = {
+                ...updatedItems[index],
+                [field]: value
+            };
+            return {
+                ...prev,
+                requirements_itemList: updatedItems
+            };
+        });
+    };
+
+    // Remove an item from the list
+    const handleRemoveItem = (index: number) => {
+        setSelectedItem(prev => ({
+            ...prev,
+            requirements_itemList: prev.requirements_itemList.filter(
+                (_, i) => i !== index
+            )
+        }));
     };
 
     const handleCloseModal = () => {
@@ -245,7 +280,9 @@ const Requirements = () => {
             </div>
 
             {isModalOpen && (
-                <Modal heading={heading} isUpdateMode={isUpdateMode}>
+                <Modal
+                onCloseHander={handleCloseModal}
+                heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
                             <Heading>Demand From</Heading>
@@ -300,6 +337,63 @@ const Requirements = () => {
                                 }
                             />
                         </div>
+
+                        <div className="mb-8px">
+                            <Heading>Requirements</Heading>
+                            {selectedItem.requirements_itemList?.map(
+                                (item, index) => (
+                                    <div style={{border:'0px solid #666', borderRadius:'12px', marginBottom:'6px', padding:'6px'}} key={index}>
+                                        <Heading style={{width:'100%'}} className='flexbox-between'>
+                                            <span>#{index}</span> 
+                                        <span style={{cursor:'pointer'}} onClick={()=>handleRemoveItem(index)}>  Ⓧ</span>
+                                        </Heading>
+                                        <div style={{display:'flex',  width:'100%',borderTop:'1px solid #666'}}>
+                                        <div style={{ width:'33%',borderRight:'1px solid #666',  }} className="mb-8px">
+                                            <Heading style={{margin:'6px 0px 12px 0px', width:'100%',textAlign:'center'}}>Name</Heading>
+                                            <Input
+                                                variation="quiet"
+                                                size="small"
+                                                placeholder="name"
+                                                isRequired={true}
+                                                value={item.itemName}
+                                                onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
+                                            />
+                                        </div>
+                                        <div style={{ width:'33%',borderRight:'1px solid #666'}} className="mb-8px">
+                                            <Heading style={{margin:'6px 0px 12px 0px', width:'100%',textAlign:'center'}}>Quantity</Heading>
+                                            <Input
+                                               type='number'
+                                                variation="quiet"
+                                                size="small"
+                                                placeholder="quantity"
+                                                isRequired={true}
+                                                value={item.itemQuantity}
+                                                onChange={(e) => handleItemChange(index, 'itemQuantity', Number(e.target.value))}
+                                            />
+                                        </div>
+                                        <div style={{ width:'33%'}} className="mb-8px">
+                                            <Heading style={{margin:'6px 0px 12px 0px', width:'100%',textAlign:'center'}}>Price</Heading>
+                                            <Input
+                                                 type='number'
+                                        
+                                                variation="quiet"
+                                                size="small"
+                                                placeholder="price"
+                                                isRequired={true}
+                                                value={item.itemPrice}
+                                                onChange={(e) => handleItemChange(index, 'itemPrice', Number(e.target.value))}
+                                            />
+                                        </div>
+                                        </div>
+                                    </div>
+                                )
+                            )}
+
+                            <ModalButton onClick={handleAddItem}>
+                                + Add Requirement
+                            </ModalButton>
+                        </div>
+
                         <div className="mb-8px">
                             <Heading>Remarks</Heading>
                             <Input
