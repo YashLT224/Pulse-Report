@@ -174,7 +174,7 @@ const schema = a
                 vehicleReport_challanDate: a.date(),
                 vehicleReport_challanDue: a.enum(['YES', 'NO']),
                 vehicleReport_batterySNO: a.string(),
-                vehicleReport_batteryWarranty: a.string(),
+                vehicleReport_batteryWarranty: a.date(),
                 vehicleReport_billNo: a.string(),
                 vehicleReport_billDate: a.date(),
                 vehicleReport_billPhoto: a.ref('File').array(),
