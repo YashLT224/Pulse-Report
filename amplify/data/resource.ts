@@ -19,6 +19,10 @@ const schema = a
             itemPrice: a.float(),
             itemQuantity: a.float()
         }),
+        SKU: a.customType({
+            sku: a.float(),
+            target: a.float()
+        }),
         UserProfile: a
             .model({
                 userId: a.id().required(),
@@ -123,6 +127,8 @@ const schema = a
                 hasExpiration: a.string(), // Encodes expiration status and state, e.g., 'yes#active'
                 expirationDate: a.date(),
                 completedAt: a.datetime(),
+                GSI1PK: a.string(), // Partition key for the GSI
+                GSI1SK: a.string(), // Sort key for the GSI
 
                 // Expense Report fields
                 expenseReport_balanceBF: a.float(),
@@ -212,7 +218,18 @@ const schema = a
                 requirements_responsiblePersonId: a.string(),
                 requirements_responsiblePersonName: a.string(),
                 requirements_remarks: a.string(),
-                requirements_itemList: a.ref('ProductEntry').array()
+                requirements_itemList: a.ref('ProductEntry').array(),
+
+                // Sales Man Performance
+                salesManPerformance_year: a.integer(),
+                salesManPerformance_month: a.string(),
+                salesManPerformance_salesManId: a.string(),
+                salesManPerformance_salesManName: a.string(),
+                salesManPerformance_salary: a.float(),
+                salesManPerformance_expense: a.float(),
+                salesManPerformance_salesInRupees: a.float(),
+                salesManPerformance_salesInKgs: a.float(),
+                salesManPerformance_skus: a.ref('SKU').array()
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [
@@ -223,7 +240,11 @@ const schema = a
                 index('hasExpiration')
                     .sortKeys(['expirationDate'])
                     .queryField('listByExpiration')
-                    .name('ExpirationIndex')
+                    .name('ExpirationIndex'),
+                index('GSI1PK')
+                    .sortKeys(['GSI1SK'])
+                    .queryField('listByGSI1')
+                    .name('GSI1')
             ])
             .authorization(allow => [
                 // Allow admin to perform all operations
