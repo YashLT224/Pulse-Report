@@ -145,18 +145,18 @@ const SalesManPerformance = () => {
     const fetchForm = useCallback(
         async (limit: number, token?: string) => {
             const params: any = {
-                formType: `${FORM_TYPE}#active`,
+                GSI1PK: `${FORM_TYPE}#${filters.date}#active`,
                 nextToken: token,
                 limit,
                 sortDirection: 'DESC'
             };
-            const response = await client.models.Form.listFormByType(params);
+            const response = await client.models.Form.listByGSI1(params);
             return {
                 data: response.data,
                 nextToken: response.nextToken || null
             };
         },
-        [client.models.Form]
+        [client.models.Form, filters.date]
     );
 
     // Use the usePagination hook
@@ -258,11 +258,25 @@ const SalesManPerformance = () => {
             updatedBy,
             ...restForm
         } = editedForm;
+        const totalExpense =
+            editedForm.salesManPerformance_salary +
+            editedForm.salesManPerformance_expense;
+        const averageExpensePercentage =
+            editedForm.salesManPerformance_salesInRupees > 0 && totalExpense > 0
+                ? (totalExpense /
+                      editedForm.salesManPerformance_salesInRupees) *
+                  100
+                : 0;
+        const GSI1PK = `${FORM_TYPE}#${restForm.salesManPerformance_year_month}#active`;
+        const GSI1SK_Metric = averageExpensePercentage;
+
         if (isUpdateMode) {
             const params: any = {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
-                updatedBy: userProfile.userId
+                updatedBy: userProfile.userId,
+                GSI1PK,
+                GSI1SK_Metric
             };
             updateItem(editedForm);
 
@@ -276,7 +290,9 @@ const SalesManPerformance = () => {
                 createdAt: new Date().toISOString(),
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
-                createdBy: userProfile.userId
+                createdBy: userProfile.userId,
+                GSI1PK,
+                GSI1SK_Metric
             };
             initiateLoding();
             client.models.Form.create(params)
@@ -298,7 +314,7 @@ const SalesManPerformance = () => {
         0
     );
     const averageExpenseAmount =
-        selectedItem.salesManPerformance_salesInRupees && totalExpense > 0
+        selectedItem.salesManPerformance_salesInRupees > 0 && totalExpense > 0
             ? (
                   (totalExpense /
                       selectedItem.salesManPerformance_salesInRupees) *
@@ -405,9 +421,10 @@ const SalesManPerformance = () => {
                                 value={
                                     selectedItem.salesManPerformance_year_month
                                 }
-                                onChange={selectedValue => {
-                                    updateField(
-                                        selectedValue,
+                                onChange={e => {
+                                    if (!e.target.value) return; // Prevent clearing
+                                    return updateField(
+                                        e.target.value,
                                         'salesManPerformance_year_month'
                                     );
                                 }}
