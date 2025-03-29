@@ -48,12 +48,15 @@ const Requirements = () => {
             header: 'Requirements',
             render: (item: Form) => (
                 <ul>
-                    {item.requirements_itemList.map((req, index) => (
-                        <li key={index}>
-                            {req.itemName} - ₹{req.itemPrice.toFixed(2)} x{' '}
-                            {req.itemQuantity}
+                    {item.requirements_itemList.map((req, index) => {
+                         let price =req.itemPrice.toFixed(2);
+                         let quantity=req.itemQuantity;
+                        let total= price*quantity;
+                       return  <li key={index}>
+                            {req.itemName} - ₹{price} x{' '}
+                            {quantity} = ₹{total}
                         </li>
-                    ))}
+                    })}
                 </ul>
             )
         },
@@ -344,7 +347,7 @@ const Requirements = () => {
                                 (item, index) => (
                                     <div style={{border:'0px solid #666', borderRadius:'12px', marginBottom:'6px', padding:'6px'}} key={index}>
                                         <Heading style={{width:'100%'}} className='flexbox-between'>
-                                            <span>#{index}</span> 
+                                            <span>#{index+1}</span> 
                                         <span style={{cursor:'pointer'}} onClick={()=>handleRemoveItem(index)}>  Ⓧ</span>
                                         </Heading>
                                         <div style={{display:'flex',  width:'100%',borderTop:'1px solid #666'}}>

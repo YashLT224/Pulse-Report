@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button } from '@aws-amplify/ui-react';
 import {
     Table,
@@ -28,6 +29,7 @@ interface UserListProps<T> {
     addNewEntryAccess?: boolean;
     handleEdit: (item: T) => void;
     addNewItemHandler?: () => void;
+    children?:React.ReactNode
 }
 
 function UserList<T extends EditableItem>({
@@ -36,7 +38,8 @@ function UserList<T extends EditableItem>({
     columns,
     addNewEntryAccess = false,
     handleEdit,
-    addNewItemHandler = () => {}
+    addNewItemHandler = () => {},
+    children
 }: UserListProps<T>) {
     // Default columns if none provided
     const defaultColumns: TableColumn<T>[] = [
@@ -55,6 +58,7 @@ function UserList<T extends EditableItem>({
     return (
         <div>
             <div className="flexbox-between">
+
                 <h2>{heading}</h2>
                 {addNewEntryAccess && (
                     <Button
@@ -68,6 +72,7 @@ function UserList<T extends EditableItem>({
                     </Button>
                 )}
             </div>
+            {children}
             <TableContainer>
                 <Table>
                     <TableHeader>
