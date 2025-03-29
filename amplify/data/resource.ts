@@ -127,8 +127,8 @@ const schema = a
                 hasExpiration: a.string(), // Encodes expiration status and state, e.g., 'yes#active'
                 expirationDate: a.date(),
                 completedAt: a.datetime(),
-                GSI1PK: a.string(), // Partition key for the GSI
-                GSI1SK: a.string(), // Sort key for the GSI
+                GSI1PK: a.string(), // Partition key for the GSI1
+                GSI1SK_Metric: a.float(), // Sort key for the GSI1
 
                 // Expense Report fields
                 expenseReport_balanceBF: a.float(),
@@ -241,7 +241,7 @@ const schema = a
                     .queryField('listByExpiration')
                     .name('ExpirationIndex'),
                 index('GSI1PK')
-                    .sortKeys(['GSI1SK'])
+                    .sortKeys(['GSI1SK_Metric'])
                     .queryField('listByGSI1')
                     .name('GSI1')
             ])
