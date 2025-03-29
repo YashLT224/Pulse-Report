@@ -49,13 +49,15 @@ const Requirements = () => {
             render: (item: Form) => (
                 <ul>
                     {item.requirements_itemList.map((req, index) => {
-                         let price =req.itemPrice.toFixed(2);
-                         let quantity=req.itemQuantity;
-                        let total= price*quantity;
-                       return  <li key={index}>
-                            {req.itemName} - ₹{price} x{' '}
-                            {quantity} = ₹{total}
-                        </li>
+                        const price = req.itemPrice;
+                        const quantity = req.itemQuantity;
+                        const total = (price * quantity).toFixed(2);
+                        return (
+                            <li key={index}>
+                                {req.itemName} - ₹{price.toFixed(2)} x{' '}
+                                {quantity} = ₹{total}
+                            </li>
+                        );
                     })}
                 </ul>
             )
@@ -284,8 +286,10 @@ const Requirements = () => {
 
             {isModalOpen && (
                 <Modal
-                onCloseHander={handleCloseModal}
-                heading={heading} isUpdateMode={isUpdateMode}>
+                    onCloseHander={handleCloseModal}
+                    heading={heading}
+                    isUpdateMode={isUpdateMode}
+                >
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
                             <Heading>Demand From</Heading>
@@ -345,48 +349,138 @@ const Requirements = () => {
                             <Heading>Requirements</Heading>
                             {selectedItem.requirements_itemList?.map(
                                 (item, index) => (
-                                    <div style={{border:'0px solid #666', borderRadius:'12px', marginBottom:'6px', padding:'6px'}} key={index}>
-                                        <Heading style={{width:'100%'}} className='flexbox-between'>
-                                            <span>#{index+1}</span> 
-                                        <span style={{cursor:'pointer'}} onClick={()=>handleRemoveItem(index)}>  Ⓧ</span>
+                                    <div
+                                        style={{
+                                            border: '0px solid #666',
+                                            borderRadius: '12px',
+                                            marginBottom: '6px',
+                                            padding: '6px'
+                                        }}
+                                        key={index}
+                                    >
+                                        <Heading
+                                            style={{ width: '100%' }}
+                                            className="flexbox-between"
+                                        >
+                                            <span>#{index + 1}</span>
+                                            <span
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() =>
+                                                    handleRemoveItem(index)
+                                                }
+                                            >
+                                                {' '}
+                                                Ⓧ
+                                            </span>
                                         </Heading>
-                                        <div style={{display:'flex',  width:'100%',borderTop:'1px solid #666'}}>
-                                        <div style={{ width:'33%',borderRight:'1px solid #666',  }} className="mb-8px">
-                                            <Heading style={{margin:'6px 0px 12px 0px', width:'100%',textAlign:'center'}}>Name</Heading>
-                                            <Input
-                                                variation="quiet"
-                                                size="small"
-                                                placeholder="name"
-                                                isRequired={true}
-                                                value={item.itemName}
-                                                onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
-                                            />
-                                        </div>
-                                        <div style={{ width:'33%',borderRight:'1px solid #666'}} className="mb-8px">
-                                            <Heading style={{margin:'6px 0px 12px 0px', width:'100%',textAlign:'center'}}>Quantity</Heading>
-                                            <Input
-                                               type='number'
-                                                variation="quiet"
-                                                size="small"
-                                                placeholder="quantity"
-                                                isRequired={true}
-                                                value={item.itemQuantity}
-                                                onChange={(e) => handleItemChange(index, 'itemQuantity', Number(e.target.value))}
-                                            />
-                                        </div>
-                                        <div style={{ width:'33%'}} className="mb-8px">
-                                            <Heading style={{margin:'6px 0px 12px 0px', width:'100%',textAlign:'center'}}>Price</Heading>
-                                            <Input
-                                                 type='number'
-                                        
-                                                variation="quiet"
-                                                size="small"
-                                                placeholder="price"
-                                                isRequired={true}
-                                                value={item.itemPrice}
-                                                onChange={(e) => handleItemChange(index, 'itemPrice', Number(e.target.value))}
-                                            />
-                                        </div>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                width: '100%',
+                                                borderTop: '1px solid #666'
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    width: '33%',
+                                                    borderRight:
+                                                        '1px solid #666'
+                                                }}
+                                                className="mb-8px"
+                                            >
+                                                <Heading
+                                                    style={{
+                                                        margin:
+                                                            '6px 0px 12px 0px',
+                                                        width: '100%',
+                                                        textAlign: 'center'
+                                                    }}
+                                                >
+                                                    Name
+                                                </Heading>
+                                                <Input
+                                                    variation="quiet"
+                                                    size="small"
+                                                    placeholder="name"
+                                                    isRequired={true}
+                                                    value={item.itemName}
+                                                    onChange={e =>
+                                                        handleItemChange(
+                                                            index,
+                                                            'itemName',
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                            <div
+                                                style={{
+                                                    width: '33%',
+                                                    borderRight:
+                                                        '1px solid #666'
+                                                }}
+                                                className="mb-8px"
+                                            >
+                                                <Heading
+                                                    style={{
+                                                        margin:
+                                                            '6px 0px 12px 0px',
+                                                        width: '100%',
+                                                        textAlign: 'center'
+                                                    }}
+                                                >
+                                                    Quantity
+                                                </Heading>
+                                                <Input
+                                                    type="number"
+                                                    variation="quiet"
+                                                    size="small"
+                                                    placeholder="quantity"
+                                                    isRequired={true}
+                                                    value={item.itemQuantity}
+                                                    onChange={e =>
+                                                        handleItemChange(
+                                                            index,
+                                                            'itemQuantity',
+                                                            Number(
+                                                                e.target.value
+                                                            )
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                            <div
+                                                style={{ width: '33%' }}
+                                                className="mb-8px"
+                                            >
+                                                <Heading
+                                                    style={{
+                                                        margin:
+                                                            '6px 0px 12px 0px',
+                                                        width: '100%',
+                                                        textAlign: 'center'
+                                                    }}
+                                                >
+                                                    Price
+                                                </Heading>
+                                                <Input
+                                                    type="number"
+                                                    variation="quiet"
+                                                    size="small"
+                                                    placeholder="price"
+                                                    isRequired={true}
+                                                    value={item.itemPrice}
+                                                    onChange={e =>
+                                                        handleItemChange(
+                                                            index,
+                                                            'itemPrice',
+                                                            Number(
+                                                                e.target.value
+                                                            )
+                                                        )
+                                                    }
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 )
