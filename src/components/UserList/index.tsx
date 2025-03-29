@@ -29,7 +29,7 @@ interface UserListProps<T> {
     addNewEntryAccess?: boolean;
     handleEdit: (item: T) => void;
     addNewItemHandler?: () => void;
-    children:React.ReactNode
+    children?:React.ReactNode
 }
 
 function UserList<T extends EditableItem>({

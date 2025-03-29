@@ -221,8 +221,7 @@ const schema = a
                 requirements_itemList: a.ref('ProductEntry').array(),
 
                 // Sales Man Performance
-                salesManPerformance_year: a.integer(),
-                salesManPerformance_month: a.string(),
+                salesManPerformance_year_month: a.string(),
                 salesManPerformance_salesManId: a.string(),
                 salesManPerformance_salesManName: a.string(),
                 salesManPerformance_salary: a.float(),
