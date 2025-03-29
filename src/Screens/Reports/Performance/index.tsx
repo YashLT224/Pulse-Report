@@ -10,7 +10,6 @@ import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
-import { formatDateForInput } from '../../../utils/helpers';
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Sales Man Performance';
@@ -24,9 +23,9 @@ const SalesManPerformance = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
-    const [filters,setFilters]=useState({
-        date:new Date().toISOString().slice(0, 7)
-    })
+    const [filters, setFilters] = useState({
+        date: new Date().toISOString().slice(0, 7) // "YYYY-MM"
+    });
 
     const personsList = useSelector(
         (state: any) => state.globalReducer.persons
@@ -46,7 +45,12 @@ const SalesManPerformance = () => {
         {
             key: 'createdAt',
             header: 'Created At',
-            render: (item: Form) => new Date(item.createdAt).toLocaleString().split(',')?.[0]
+            render: (item: Form) =>
+                new Date(item.createdAt).toLocaleString().split(',')?.[0]
+        },
+        {
+            key: 'salesManPerformance_year_month',
+            header: 'Performance Period'
         },
         {
             key: 'salesManPerformance_salesManName',
@@ -103,53 +107,58 @@ const SalesManPerformance = () => {
         {
             key: 'salesManPerformance_avarage_Expence_Amount',
             header: 'Avg. Exp. Amount',
-            render: (item: Form) =>
-                (((item.salesManPerformance_salary +
-                    item.salesManPerformance_expense) /
-                    item.salesManPerformance_salesInRupees) *
-                100).toFixed(2)
+            render: (item: Form) => {
+                const salaryAndExpense =
+                    item.salesManPerformance_salary +
+                    item.salesManPerformance_expense;
+                const salesInRupees = item.salesManPerformance_salesInRupees;
+
+                const percentage =
+                    salesInRupees > 0 && salaryAndExpense > 0
+                        ? (salaryAndExpense / salesInRupees) * 100
+                        : 0;
+
+                return percentage.toFixed(2);
+            }
         },
         {
             key: 'salesManPerformance_avarage_Expence_Weight',
             header: 'Avg. Exp. Weight',
-            render: (item: Form) =>{
-                 const totalSales = item.salesManPerformance_skus.reduce(
+            render: (item: Form) => {
+                const salaryAndExpense =
+                    item.salesManPerformance_salary +
+                    item.salesManPerformance_expense;
+                const totalSales = item.salesManPerformance_skus.reduce(
                     (acc: number, curr: { sku: number; target: number }) =>
                         acc + curr.sku,
                     0
-                )
-                  return (
-                        ((item.salesManPerformance_salary +
-                            item.salesManPerformance_expense) /
-                        totalSales).toFixed(2)
-                    );
+                );
+
+                return totalSales > 0 && salaryAndExpense > 0
+                    ? (salaryAndExpense / totalSales).toFixed(2)
+                    : '0.00';
             }
-                 ,
-           
-          
         }
     ];
 
+    // fetch function for usePagination
+    const fetchForm = useCallback(
+        async (limit: number, token?: string) => {
+            const params: any = {
+                formType: `${FORM_TYPE}#active`,
+                nextToken: token,
+                limit,
+                sortDirection: 'DESC'
+            };
+            const response = await client.models.Form.listFormByType(params);
+            return {
+                data: response.data,
+                nextToken: response.nextToken || null
+            };
+        },
+        [client.models.Form]
+    );
 
-        // fetch function for usePagination
-        const fetchForm = useCallback(
-            async (limit: number, token?: string) => {
-                const params: any = {
-                    formType: `${FORM_TYPE}#active`,
-                    nextToken: token,
-                    limit,
-                    sortDirection: 'DESC'
-                };
-                const response = await client.models.Form.listFormByType(params);
-                return {
-                    data: response.data,
-                    nextToken: response.nextToken || null
-                };
-            },
-            [client.models.Form]
-        );
-
-        
     // Use the usePagination hook
     const {
         items,
@@ -168,20 +177,20 @@ const SalesManPerformance = () => {
         idField
     });
 
-    console.log(selectedItem.salesManPerformance_skus)
-
-
     const addNewItemHandler = () => {
         setUpdateMode(false);
         setIsModalOpen(true);
         setSelectedItem({
+            salesManPerformance_year_month: new Date()
+                .toISOString()
+                .slice(0, 7), // "YYYY-MM"
             salesManPerformance_salesManName: '',
             salesManPerformance_salesManId: '',
             salesManPerformance_salary: 0,
             salesManPerformance_expense: 0,
             salesManPerformance_salesInRupees: 0,
             salesManPerformance_salesInKgs: 0,
-            salesManPerformance_skus: [{sku:0,target:0}]
+            salesManPerformance_skus: [{ sku: 0, target: 0 }]
         });
     };
 
@@ -200,9 +209,19 @@ const SalesManPerformance = () => {
         });
     };
 
+    // Remove an item from the list
+    const handleRemoveItem = (index: number) => {
+        setSelectedItem(prev => ({
+            ...prev,
+            salesManPerformance_skus: prev.salesManPerformance_skus.filter(
+                (_, i) => i !== index
+            )
+        }));
+    };
+
     const handleSave = () => {
         if (!selectedItem) return;
-         onEdit(selectedItem as Form);
+        onEdit(selectedItem as Form);
         setIsModalOpen(false);
     };
     const updateField = (value: any, key: string, isMultiValue = false) => {
@@ -218,8 +237,6 @@ const SalesManPerformance = () => {
             }));
         }
     };
-
-
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -273,14 +290,39 @@ const SalesManPerformance = () => {
         }
     };
 
-    const isSubmitDisabled = false;
-    // !selectedItem.requirements_demandFromId ||
-    // !selectedItem.requirements_demandFromName ||
-    // !selectedItem.requirements_responsiblePersonId ||
-    // !selectedItem.requirements_responsiblePersonName ||
-    // !selectedItem.requirements_remarks ||
-    // !selectedItem.expirationDate ||
-    // !selectedItem.requirements_itemList.length;
+    const totalExpense =
+        selectedItem.salesManPerformance_salary +
+        selectedItem.salesManPerformance_expense;
+    const totalSales = selectedItem?.salesManPerformance_skus?.reduce(
+        (acc: number, curr: { sku: number; target: number }) => acc + curr.sku,
+        0
+    );
+    const averageExpenseAmount =
+        selectedItem.salesManPerformance_salesInRupees && totalExpense > 0
+            ? (
+                  (totalExpense /
+                      selectedItem.salesManPerformance_salesInRupees) *
+                  100
+              ).toFixed(2)
+            : '0.00';
+
+    const averageExpenseWeight =
+        totalSales > 0 && totalExpense > 0
+            ? (totalExpense / totalSales).toFixed(2)
+            : '0.00';
+
+    const isSubmitDisabled =
+        !selectedItem.salesManPerformance_year_month ||
+        !selectedItem.salesManPerformance_salesManName ||
+        !selectedItem.salesManPerformance_salesManId ||
+        selectedItem.salesManPerformance_salary === '' ||
+        selectedItem.salesManPerformance_expense === '' ||
+        selectedItem.salesManPerformance_salesInRupees === '' ||
+        selectedItem.salesManPerformance_salesInKgs === '' ||
+        !selectedItem.salesManPerformance_skus.length ||
+        selectedItem.salesManPerformance_skus.some(
+            skuItem => skuItem.sku === '' || skuItem.target === ''
+        );
 
     return (
         <>
@@ -315,26 +357,27 @@ const SalesManPerformance = () => {
                     columns={itemsColumns}
                     addNewEntryAccess={true}
                     addNewItemHandler={addNewItemHandler}
-                     handleEdit={handleEdit}
-                     
+                    handleEdit={handleEdit}
                 >
                     {/* Filters */}
-                     <div style={{width:'180px'}} className="mb-8px">
-                            <Input
-                               
-                                    type="month"
-                                variation="quiet"
-                                size="small"
-                                placeholder="Deadline"
-                                isRequired={true}
-                                value={filters.date}
-                                onChange={e =>
-                                    setFilters((prev)=>({...prev,date: e.target.value})
-                                      
-                                    )
-                                }
-                            />
-                        </div>
+                    <div style={{ width: '180px' }} className="mb-8px">
+                        <Input
+                            type="month"
+                            variation="quiet"
+                            size="small"
+                            placeholder="Performance Period"
+                            isRequired={true}
+                            value={filters.date}
+                            onChange={e => {
+                                if (!e.target.value) return; // Prevent clearing
+
+                                setFilters(prev => ({
+                                    ...prev,
+                                    date: e.target.value
+                                }));
+                            }}
+                        />
+                    </div>
                 </UserListItems>
                 <PaginationControls
                     onPrevious={goToPrevious}
@@ -351,6 +394,25 @@ const SalesManPerformance = () => {
                     isUpdateMode={isUpdateMode}
                 >
                     <form onSubmit={handleSave}>
+                        <div className="mb-8px">
+                            <Heading>Performance Period</Heading>
+                            <Input
+                                type="month"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Performance Period"
+                                isRequired={true}
+                                value={
+                                    selectedItem.salesManPerformance_year_month
+                                }
+                                onChange={selectedValue => {
+                                    updateField(
+                                        selectedValue,
+                                        'salesManPerformance_year_month'
+                                    );
+                                }}
+                            />
+                        </div>
                         <div className="mb-8px selectSearch">
                             <Heading>Sales Man</Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
@@ -378,12 +440,13 @@ const SalesManPerformance = () => {
                                 placeholder="Salary"
                                 isRequired={true}
                                 value={selectedItem.salesManPerformance_salary}
-                                onChange={e =>
+                                onChange={e => {
+                                    const value = e.target.value;
                                     updateField(
-                                        +e.target.value,
+                                        value ? +value : value,
                                         'salesManPerformance_salary'
-                                    )
-                                }
+                                    );
+                                }}
                             />
                         </div>
 
@@ -396,12 +459,13 @@ const SalesManPerformance = () => {
                                 placeholder="Expense"
                                 isRequired={true}
                                 value={selectedItem.salesManPerformance_expense}
-                                onChange={e =>
+                                onChange={e => {
+                                    const value = e.target.value;
                                     updateField(
-                                        +e.target.value,
+                                        value ? +value : value,
                                         'salesManPerformance_expense'
-                                    )
-                                }
+                                    );
+                                }}
                             />
                         </div>
 
@@ -413,10 +477,7 @@ const SalesManPerformance = () => {
                                 size="small"
                                 placeholder="Total Expense"
                                 isRequired={true}
-                                value={
-                                    selectedItem.salesManPerformance_salary +
-                                    selectedItem.salesManPerformance_expense
-                                }
+                                value={totalExpense}
                             />
                         </div>
 
@@ -461,7 +522,7 @@ const SalesManPerformance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Add Sku's</Heading>
+                            <Heading>Add SKUs</Heading>
                             {selectedItem.salesManPerformance_skus?.map(
                                 (item, index) => (
                                     <div
@@ -520,15 +581,17 @@ const SalesManPerformance = () => {
                                                     placeholder="sku"
                                                     isRequired={true}
                                                     value={item.sku}
-                                                    onChange={e =>
+                                                    onChange={e => {
+                                                        const value =
+                                                            e.target.value;
                                                         handleItemChange(
                                                             index,
                                                             'sku',
-                                                            Number(
-                                                                e.target.value
-                                                            )
-                                                        )
-                                                    }
+                                                            value
+                                                                ? +value
+                                                                : value
+                                                        );
+                                                    }}
                                                 />
                                             </div>
                                             <div
@@ -552,15 +615,17 @@ const SalesManPerformance = () => {
                                                     placeholder="target"
                                                     isRequired={true}
                                                     value={item.target}
-                                                    onChange={e =>
+                                                    onChange={e => {
+                                                        const value =
+                                                            e.target.value;
                                                         handleItemChange(
                                                             index,
                                                             'target',
-                                                            Number(
-                                                                e.target.value
-                                                            )
-                                                        )
-                                                    }
+                                                            value
+                                                                ? +value
+                                                                : value
+                                                        );
+                                                    }}
                                                 />
                                             </div>
                                         </div>
@@ -576,7 +641,7 @@ const SalesManPerformance = () => {
                         <div className="mb-8px">
                             <Heading>Total</Heading>
                             <Input
-                                  type="number"
+                                type="number"
                                 variation="quiet"
                                 size="small"
                                 placeholder="Total"
@@ -594,17 +659,12 @@ const SalesManPerformance = () => {
                         <div className="mb-8px">
                             <Heading>Averge Expense Amount</Heading>
                             <Input
-                                 type="number"
+                                type="number"
                                 variation="quiet"
                                 size="small"
                                 placeholder="Averge Expense Amount"
                                 isRequired={true}
-                                value={
-                                    (((selectedItem.salesManPerformance_salary +
-                                        selectedItem.salesManPerformance_expense) /
-                                        selectedItem.salesManPerformance_salesInRupees) *
-                                    100).toFixed(2)
-                                }
+                                value={averageExpenseAmount}
                             />
                         </div>
 
@@ -616,20 +676,7 @@ const SalesManPerformance = () => {
                                 size="small"
                                 placeholder="Averge Expense Weight"
                                 isRequired={true}
-                                value={
-                                    (( selectedItem.salesManPerformance_salary +
-                                        selectedItem.salesManPerformance_expense) /
-                                    selectedItem?.salesManPerformance_skus?.reduce(
-                                        (
-                                            acc: number,
-                                            curr: {
-                                                sku: number;
-                                                target: number;
-                                            }
-                                        ) => acc + curr.sku,
-                                        0
-                                    )).toFixed(2)
-                                }
+                                value={averageExpenseWeight}
                             />
                         </div>
 
