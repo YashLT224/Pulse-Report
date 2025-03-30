@@ -26,10 +26,9 @@ const Alerts = () => {
                 hasExpiration: 'yes#active',
                 expirationDate: { between: [startDate, endDate] },
                 nextToken: token,
-                limit,
-                sortDirection: 'DESC'
+                limit
             };
-            const response = await client.models.Form.list(params);
+            const response = await client.models.Form.listByExpiration(params);
             return {
                 data: response.data,
                 nextToken: response.nextToken || null
