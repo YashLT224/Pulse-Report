@@ -234,6 +234,7 @@ const schema = a
                 documentFileStatus_remarks: a.string(),
                 documentFileStatus_receivedBy_givenToId: a.string(),
                 documentFileStatus_receivedBy_givenToName: a.string(),
+                documentFileStatus_statusChangeDate: a.date(),
 
                 // Sales Man Performance
                 salesManPerformance_year_month: a.string(),

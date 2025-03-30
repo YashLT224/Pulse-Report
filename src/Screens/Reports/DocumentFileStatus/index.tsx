@@ -177,12 +177,12 @@ const DocumentFileStatus = () => {
         } = editedForm;
 
         // Check if we need to create a new record instead of updating
-        const shouldCreateNewRecord =
-            !isUpdateMode || // It's a new record
-            (isUpdateMode && // It's an update but status changed
-                items.find(item => item[idField] === editedForm[idField])
-                    ?.documentFileStatus_status !==
-                    editedForm.documentFileStatus_status);
+        const hasStatusChanged =
+            isUpdateMode && // It's an update but status changed
+            items.find(item => item[idField] === editedForm[idField])
+                ?.documentFileStatus_status !==
+                editedForm.documentFileStatus_status;
+        const shouldCreateNewRecord = !isUpdateMode || hasStatusChanged; // It's a new record or status has changed
 
         if (shouldCreateNewRecord) {
             // Create a new record
@@ -194,7 +194,10 @@ const DocumentFileStatus = () => {
                 state: 'active',
                 createdBy: userProfile.userId,
                 expirationDate: expirationDate || null,
-                hasExpiration: expirationDate ? 'yes#active' : null
+                hasExpiration: expirationDate ? 'yes#active' : null,
+                ...(hasStatusChanged && {
+                    documentFileStatus_statusChangeDate: new Date().toISOString()
+                })
             };
 
             initiateLoding();
@@ -314,6 +317,9 @@ const DocumentFileStatus = () => {
                         <div className="mb-8px">
                             <Heading>Status</Heading>
                             <SelectField
+                                disabled={
+                                    !!selectedItem.documentFileStatus_statusChangeDate
+                                }
                                 label=""
                                 value={selectedItem.documentFileStatus_status}
                                 onChange={e =>
@@ -324,7 +330,9 @@ const DocumentFileStatus = () => {
                                 }
                             >
                                 <option value="in">In File</option>
-                                <option value="out">Out File</option>
+                                <option value="out" disabled>
+                                    Out File
+                                </option>
                             </SelectField>
                         </div>
 
