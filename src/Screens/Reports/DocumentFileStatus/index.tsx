@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { ulid } from 'ulid';
 import { useSelector } from 'react-redux';
-import { Loader, Input,SelectField } from '@aws-amplify/ui-react';
+import { Loader, Input, SelectField } from '@aws-amplify/ui-react';
 import SelectSearch from 'react-select-search';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
@@ -29,14 +29,24 @@ const DocumentFileStatus = () => {
     );
 
     const itemsColumns = [
-      {
-        key: 'createdAt',
-        header: 'Created At',
-        render: (item: Form) => new Date(item.createdAt).toLocaleString()
-    },
+        {
+            key: 'createdAt',
+            header: 'Created At',
+            render: (item: Form) =>
+                new Date(item.createdAt).toLocaleString().split(',')?.[0]
+        },
+        {
+            key: 'documentFileStatus_status',
+            header: 'Status',
+            render: (item: Form) => {
+                return item.documentFileStatus_status === 'in'
+                    ? 'In File'
+                    : 'Out File';
+            }
+        },
         {
             key: 'documentFileStatus_inDate_outDate',
-            header: 'In Date/ Out Date'
+            header: 'In Date / Out Date'
         },
         {
             key: 'documentFileStatus_fileName',
@@ -54,7 +64,7 @@ const DocumentFileStatus = () => {
 
         {
             key: 'documentFileStatus_window',
-            header: 'Window'
+            header: 'Window Name'
         },
         {
             key: 'documentFileStatus_documentType',
@@ -63,226 +73,196 @@ const DocumentFileStatus = () => {
 
         {
             key: 'documentFileStatus_fileNo',
-            header: 'File No'
+            header: 'File No.'
         },
         {
-          key: 'documentFileStatus_status',
-          header: 'Status'
-      },
-        {
-          key: 'expirationDate',
-          header: 'Date Expiry'
-      },
+            key: 'expirationDate',
+            header: 'Date Expiry'
+        },
         {
             key: 'documentFileStatus_receivedFrom_givenByName',
-            header: 'Received From/ Given By'
+            header: 'Received From / Given By'
         },
         {
             key: 'documentFileStatus_receivedBy_givenToName',
-            header: 'Received By/ Given To'
+            header: 'Received By / Given To'
         },
         {
             key: 'documentFileStatus_remarks',
-            header: 'remarks'
+            header: 'Remarks'
         }
     ];
 
-
     // fetch function for usePagination
     const fetchForm = useCallback(
-      async (limit: number, token?: string) => {
-          const params: any = {
-              formType: `${FORM_TYPE}#active`,
-              nextToken: token,
-              limit,
-              sortDirection: 'DESC'
-          };
-          const response = await client.models.Form.listFormByType(params);
-          return {
-              data: response.data,
-              nextToken: response.nextToken || null
-          };
-      },
-      [client.models.Form]
-  );
+        async (limit: number, token?: string) => {
+            const params: any = {
+                formType: `${FORM_TYPE}#active`,
+                nextToken: token,
+                limit,
+                sortDirection: 'DESC'
+            };
+            const response = await client.models.Form.listFormByType(params);
+            return {
+                data: response.data,
+                nextToken: response.nextToken || null
+            };
+        },
+        [client.models.Form]
+    );
 
-
-
-     // Use the usePagination hook
-     const {
-      items,
-      isLoading,
-      hasNext,
-      hasPrevious,
-      goToNext,
-      goToPrevious,
-      initiateLoding,
-      updateItem,
-      refreshList,
-      stopLoding
-  } = usePagination<Form>({
-      limit: LIMIT,
-      fetchFn: fetchForm,
-      idField
-  });
-
-
-
-  const addNewItemHandler = () => {
-    setUpdateMode(false);
-    setIsModalOpen(true);
-    setSelectedItem({
-      documentFileStatus_inDate_outDate:  formatDateForInput(new Date()),
-      documentFileStatus_fileName: '',
-      documentFileStatus_documentName:'',
-      documentFileStatus_year:'',
-      documentFileStatus_window:'',
-      documentFileStatus_documentType:'',
-      documentFileStatus_fileNo:'',
-      expirationDate: formatDateForInput(new Date()),
-      documentFileStatus_receivedFrom_givenById: '',
-        documentFileStatus_receivedFrom_givenByName: '',
-        documentFileStatus_receivedBy_givenToId: '',
-        documentFileStatus_receivedBy_givenToName: '',
-        documentFileStatus_remarks: '',
-        documentFileStatus_status:'in'
+    // Use the usePagination hook
+    const {
+        items,
+        isLoading,
+        hasNext,
+        hasPrevious,
+        goToNext,
+        goToPrevious,
+        initiateLoding,
+        updateItem,
+        refreshList,
+        stopLoding
+    } = usePagination<Form>({
+        limit: LIMIT,
+        fetchFn: fetchForm,
+        idField
     });
-};
 
-
-const handleAddItem = () => {
-  setSelectedItem(prev => ({
-      ...prev,
-      requirements_itemList: [
-          ...prev.requirements_itemList,
-          { itemName: '', itemQuantity: 0, itemPrice: 0 }
-      ]
-  }));
-};
-
-
-
-
-    // Update a specific item in the list
-    const handleItemChange = (index, field, value) => {
-      setSelectedItem(prev => {
-          const updatedItems = [...prev.requirements_itemList];
-          updatedItems[index] = {
-              ...updatedItems[index],
-              [field]: value
-          };
-          return {
-              ...prev,
-              requirements_itemList: updatedItems
-          };
-      });
-  };
-
-
-      // Remove an item from the list
-      const handleRemoveItem = (index: number) => {
-        setSelectedItem(prev => ({
-            ...prev,
-            requirements_itemList: prev.requirements_itemList.filter(
-                (_, i) => i !== index
-            )
-        }));
+    const addNewItemHandler = () => {
+        setUpdateMode(false);
+        setIsModalOpen(true);
+        setSelectedItem({
+            documentFileStatus_inDate_outDate: formatDateForInput(new Date()),
+            documentFileStatus_fileName: '',
+            documentFileStatus_documentName: '',
+            documentFileStatus_year: '',
+            documentFileStatus_window: '',
+            documentFileStatus_documentType: '',
+            documentFileStatus_fileNo: '',
+            // Expiration Date is optional for Document File Status
+            // expirationDate: formatDateForInput(new Date()),
+            documentFileStatus_receivedFrom_givenById: '',
+            documentFileStatus_receivedFrom_givenByName: '',
+            documentFileStatus_receivedBy_givenToId: '',
+            documentFileStatus_receivedBy_givenToName: '',
+            documentFileStatus_remarks: '',
+            documentFileStatus_status: 'in'
+        });
     };
 
     const handleCloseModal = () => {
-      setIsModalOpen(false);
-  };
+        setIsModalOpen(false);
+    };
 
-  const handleEdit = (item: Form) => {
-      setSelectedItem(item);
-      setUpdateMode(true);
-      setIsModalOpen(true);
-  };
+    const handleEdit = (item: Form) => {
+        setSelectedItem(item);
+        setUpdateMode(true);
+        setIsModalOpen(true);
+    };
 
+    const onEdit = async (editedForm: Form) => {
+        const {
+            createdAt,
+            updatedAt,
+            hasExpiration,
+            formType,
+            state,
+            createdBy,
+            updatedBy,
+            expirationDate,
+            GSI1PK,
+            GSI1SK_Metric,
+            ...restForm
+        } = editedForm;
 
+        // Check if we need to create a new record instead of updating
+        const shouldCreateNewRecord =
+            !isUpdateMode || // It's a new record
+            (isUpdateMode && // It's an update but status changed
+                items.find(item => item[idField] === editedForm[idField])
+                    ?.documentFileStatus_status !==
+                    editedForm.documentFileStatus_status);
 
-  const onEdit = async (editedForm: Form) => {
-    const {
-        createdAt,
-        updatedAt,
-        hasExpiration,
-        formType,
-        state,
-        createdBy,
-        updatedBy,
-        ...restForm
-    } = editedForm;
-    if (isUpdateMode) {
-        const params: any = {
-            ...restForm,
-            updatedAt: new Date().toISOString(),
-            updatedBy: userProfile.userId
-        };
-        updateItem(editedForm);
+        if (shouldCreateNewRecord) {
+            // Create a new record
+            const params: any = {
+                ...restForm,
+                [idField]: ulid(),
+                createdAt: new Date().toISOString(),
+                formType: `${FORM_TYPE}#active`,
+                state: 'active',
+                createdBy: userProfile.userId,
+                expirationDate: expirationDate || null,
+                hasExpiration: expirationDate ? 'yes#active' : null
+            };
 
-        client.models.Form.update(params).catch(error => {
-            console.error(`Failed to update ${heading}:`, error);
-        });
-    } else {
-        const params: any = {
-            ...restForm,
-            [idField]: ulid(),
-            hasExpiration: 'yes#active',
-            createdAt: new Date().toISOString(),
-            formType: `${FORM_TYPE}#active`,
-            state: 'active',
-            createdBy: userProfile.userId
-        };
-        initiateLoding();
-        client.models.Form.create(params)
-            .then(() => {
-                refreshList();
-            })
-            .catch(error => {
-                console.error(`Failed to create ${heading}:`, error);
-                stopLoding();
+            initiateLoding();
+            client.models.Form.create(params)
+                .then(() => {
+                    refreshList();
+                })
+                .catch(error => {
+                    console.error(`Failed to create ${heading}:`, error);
+                    stopLoding();
+                });
+        } else {
+            // Update existing record
+            const params: any = {
+                ...restForm,
+                updatedAt: new Date().toISOString(),
+                updatedBy: userProfile.userId,
+                expirationDate: expirationDate || null,
+                hasExpiration: expirationDate ? 'yes#active' : null
+            };
+            updateItem(editedForm);
+
+            client.models.Form.update(params).catch(error => {
+                console.error(`Failed to update ${heading}:`, error);
             });
-    }
-};
+        }
+    };
 
+    const handleSave = () => {
+        if (!selectedItem) return;
+        onEdit(selectedItem as Form);
+        setIsModalOpen(false);
+    };
 
+    const updateField = (value: any, key: string, isMultiValue = false) => {
+        if (!isMultiValue) {
+            setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
+        } else {
+            const keys = key.split('#');
+            const values = value.split('#');
+            setSelectedItem((prev: any) => ({
+                ...prev,
+                [keys[0]]: values[0],
+                [keys[1]]: values[1]
+            }));
+        }
+    };
 
-const handleSave = () => {
-  if (!selectedItem) return;
-  onEdit(selectedItem as Form);
-  setIsModalOpen(false);
-};
+    const isSubmitDisabled =
+        !selectedItem.documentFileStatus_status ||
+        !selectedItem.documentFileStatus_inDate_outDate ||
+        !selectedItem.documentFileStatus_fileName ||
+        !selectedItem.documentFileStatus_documentName ||
+        !selectedItem.documentFileStatus_year ||
+        !selectedItem.documentFileStatus_window ||
+        !selectedItem.documentFileStatus_documentType ||
+        !selectedItem.documentFileStatus_fileNo ||
+        !selectedItem.documentFileStatus_receivedFrom_givenById ||
+        !selectedItem.documentFileStatus_receivedFrom_givenByName ||
+        !selectedItem.documentFileStatus_receivedBy_givenToId ||
+        !selectedItem.documentFileStatus_receivedBy_givenToName ||
+        !selectedItem.documentFileStatus_remarks;
 
-
-
-const updateField = (value: any, key: string, isMultiValue = false) => {
-  if (!isMultiValue) {
-      setSelectedItem((prev: any) => ({ ...prev, [key]: value }));
-  } else {
-      const keys = key.split('#');
-      const values = value.split('#');
-      setSelectedItem((prev: any) => ({
-          ...prev,
-          [keys[0]]: values[0],
-          [keys[1]]: values[1]
-      }));
-  }
-};
-
-const isSubmitDisabled =false
-// !selectedItem.requirements_demandFromId ||
-// !selectedItem.requirements_demandFromName ||
-// !selectedItem.requirements_responsiblePersonId ||
-// !selectedItem.requirements_responsiblePersonName ||
-// !selectedItem.requirements_remarks ||
-// !selectedItem.expirationDate ||
-// !selectedItem.requirements_itemList.length;
-
-
-    return <>
-       <div style={{ position: 'relative' }}>
-          {/* Loader overlay */}
-       {isLoading && (
+    return (
+        <>
+            <div style={{ position: 'relative' }}>
+                {/* Loader overlay */}
+                {isLoading && (
                     <div
                         style={{
                             position: 'absolute',
@@ -306,7 +286,7 @@ const isSubmitDisabled =false
                     </div>
                 )}
 
-<UserListItems<Form>
+                <UserListItems<Form>
                     heading={heading}
                     items={items}
                     columns={itemsColumns}
@@ -315,45 +295,58 @@ const isSubmitDisabled =false
                     handleEdit={handleEdit}
                 />
 
-
-
-                 {/* Pagination Controls */}
-                 <PaginationControls
+                {/* Pagination Controls */}
+                <PaginationControls
                     onPrevious={goToPrevious}
                     onNext={goToNext}
                     hasPrevious={hasPrevious}
                     hasNext={hasNext}
                 />
-       </div>
-    
-       {isModalOpen && (
+            </div>
+
+            {isModalOpen && (
                 <Modal
                     onCloseHander={handleCloseModal}
                     heading={heading}
                     isUpdateMode={isUpdateMode}
                 >
                     <form onSubmit={handleSave}>
+                        <div className="mb-8px">
+                            <Heading>Status</Heading>
+                            <SelectField
+                                label=""
+                                value={selectedItem.documentFileStatus_status}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'documentFileStatus_status'
+                                    )
+                                }
+                            >
+                                <option value="in">In File</option>
+                                <option value="out">Out File</option>
+                            </SelectField>
+                        </div>
 
-
-
-                    <div className="mb-8px">
-                            <Heading>In Date/ Out Date</Heading>
+                        <div className="mb-8px">
+                            <Heading>In Date / Out Date</Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Deadline"
+                                placeholder="In Date / Out Date"
                                 isRequired={true}
-                                value={selectedItem.expirationDate}
+                                value={
+                                    selectedItem.documentFileStatus_inDate_outDate
+                                }
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'expirationDate'
+                                        'documentFileStatus_inDate_outDate'
                                     )
                                 }
                             />
                         </div>
-
 
                         <div className="mb-8px">
                             <Heading>File Name</Heading>
@@ -381,7 +374,9 @@ const isSubmitDisabled =false
                                 size="small"
                                 placeholder="Document Name"
                                 isRequired={true}
-                                value={selectedItem.documentFileStatus_documentName}
+                                value={
+                                    selectedItem.documentFileStatus_documentName
+                                }
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
@@ -397,7 +392,7 @@ const isSubmitDisabled =false
                                 type="text"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Document Name"
+                                placeholder="Year"
                                 isRequired={true}
                                 value={selectedItem.documentFileStatus_year}
                                 onChange={e =>
@@ -410,12 +405,12 @@ const isSubmitDisabled =false
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Window</Heading>
+                            <Heading>Window Name</Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Window"
+                                placeholder="Window Name"
                                 isRequired={true}
                                 value={selectedItem.documentFileStatus_window}
                                 onChange={e =>
@@ -435,7 +430,9 @@ const isSubmitDisabled =false
                                 size="small"
                                 placeholder="Document Type"
                                 isRequired={true}
-                                value={selectedItem.documentFileStatus_documentType}
+                                value={
+                                    selectedItem.documentFileStatus_documentType
+                                }
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
@@ -445,14 +442,13 @@ const isSubmitDisabled =false
                             />
                         </div>
 
-
                         <div className="mb-8px">
-                            <Heading>File No</Heading>
+                            <Heading>File No.</Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
                                 size="small"
-                                placeholder="File No"
+                                placeholder="File No."
                                 isRequired={true}
                                 value={selectedItem.documentFileStatus_fileNo}
                                 onChange={e =>
@@ -462,42 +458,6 @@ const isSubmitDisabled =false
                                     )
                                 }
                             />
-                        </div>
-
-
-                        <div className="mb-8px">
-                            <Heading>File No</Heading>
-                            <Input
-                                type="text"
-                                variation="quiet"
-                                size="small"
-                                placeholder="File No"
-                                isRequired={true}
-                                value={selectedItem.documentFileStatus_fileNo}
-                                onChange={e =>
-                                    updateField(
-                                        e.target.value,
-                                        'documentFileStatus_fileNo'
-                                    )
-                                }
-                            />
-                        </div>
-
-                        <div className="mb-8px">
-                            <Heading>Status</Heading>
-                            <SelectField
-                                label=""
-                                value={selectedItem.documentFileStatus_status}
-                                onChange={e =>
-                                    updateField(
-                                        e.target.value,
-                                        'documentFileStatus_status'
-                                    )
-                                }
-                            >
-                                <option value="in">In</option>
-                                <option value="out">Out</option>
-                            </SelectField>
                         </div>
 
                         <div className="mb-8px">
@@ -506,8 +466,8 @@ const isSubmitDisabled =false
                                 type="date"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Deadline"
-                                isRequired={true}
+                                placeholder="Date Expiry"
+                                // isRequired={true}
                                 value={selectedItem.expirationDate}
                                 onChange={e =>
                                     updateField(
@@ -519,14 +479,14 @@ const isSubmitDisabled =false
                         </div>
 
                         <div className="mb-8px selectSearch">
-                            <Heading>Received From/ Given By</Heading>
+                            <Heading>Received From / Given By</Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
                                 options={personsList}
                                 value={`${selectedItem.documentFileStatus_receivedFrom_givenByName}#${selectedItem.documentFileStatus_receivedFrom_givenById}`}
                                 // name="Person Name"
-                                placeholder="Responsible Person"
+                                placeholder="Received From / Given By"
                                 onChange={selectedValue => {
                                     updateField(
                                         selectedValue,
@@ -538,14 +498,14 @@ const isSubmitDisabled =false
                         </div>
 
                         <div className="mb-8px selectSearch">
-                            <Heading>Received By/ Given To</Heading>
+                            <Heading>Received By / Given To</Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
                                 options={personsList}
                                 value={`${selectedItem.documentFileStatus_receivedBy_givenToName}#${selectedItem.documentFileStatus_receivedBy_givenToId}`}
                                 // name="Person Name"
-                                placeholder="Received By/ Given To"
+                                placeholder="Received By / Given To"
                                 onChange={selectedValue => {
                                     updateField(
                                         selectedValue,
@@ -555,10 +515,6 @@ const isSubmitDisabled =false
                                 }}
                             />
                         </div>
-
- 
-
-
 
                         <div className="mb-8px">
                             <Heading>Remarks</Heading>
@@ -598,9 +554,8 @@ const isSubmitDisabled =false
                     </form>
                 </Modal>
             )}
-    
-    
-    </>
+        </>
+    );
 };
 
 export default DocumentFileStatus;

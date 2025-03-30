@@ -50,7 +50,7 @@ export const formTypes = [
         label: 'documentFileStatus',
         name: 'Document File Status',
         icon: docStatus,
-        route: '/document'
+        route: '/document-file-status'
     },
     {
         id: '6',

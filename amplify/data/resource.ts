@@ -220,23 +220,20 @@ const schema = a
                 requirements_remarks: a.string(),
                 requirements_itemList: a.ref('ProductEntry').array(),
 
-
-                 // document file status
-                 documentFileStatus_inDate_outDate: a.string(),
-                 documentFileStatus_fileName: a.string(),
-                 documentFileStatus_documentName: a.string(),
-                 documentFileStatus_year: a.string(),
-                 documentFileStatus_window: a.string(),
-                 documentFileStatus_documentType: a.string(),
-                 documentFileStatus_fileNo: a.string(),
-                 documentFileStatus_receivedFrom_givenById: a.string(),
-                 documentFileStatus_receivedFrom_givenByName: a.string(),
-                 documentFileStatus_status: a.string(),
-                 documentFileStatus_remarks: a.string(),
-                 documentFileStatus_receivedBy_givenToId: a.string(),
-                 documentFileStatus_receivedBy_givenToName: a.string(),
-                
-
+                // Document File Status
+                documentFileStatus_inDate_outDate: a.string(),
+                documentFileStatus_fileName: a.string(),
+                documentFileStatus_documentName: a.string(),
+                documentFileStatus_year: a.string(),
+                documentFileStatus_window: a.string(),
+                documentFileStatus_documentType: a.string(),
+                documentFileStatus_fileNo: a.string(),
+                documentFileStatus_receivedFrom_givenById: a.string(),
+                documentFileStatus_receivedFrom_givenByName: a.string(),
+                documentFileStatus_status: a.string(),
+                documentFileStatus_remarks: a.string(),
+                documentFileStatus_receivedBy_givenToId: a.string(),
+                documentFileStatus_receivedBy_givenToName: a.string(),
 
                 // Sales Man Performance
                 salesManPerformance_year_month: a.string(),

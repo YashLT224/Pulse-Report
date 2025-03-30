@@ -148,7 +148,7 @@ const AppRoutes = () => {
             />
 
             <Route
-                path="/document"
+                path="/document-file-status"
                 element={
                     <ProtectedRoute
                         element={<DocumentFileStatus />}
