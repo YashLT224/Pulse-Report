@@ -171,9 +171,43 @@ const DocumentFileStatus = () => {
             createdBy,
             updatedBy,
             expirationDate,
+            GSI1PK,
+            GSI1SK_Metric,
             ...restForm
         } = editedForm;
-        if (isUpdateMode) {
+
+        // Check if we need to create a new record instead of updating
+        const shouldCreateNewRecord =
+            !isUpdateMode || // It's a new record
+            (isUpdateMode && // It's an update but status changed
+                items.find(item => item[idField] === editedForm[idField])
+                    ?.documentFileStatus_status !==
+                    editedForm.documentFileStatus_status);
+
+        if (shouldCreateNewRecord) {
+            // Create a new record
+            const params: any = {
+                ...restForm,
+                [idField]: ulid(),
+                createdAt: new Date().toISOString(),
+                formType: `${FORM_TYPE}#active`,
+                state: 'active',
+                createdBy: userProfile.userId,
+                expirationDate: expirationDate || null,
+                hasExpiration: expirationDate ? 'yes#active' : null
+            };
+
+            initiateLoding();
+            client.models.Form.create(params)
+                .then(() => {
+                    refreshList();
+                })
+                .catch(error => {
+                    console.error(`Failed to create ${heading}:`, error);
+                    stopLoding();
+                });
+        } else {
+            // Update existing record
             const params: any = {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
@@ -186,28 +220,6 @@ const DocumentFileStatus = () => {
             client.models.Form.update(params).catch(error => {
                 console.error(`Failed to update ${heading}:`, error);
             });
-        } else {
-            const params: any = {
-                ...restForm,
-                [idField]: ulid(),
-                createdAt: new Date().toISOString(),
-                formType: `${FORM_TYPE}#active`,
-                state: 'active',
-                createdBy: userProfile.userId,
-                ...(expirationDate && {
-                    expirationDate,
-                    hasExpiration: 'yes#active'
-                })
-            };
-            initiateLoding();
-            client.models.Form.create(params)
-                .then(() => {
-                    refreshList();
-                })
-                .catch(error => {
-                    console.error(`Failed to create ${heading}:`, error);
-                    stopLoding();
-                });
         }
     };
 
