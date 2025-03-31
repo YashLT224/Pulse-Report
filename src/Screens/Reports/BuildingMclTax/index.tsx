@@ -8,6 +8,8 @@ import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
+import {buildingMclTax_itemsColumns as itemsColumns} from '../../../data/forms'
+
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Building MCL Tax';
@@ -24,54 +26,7 @@ const BuildingMCLTax = () => {
     const [isUpdateMode, setUpdateMode] = useState(false);
 
     // Define columns for the People | Party list
-    const itemsColumns = [
-        {
-            key: 'buildingMclTax_buildingName',
-            header: 'Building Name'
-        },
-        {
-            key: 'buildingMclTax_buildingTax',
-            header: 'Building Tax'
-        },
-        {
-            key: 'expirationDate',
-            header: 'Due Date'
-        },
-        {
-            key: 'buildingMclTax_taxType',
-            header: 'Tax Type'
-        },
-        {
-            key: 'buildingMclTax_status',
-            header: 'Status',
-            render: item => (
-                <div
-                    style={{
-                        color:
-                            item.buildingMclTax_status === 'PAID'
-                                ? 'green'
-                                : 'red'
-                    }}
-                >
-                    {item.buildingMclTax_status}
-                </div>
-            )
-        },
-
-        {
-            key: 'buildingMclTax_paidDate',
-            header: 'Paid On'
-        },
-        {
-            key: 'buildingMclTax_documentFileNo',
-            header: 'Document File No.'
-        },
-        {
-            key: 'createdAt',
-            header: 'Created At',
-            render: (item: Form) => new Date(item.createdAt).toLocaleString()
-        }
-    ];
+  
 
     // fetch function for usePagination
     const fetchForm = useCallback(

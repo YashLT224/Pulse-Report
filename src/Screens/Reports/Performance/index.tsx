@@ -10,6 +10,7 @@ import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
+import {salesManPerformance_itemsColumns as itemsColumns} from '../../../data/forms'
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Sales Man Performance';
@@ -41,105 +42,7 @@ const SalesManPerformance = () => {
         }));
     };
 
-    const itemsColumns = [
-        {
-            key: 'createdAt',
-            header: 'Created At',
-            render: (item: Form) =>
-                new Date(item.createdAt).toLocaleString().split(',')?.[0]
-        },
-        {
-            key: 'salesManPerformance_year_month',
-            header: 'Performance Period'
-        },
-        {
-            key: 'salesManPerformance_salesManName',
-            header: 'Sales Man'
-        },
-        {
-            key: 'salesManPerformance_salary',
-            header: 'Salary'
-        },
-        {
-            key: 'salesManPerformance_expense',
-            header: 'Expense'
-        },
-        {
-            key: 'salesManPerformance_totalExpense',
-            header: 'Total Expense',
-            render: (item: Form) =>
-                item.salesManPerformance_salary +
-                item.salesManPerformance_expense
-        },
-        {
-            key: 'salesManPerformance_salesInRupees',
-            header: 'Sales In Rupees'
-        },
-        {
-            key: 'salesManPerformance_salesInKgs',
-            header: 'Sales In Kgs'
-        },
-        {
-            key: 'salesManPerformance_skus',
-            header: 'SKUs - (Targets)',
-            render: (item: Form) => (
-                <ul>
-                    {item.salesManPerformance_skus.map((req, index) => (
-                        <li key={index}>
-                            ₹{req.sku} - (₹{req.target})
-                        </li>
-                    ))}
-                </ul>
-            )
-        },
-        {
-            key: 'salesManPerformance_totalSales',
-            header: 'Total',
-            render: (item: Form) => {
-                const totalSales = item.salesManPerformance_skus.reduce(
-                    (acc: number, curr: { sku: number; target: number }) =>
-                        acc + curr.sku,
-                    0
-                );
-                return <span>₹{totalSales}</span>;
-            }
-        },
-        {
-            key: 'salesManPerformance_avarage_Expence_Amount',
-            header: 'Avg. Exp. Amount',
-            render: (item: Form) => {
-                const salaryAndExpense =
-                    item.salesManPerformance_salary +
-                    item.salesManPerformance_expense;
-                const salesInRupees = item.salesManPerformance_salesInRupees;
 
-                const percentage =
-                    salesInRupees > 0 && salaryAndExpense > 0
-                        ? (salaryAndExpense / salesInRupees) * 100
-                        : 0;
-
-                return percentage.toFixed(2);
-            }
-        },
-        {
-            key: 'salesManPerformance_avarage_Expence_Weight',
-            header: 'Avg. Exp. Weight',
-            render: (item: Form) => {
-                const salaryAndExpense =
-                    item.salesManPerformance_salary +
-                    item.salesManPerformance_expense;
-                const totalSales = item.salesManPerformance_skus.reduce(
-                    (acc: number, curr: { sku: number; target: number }) =>
-                        acc + curr.sku,
-                    0
-                );
-
-                return totalSales > 0 && salaryAndExpense > 0
-                    ? (salaryAndExpense / totalSales).toFixed(2)
-                    : '0.00';
-            }
-        }
-    ];
 
     // fetch function for usePagination
     const fetchForm = useCallback(

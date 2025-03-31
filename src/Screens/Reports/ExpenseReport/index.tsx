@@ -12,7 +12,7 @@ import { ModalButton, Heading } from '../../../style';
 import SelectSearch from 'react-select-search';
 import { AppDispatch } from '../../../Redux/store';
 import { setPersonBalanceBF } from '../../../Redux/slices/globalDataSlice';
-
+import {expenseReport_itemsColumns as itemsColumns} from '../../../data/forms'
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Expense Report';
 const idField = 'formId';
@@ -48,41 +48,7 @@ const ExpenseReport = () => {
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
 
-    const itemsColumns = [
-        {
-            key: 'createdAt',
-            header: 'Created At',
-            render: (item: Form) => new Date(item.createdAt).toLocaleString()
-        },
-        {
-            key: 'expenseReport_personName',
-            header: 'Person Name'
-        },
-        {
-            key: 'expenseReport_workAssign',
-            header: 'Work Assign'
-        },
-        {
-            key: 'expenseReport_balanceBF',
-            header: 'Balance B/F'
-        },
-        {
-            key: 'expenseReport_payment',
-            header: 'Payment (Petty Cash)'
-        },
-        {
-            key: 'expenseReport_expense',
-            header: 'Expense'
-        },
-        {
-            key: 'expenseReport_balance',
-            header: 'Balance C/F'
-        },
-        {
-            key: 'expenseReport_remarks',
-            header: 'Remarks'
-        }
-    ];
+
 
     // fetch function for usePagination
     const fetchForm = useCallback(
