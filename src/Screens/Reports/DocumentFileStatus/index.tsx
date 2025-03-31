@@ -185,8 +185,8 @@ const DocumentFileStatus = () => {
         const shouldCreateNewRecord = !isUpdateMode || hasStatusChanged; // It's a new record or status has changed
 
         if (shouldCreateNewRecord) {
-            // Create a new record
-            const params: any = {
+            // Create a new record params
+            const newParams: any = {
                 ...restForm,
                 [idField]: ulid(),
                 createdAt: new Date().toISOString(),
@@ -194,14 +194,25 @@ const DocumentFileStatus = () => {
                 state: 'active',
                 createdBy: userProfile.userId,
                 expirationDate: expirationDate || null,
-                hasExpiration: expirationDate ? 'yes#active' : null,
-                ...(hasStatusChanged && {
-                    documentFileStatus_statusChangeDate: new Date().toISOString()
-                })
+                hasExpiration: expirationDate ? 'yes#active' : null
             };
+            // Update record params
+            const updatedParams: any = {
+                [idField]: editedForm[idField],
+                updatedAt: new Date().toISOString(),
+                updatedBy: userProfile.userId,
+                documentFileStatus_statusChangeDate: new Date().toISOString()
+            };
+            const promises = [
+                client.models.Form.create(newParams),
+                ...(hasStatusChanged
+                    ? [client.models.Form.update(updatedParams)]
+                    : [])
+            ];
 
             initiateLoding();
-            client.models.Form.create(params)
+
+            Promise.all(promises)
                 .then(() => {
                     refreshList();
                 })
@@ -330,7 +341,7 @@ const DocumentFileStatus = () => {
                                 }
                             >
                                 <option value="in">In File</option>
-                                <option value="out" disabled>
+                                <option value="out" disabled={!isUpdateMode}>
                                     Out File
                                 </option>
                             </SelectField>
