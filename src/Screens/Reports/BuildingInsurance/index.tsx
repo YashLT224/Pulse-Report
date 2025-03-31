@@ -10,6 +10,7 @@ import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import SelectSearch from 'react-select-search';
 import { ModalButton, Heading } from '../../../style';
+import {buildingInsurance_itemsColumns as itemsColumns} from '../../../data/forms'
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Building Insurance';
@@ -48,58 +49,7 @@ const BuildingInsurance = () => {
         (state: any) => state.globalReducer.persons
     );
 
-    const itemsColumns = [
-        {
-            key: 'createdAt',
-            header: 'Created At',
-            render: (item: Form) => new Date(item.createdAt).toLocaleString()
-        },
-        {
-            key: 'buildingInsurance_buildingName',
-            header: 'Building Name'
-        },
-        {
-            key: 'buildingInsurance_insuranceDate',
-            header: 'Insurance Date'
-        },
-        {
-            key: 'buildingInsurance_insureAmount',
-            header: 'Insure Amount'
-        },
-        {
-            key: 'buildingInsurance_insuranceAmount',
-            header: 'Insurance Amount'
-        },
 
-        {
-            key: 'expirationDate',
-            header: 'Due Date'
-        },
-        {
-            key: 'buildingInsurance_status',
-            header: 'Status',
-            render: item => (
-                <div
-                    style={{
-                        color:
-                            item.buildingInsurance_status === 'PAID'
-                                ? 'green'
-                                : 'red'
-                    }}
-                >
-                    {item.buildingInsurance_status}
-                </div>
-            )
-        },
-        {
-            key: 'buildingInsurance_documentNo',
-            header: 'Document No.'
-        },
-        {
-            key: 'buildingInsurance_markToName',
-            header: 'Mark To'
-        }
-    ];
 
     // fetch function for usePagination
     const fetchForm = useCallback(

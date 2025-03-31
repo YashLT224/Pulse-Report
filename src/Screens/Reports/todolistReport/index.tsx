@@ -10,6 +10,7 @@ import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
 import SelectSearch from 'react-select-search';
+import {toDoList_itemsColumns as itemsColumns} from '../../../data/forms'
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Todo List';
@@ -18,11 +19,7 @@ const FORM_TYPE = 'toDoList';
 
 type Form = Schema['Form']['type'];
 
-const workStatusMap = {
-    pending: 'Pending',
-    inprogress: 'In Progress',
-    completed: 'Completed'
-};
+
 
 const ToDoList = () => {
     const { userProfile, client } = useAuth();
@@ -34,54 +31,7 @@ const ToDoList = () => {
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
 
-    // Define columns for the People | Party list
-    const itemsColumns = [
-        {
-            key: 'createdAt',
-            header: 'Created At',
-            render: (item: Form) => new Date(item.createdAt).toLocaleString()
-        },
-        {
-            key: 'toDoList_assignName',
-            header: 'Assign'
-        },
-        {
-            key: 'toDoList_jointAssignName',
-            header: 'Joint Assign'
-        },
-        {
-            key: 'toDoList_jointWork',
-            header: 'Joint work'
-        },
-        {
-            key: 'toDoList_work',
-            header: 'Work'
-        },
-        {
-            key: 'expirationDate',
-            header: 'Dead Line'
-        },
-
-        {
-            key: 'toDoList_reportToName',
-            header: 'Report To'
-        },
-        {
-            key: 'toDoList_workStatus',
-            header: 'Work Status',
-            render: (item: Form) =>
-                workStatusMap[item.toDoList_workStatus] ||
-                item.toDoList_workStatus
-        },
-        {
-            key: 'toDoList_nextDate',
-            header: 'Next Date'
-        },
-        {
-            key: 'toDoList_remarks',
-            header: 'Remarks'
-        }
-    ];
+    
 
     // fetch function for usePagination
     const fetchForm = useCallback(

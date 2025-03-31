@@ -11,6 +11,8 @@ import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
 import { formatDateForInput } from '../../../utils/helpers';
+import {requirements_itemsColumns as itemsColumns} from '../../../data/forms'
+
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Requirements';
@@ -29,48 +31,6 @@ const Requirements = () => {
         (state: any) => state.globalReducer.persons
     );
 
-    const itemsColumns = [
-        {
-            key: 'createdAt',
-            header: 'Created At',
-            render: (item: Form) => new Date(item.createdAt).toLocaleString()
-        },
-        {
-            key: 'requirements_demandFromName',
-            header: 'Demand From'
-        },
-        {
-            key: 'requirements_responsiblePersonName',
-            header: 'Responsible Person'
-        },
-        {
-            key: 'requirements_itemList',
-            header: 'Requirements',
-            render: (item: Form) => (
-                <ul>
-                    {item.requirements_itemList.map((req, index) => {
-                        const price = req.itemPrice;
-                        const quantity = req.itemQuantity;
-                        const total = (price * quantity).toFixed(2);
-                        return (
-                            <li key={index}>
-                                {req.itemName} - ₹{price.toFixed(2)} x{' '}
-                                {quantity} = ₹{total}
-                            </li>
-                        );
-                    })}
-                </ul>
-            )
-        },
-        {
-            key: 'expirationDate',
-            header: 'Deadline'
-        },
-        {
-            key: 'requirements_remarks',
-            header: 'Remarks'
-        }
-    ];
 
     // fetch function for usePagination
     const fetchForm = useCallback(

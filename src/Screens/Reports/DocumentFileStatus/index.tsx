@@ -11,12 +11,14 @@ import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
 import { formatDateForInput } from '../../../utils/helpers';
+import {documentFileStatus_itemsColumns as itemsColumns} from '../../../data/forms'
+
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Document File Status';
 const idField = 'formId';
 type Form = Schema['Form']['type'];
-const FORM_TYPE = ' documentFileStatus';
+const FORM_TYPE = 'documentFileStatus';
 const DocumentFileStatus = () => {
     const { userProfile, client } = useAuth();
 
@@ -28,70 +30,7 @@ const DocumentFileStatus = () => {
         (state: any) => state.globalReducer.persons
     );
 
-    const itemsColumns = [
-        {
-            key: 'createdAt',
-            header: 'Created At',
-            render: (item: Form) =>
-                new Date(item.createdAt).toLocaleString().split(',')?.[0]
-        },
-        {
-            key: 'documentFileStatus_status',
-            header: 'Status',
-            render: (item: Form) => {
-                return item.documentFileStatus_status === 'in'
-                    ? 'In File'
-                    : 'Out File';
-            }
-        },
-        {
-            key: 'documentFileStatus_inDate_outDate',
-            header: 'In Date / Out Date'
-        },
-        {
-            key: 'documentFileStatus_fileName',
-            header: 'File Name'
-        },
-
-        {
-            key: 'documentFileStatus_documentName',
-            header: 'Document Name'
-        },
-        {
-            key: 'documentFileStatus_year',
-            header: 'Year'
-        },
-
-        {
-            key: 'documentFileStatus_window',
-            header: 'Window Name'
-        },
-        {
-            key: 'documentFileStatus_documentType',
-            header: 'Document Type'
-        },
-
-        {
-            key: 'documentFileStatus_fileNo',
-            header: 'File No.'
-        },
-        {
-            key: 'expirationDate',
-            header: 'Date Expiry'
-        },
-        {
-            key: 'documentFileStatus_receivedFrom_givenByName',
-            header: 'Received From / Given By'
-        },
-        {
-            key: 'documentFileStatus_receivedBy_givenToName',
-            header: 'Received By / Given To'
-        },
-        {
-            key: 'documentFileStatus_remarks',
-            header: 'Remarks'
-        }
-    ];
+ 
 
     // fetch function for usePagination
     const fetchForm = useCallback(

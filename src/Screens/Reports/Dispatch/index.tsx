@@ -11,6 +11,7 @@ import Modal from '../../../components/Modal';
 import SelectSearch from 'react-select-search';
 import eyeIcon from '../../../assets/eye.svg';
 import { ModalButton, Heading } from '../../../style';
+import {dispatchInstructionsHeader as itemsColumns} from '../../../data/forms'
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Dispatch Instructions';
@@ -33,54 +34,6 @@ const Dispatch = () => {
     const personsList = useSelector(
         (state: any) => state.globalReducer.persons
     );
-    // Define columns for the People | Party list
-    const itemsColumns = [
-        {
-            key: 'createdAt',
-            header: 'Created At',
-            render: (item: Form) => new Date(item.createdAt).toLocaleString()
-        },
-        {
-            key: 'dispatchInstructions_partyName',
-            header: 'Party Name'
-        },
-        {
-            key: 'dispatchInstructions_instructions',
-            header: 'Instructions',
-            render: (item: Form) => (
-                <div className="flexbox-between">
-                    <p>
-                        {item.dispatchInstructions_instructions.slice(0, 40)}
-                        {item.dispatchInstructions_instructions.length > 40
-                            ? '...'
-                            : ''}
-                    </p>
-                    <img
-                        className="pointer"
-                        src={eyeIcon}
-                        alt="View"
-                        width="30"
-                        height="30"
-                        onClick={() =>
-                            setViewDescription({
-                                value: item.dispatchInstructions_instructions,
-                                isOpen: true
-                            })
-                        }
-                    />
-                </div>
-            )
-        },
-        {
-            key: 'dispatchInstructions_responsiblePersonName',
-            header: 'Responsible Person'
-        },
-        {
-            key: 'dispatchInstructions_remarks',
-            header: 'Remarks'
-        }
-    ];
-
     // fetch function for usePagination
     const fetchForm = useCallback(
         async (limit: number, token?: string) => {
@@ -234,7 +187,7 @@ const Dispatch = () => {
                 <UserListItems
                     heading={heading}
                     items={items}
-                    columns={itemsColumns}
+                    columns={itemsColumns(setViewDescription)}
                     addNewEntryAccess={true}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
