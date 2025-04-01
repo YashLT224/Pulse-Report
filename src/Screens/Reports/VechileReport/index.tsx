@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 import { ulid } from 'ulid';
-import { getUrl } from 'aws-amplify/storage';
 import { FileUploader } from '@aws-amplify/ui-react-storage';
 import { Loader, Input, SelectField } from '@aws-amplify/ui-react';
+import { vehicleReport_itemsColumns as itemsColumns } from '../../../data/forms';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
 import useAuth from '../../../Hooks/useAuth';
@@ -11,7 +11,6 @@ import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { formatDateForInput, getEarliestDate } from '../../../utils/helpers';
 import { ModalButton, Heading } from '../../../style';
-import eyeIcon from '../../../assets/eye.svg';
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Vechile Report';
@@ -27,116 +26,6 @@ const VechileReport = () => {
     const [isUpdateMode, setUpdateMode] = useState(false);
     const [files, setFiles] = useState({});
     const [defaultFiles, setDefaultFiles] = useState([]);
-
-    const itemsColumns = [
-        // {
-        //     key: 'createdAt',
-        //     header: 'Created At',
-        //     render: (item: Form) => new Date(item.createdAt).toLocaleString()
-        // },
-        {
-            key: 'vehicleReport_vehicleNo',
-            header: 'Vehicle No.'
-        },
-        {
-            key: 'vehicleReport_roadTaxDue',
-            header: 'Road Tax Due'
-        },
-        {
-            key: 'vehicleReport_stateTaxDue',
-            header: 'State Tax Due'
-        },
-        {
-            key: 'vehicleReport_fitnessDue',
-            header: 'Fitness Due'
-        },
-        {
-            key: 'vehicleReport_challan',
-            header: 'Challan'
-        },
-
-        {
-            key: 'vehicleReport_challanDate',
-            header: 'Challan Date'
-        },
-        {
-            key: 'vehicleReport_challanDue',
-            header: 'Challan Due'
-        },
-
-        {
-            key: 'vehicleReport_batterySNO',
-            header: 'Battery S.No.'
-        },
-
-        {
-            key: 'vehicleReport_batteryWarranty',
-            header: 'Battery Warranty'
-        },
-
-        {
-            key: 'vehicleReport_billNo',
-            header: 'Bill No.'
-        },
-        {
-            key: 'vehicleReport_billDate',
-            header: 'Bill Date'
-        },
-        {
-            key: 'vehicleReport_billPhoto',
-            header: 'Bill Photo',
-            render: (item: Form) => {
-                return (
-                    <div>
-                        {item.vehicleReport_billPhoto?.map(fileItem => (
-                            <div key={fileItem.key} className="flexbox-between">
-                                <p>{fileItem.name}</p>
-                                <img
-                                    className="pointer"
-                                    src={eyeIcon}
-                                    alt="View"
-                                    width="30"
-                                    height="30"
-                                    onClick={async () => {
-                                        try {
-                                            const linkToStorageFile = await getUrl(
-                                                {
-                                                    path: fileItem.key
-                                                }
-                                            );
-                                            const url = linkToStorageFile.url.toString();
-                                            // Create an anchor element and trigger a download
-                                            const a = document.createElement(
-                                                'a'
-                                            );
-                                            a.href = url;
-                                            a.target = '_blank';
-                                            a.rel = 'noopener noreferrer';
-                                            a.download =
-                                                fileItem.name ||
-                                                'downloaded-file'; // Ensure a valid filename
-                                            document.body.appendChild(a);
-                                            a.click();
-                                            document.body.removeChild(a);
-                                        } catch (error) {
-                                            console.error(
-                                                'Error fetching URL:',
-                                                error
-                                            );
-                                        }
-                                    }}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                );
-            }
-        },
-        {
-            key: 'vehicleReport_status',
-            header: 'Status'
-        }
-    ];
 
     // fetch function for usePagination
     const fetchForm = useCallback(

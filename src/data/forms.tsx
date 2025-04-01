@@ -10,6 +10,8 @@ import requirements from '../assets/requirements.svg';
 import todolist from '../assets/todolist.png';
 import { Schema } from '../../amplify/data/resource';
 import eyeIcon from '../assets/eye.svg';
+import { getUrl } from 'aws-amplify/storage';
+
 export const formTypes = [
     {
         id: '0',
@@ -181,8 +183,7 @@ export const buildingInsurance_itemsColumns = [
     }
 ];
 
-
-export   const buildingMclTax_itemsColumns = [
+export const buildingMclTax_itemsColumns = [
     {
         key: 'buildingMclTax_buildingName',
         header: 'Building Name'
@@ -206,9 +207,7 @@ export   const buildingMclTax_itemsColumns = [
             <div
                 style={{
                     color:
-                        item.buildingMclTax_status === 'PAID'
-                            ? 'green'
-                            : 'red'
+                        item.buildingMclTax_status === 'PAID' ? 'green' : 'red'
                 }}
             >
                 {item.buildingMclTax_status}
@@ -231,7 +230,7 @@ export   const buildingMclTax_itemsColumns = [
     }
 ];
 
-export    const documentFileStatus_itemsColumns = [
+export const documentFileStatus_itemsColumns = [
     {
         key: 'createdAt',
         header: 'Created At',
@@ -296,13 +295,204 @@ export    const documentFileStatus_itemsColumns = [
     }
 ];
 
+export const vehicleReport_itemsColumns = [
+    {
+        key: 'createdAt',
+        header: 'Created At',
+        render: (item: Form) => new Date(item.createdAt).toLocaleString()
+    },
+    {
+        key: 'vehicleReport_vehicleNo',
+        header: 'Vehicle No.'
+    },
+    {
+        key: 'vehicleReport_roadTaxDue',
+        header: 'Road Tax Due'
+    },
+    {
+        key: 'vehicleReport_stateTaxDue',
+        header: 'State Tax Due'
+    },
+    {
+        key: 'vehicleReport_fitnessDue',
+        header: 'Fitness Due'
+    },
+    {
+        key: 'vehicleReport_challan',
+        header: 'Challan'
+    },
+
+    {
+        key: 'vehicleReport_challanDate',
+        header: 'Challan Date'
+    },
+    {
+        key: 'vehicleReport_challanDue',
+        header: 'Challan Due'
+    },
+
+    {
+        key: 'vehicleReport_batterySNO',
+        header: 'Battery S.No.'
+    },
+
+    {
+        key: 'vehicleReport_batteryWarranty',
+        header: 'Battery Warranty'
+    },
+
+    {
+        key: 'vehicleReport_billNo',
+        header: 'Bill No.'
+    },
+    {
+        key: 'vehicleReport_billDate',
+        header: 'Bill Date'
+    },
+    {
+        key: 'vehicleReport_billPhoto',
+        header: 'Bill Photo',
+        render: (item: Form) => {
+            return (
+                <div>
+                    {item.vehicleReport_billPhoto?.map(fileItem => (
+                        <div key={fileItem.key} className="flexbox-between">
+                            <p>{fileItem.name}</p>
+                            <img
+                                className="pointer"
+                                src={eyeIcon}
+                                alt="View"
+                                width="30"
+                                height="30"
+                                onClick={async () => {
+                                    try {
+                                        const linkToStorageFile = await getUrl({
+                                            path: fileItem.key
+                                        });
+                                        const url = linkToStorageFile.url.toString();
+                                        // Create an anchor element and trigger a download
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.target = '_blank';
+                                        a.rel = 'noopener noreferrer';
+                                        a.download =
+                                            fileItem.name || 'downloaded-file'; // Ensure a valid filename
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        document.body.removeChild(a);
+                                    } catch (error) {
+                                        console.error(
+                                            'Error fetching URL:',
+                                            error
+                                        );
+                                    }
+                                }}
+                            />
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+    },
+    {
+        key: 'vehicleReport_status',
+        header: 'Status'
+    }
+];
+
+export const vehicleInsurance_itemsColumns = [
+    {
+        key: 'createdAt',
+        header: 'Created At',
+        render: (item: Form) => new Date(item.createdAt).toLocaleString()
+    },
+    {
+        key: 'vehicleInsurance_vehicleNo',
+        header: 'Vehicle No.'
+    },
+    {
+        key: 'vehicleInsurance_insuranceDate',
+        header: 'Insurance Date'
+    },
+    {
+        key: 'expirationDate',
+        header: 'Insurance Expiry'
+    },
+    {
+        key: 'vehicleInsurance_insuranceCompany',
+        header: 'Insurance Company'
+    },
+    {
+        key: 'vehicleInsurance_insureAmount',
+        header: 'Insure Amount'
+    },
+    {
+        key: 'vehicleInsurance_insuranceAmount',
+        header: 'Insurance Amount'
+    },
+    {
+        key: 'vehicleInsurance_insuranceCopy',
+        header: 'Insurance Copy',
+        render: (item: Form) => {
+            return (
+                <div>
+                    {item.vehicleInsurance_insuranceCopy.map(fileItem => (
+                        <div key={fileItem.key} className="flexbox-between">
+                            <p>{fileItem.name}</p>
+                            <img
+                                className="pointer"
+                                src={eyeIcon}
+                                alt="View"
+                                width="30"
+                                height="30"
+                                onClick={async () => {
+                                    try {
+                                        const linkToStorageFile = await getUrl({
+                                            path: fileItem.key
+                                        });
+                                        const url = linkToStorageFile.url.toString();
+                                        // Create an anchor element and trigger a download
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.target = '_blank';
+                                        a.rel = 'noopener noreferrer';
+                                        a.download =
+                                            fileItem.name || 'downloaded-file'; // Ensure a valid filename
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        document.body.removeChild(a);
+                                    } catch (error) {
+                                        console.error(
+                                            'Error fetching URL:',
+                                            error
+                                        );
+                                    }
+                                }}
+                            />
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+    },
+    {
+        key: 'vehicleInsurance_vehicleType',
+        header: 'Vehicle Type'
+    },
+    {
+        key: 'vehicleInsurance_remarks',
+        header: 'Remarks'
+    }
+];
+
 const workStatusMap = {
-    pending: <div style={{color:'red'}}>PENDING</div>,
-    inprogress: <div style={{color:'darkorange'}}>IN PROGRESS</div>,
-    completed: <div style={{color:'green'}}>COMPLETED</div>
+    pending: <div style={{ color: 'red' }}>PENDING</div>,
+    inprogress: <div style={{ color: 'darkorange' }}>IN PROGRESS</div>,
+    completed: <div style={{ color: 'green' }}>COMPLETED</div>
 };
- // Define columns for the People | Party list
- export const toDoList_itemsColumns = [
+
+// Define columns for the People | Party list
+export const toDoList_itemsColumns = [
     {
         key: 'createdAt',
         header: 'Created At',
@@ -337,8 +527,7 @@ const workStatusMap = {
         key: 'toDoList_workStatus',
         header: 'Work Status',
         render: (item: Form) =>
-            workStatusMap[item.toDoList_workStatus] ||
-            item.toDoList_workStatus
+            workStatusMap[item.toDoList_workStatus] || item.toDoList_workStatus
     },
     {
         key: 'toDoList_nextDate',
@@ -350,7 +539,7 @@ const workStatusMap = {
     }
 ];
 
-export const  requirements_itemsColumns = [
+export const requirements_itemsColumns = [
     {
         key: 'createdAt',
         header: 'Created At',
@@ -375,8 +564,8 @@ export const  requirements_itemsColumns = [
                     const total = (price * quantity).toFixed(2);
                     return (
                         <li key={index}>
-                            {req.itemName} - ₹{price.toFixed(2)} x{' '}
-                            {quantity} = ₹{total}
+                            {req.itemName} - ₹{price.toFixed(2)} x {quantity} =
+                            ₹{total}
                         </li>
                     );
                 })}
@@ -420,8 +609,7 @@ export const salesManPerformance_itemsColumns = [
         key: 'salesManPerformance_totalExpense',
         header: 'Total Expense',
         render: (item: Form) =>
-            item.salesManPerformance_salary +
-            item.salesManPerformance_expense
+            item.salesManPerformance_salary + item.salesManPerformance_expense
     },
     {
         key: 'salesManPerformance_salesInRupees',
@@ -493,7 +681,7 @@ export const salesManPerformance_itemsColumns = [
     }
 ];
 
-export function dispatchInstructionsHeader(setViewDescription){
+export function dispatchInstructionsHeader(setViewDescription) {
     const itemsColumns = [
         {
             key: 'createdAt',
@@ -540,9 +728,9 @@ export function dispatchInstructionsHeader(setViewDescription){
             header: 'Remarks'
         }
     ];
-return  itemsColumns
+    return itemsColumns;
 }
 
-export function dummy(){
-    return <></>
+export function dummy() {
+    return <></>;
 }

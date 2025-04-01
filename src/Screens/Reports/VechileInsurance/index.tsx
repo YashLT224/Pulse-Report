@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
 import { ulid } from 'ulid';
-import { getUrl } from 'aws-amplify/storage';
 import { FileUploader } from '@aws-amplify/ui-react-storage';
 import { Loader, Input } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
+import { vehicleInsurance_itemsColumns as itemsColumns } from '../../../data/forms';
 import useAuth from '../../../Hooks/useAuth';
 import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
@@ -14,7 +14,6 @@ import {
     formatDateForInput
 } from '../../../utils/helpers';
 import { ModalButton, Heading } from '../../../style';
-import eyeIcon from '../../../assets/eye.svg';
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Vechile Insurance';
@@ -31,96 +30,6 @@ const VechileInsurance = () => {
     const [isUpdateMode, setUpdateMode] = useState(false);
     const [files, setFiles] = useState({});
     const [defaultFiles, setDefaultFiles] = useState([]);
-
-    const itemsColumns = [
-        {
-            key: 'createdAt',
-            header: 'Created At',
-            render: (item: Form) => new Date(item.createdAt).toLocaleString()
-        },
-        {
-            key: 'vehicleInsurance_vehicleNo',
-            header: 'Vehicle No.'
-        },
-        {
-            key: 'vehicleInsurance_insuranceDate',
-            header: 'Insurance Date'
-        },
-        {
-            key: 'expirationDate',
-            header: 'Insurance Expiry'
-        },
-        {
-            key: 'vehicleInsurance_insuranceCompany',
-            header: 'Insurance Company'
-        },
-        {
-            key: 'vehicleInsurance_insureAmount',
-            header: 'Insure Amount'
-        },
-        {
-            key: 'vehicleInsurance_insuranceAmount',
-            header: 'Insurance Amount'
-        },
-        {
-            key: 'vehicleInsurance_insuranceCopy',
-            header: 'Insurance Copy',
-            render: (item: Form) => {
-                return (
-                    <div>
-                        {item.vehicleInsurance_insuranceCopy.map(fileItem => (
-                            <div key={fileItem.key} className="flexbox-between">
-                                <p>{fileItem.name}</p>
-                                <img
-                                    className="pointer"
-                                    src={eyeIcon}
-                                    alt="View"
-                                    width="30"
-                                    height="30"
-                                    onClick={async () => {
-                                        try {
-                                            const linkToStorageFile = await getUrl(
-                                                {
-                                                    path: fileItem.key
-                                                }
-                                            );
-                                            const url = linkToStorageFile.url.toString();
-                                            // Create an anchor element and trigger a download
-                                            const a = document.createElement(
-                                                'a'
-                                            );
-                                            a.href = url;
-                                            a.target = '_blank';
-                                            a.rel = 'noopener noreferrer';
-                                            a.download =
-                                                fileItem.name ||
-                                                'downloaded-file'; // Ensure a valid filename
-                                            document.body.appendChild(a);
-                                            a.click();
-                                            document.body.removeChild(a);
-                                        } catch (error) {
-                                            console.error(
-                                                'Error fetching URL:',
-                                                error
-                                            );
-                                        }
-                                    }}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                );
-            }
-        },
-        {
-            key: 'vehicleInsurance_vehicleType',
-            header: 'Vehicle Type'
-        },
-        {
-            key: 'vehicleInsurance_remarks',
-            header: 'Remarks'
-        }
-    ];
 
     // fetch function for usePagination
     const fetchForm = useCallback(

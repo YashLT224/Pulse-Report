@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Loader, Input } from '@aws-amplify/ui-react';
+import { Loader } from '@aws-amplify/ui-react';
 import useAuth from '../../Hooks/useAuth';
 import { Schema } from '../../../amplify/data/resource';
 import { usePagination } from '../../Hooks/usePagination';
@@ -9,7 +9,9 @@ import {
     buildingMclTax_itemsColumns,
     documentFileStatus_itemsColumns,
     toDoList_itemsColumns,
-    requirements_itemsColumns
+    requirements_itemsColumns,
+    vehicleReport_itemsColumns,
+    vehicleInsurance_itemsColumns
 } from '../../data/forms';
 
 const formColumns = {
@@ -26,11 +28,18 @@ const formColumns = {
         label: 'Document File Status'
     },
     toDoList: { columns: toDoList_itemsColumns, label: 'Todo List' },
-    requirements: { columns: requirements_itemsColumns, label: 'Requirements' }
+    requirements: { columns: requirements_itemsColumns, label: 'Requirements' },
+    vehicleReport: {
+        columns: vehicleReport_itemsColumns,
+        label: 'Vehicle Report'
+    },
+    vehicleInsurance: {
+        columns: vehicleInsurance_itemsColumns,
+        label: 'Vehicle Insurance'
+    }
 };
 
 const LIMIT = 1000; // Number of items to display per page
-const heading = 'Alerts';
 const idField = 'formId';
 type Form = Schema['Form']['type'];
 
@@ -56,7 +65,7 @@ const Alerts = () => {
                 limit
             };
             const response = await client.models.Form.listByExpiration(params);
-            let synchronisedData = formatDataByFormType(response.data);
+            const synchronisedData = formatDataByFormType(response.data);
             return {
                 data: [synchronisedData],
                 nextToken: response.nextToken || null
@@ -66,14 +75,7 @@ const Alerts = () => {
     );
 
     // Use the usePagination hook
-    const {
-        items,
-        isLoading,
-        initiateLoding,
-        updateItem,
-        refreshList,
-        stopLoding
-    } = usePagination<Form>({
+    const { items, isLoading } = usePagination<Form>({
         limit: LIMIT,
         fetchFn: fetchForm,
         idField
