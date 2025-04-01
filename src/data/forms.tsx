@@ -297,9 +297,9 @@ export    const documentFileStatus_itemsColumns = [
 ];
 
 const workStatusMap = {
-    pending: 'Pending',
-    inprogress: 'In Progress',
-    completed: 'Completed'
+    pending: <div style={{color:'red'}}>PENDING</div>,
+    inprogress: <div style={{color:'darkorange'}}>IN PROGRESS</div>,
+    completed: <div style={{color:'green'}}>COMPLETED</div>
 };
  // Define columns for the People | Party list
  export const toDoList_itemsColumns = [
@@ -349,9 +349,6 @@ const workStatusMap = {
         header: 'Remarks'
     }
 ];
-
-
-
 
 export const  requirements_itemsColumns = [
     {
@@ -496,7 +493,6 @@ export const salesManPerformance_itemsColumns = [
     }
 ];
 
-
 export function dispatchInstructionsHeader(setViewDescription){
     const itemsColumns = [
         {
@@ -546,8 +542,6 @@ export function dispatchInstructionsHeader(setViewDescription){
     ];
 return  itemsColumns
 }
-
-
 
 export function dummy(){
     return <></>
