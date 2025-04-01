@@ -553,7 +553,7 @@ const SalesManPerformance = () => {
                                 )
                             )}
 
-                            <ModalButton onClick={handleAddItem}>
+                            <ModalButton type='button' onClick={handleAddItem}>
                                 + Add Requirement
                             </ModalButton>
                         </div>
