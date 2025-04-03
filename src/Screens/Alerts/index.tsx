@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import {
     Loader,
     Input,
@@ -57,8 +57,13 @@ const Alerts = () => {
         formType: null
     });
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const allowedForms = userProfile?.allowedForms || [];
-    const userRole = userProfile?.role || [];
+    const [isChecked, setIsChecked] = useState(false);
+    const allowedForms = useMemo(() => userProfile?.allowedForms || [], [
+        userProfile?.allowedForms
+    ]);
+    const userRole = useMemo(() => userProfile?.role || [], [
+        userProfile?.role
+    ]);
     const now = new Date();
     const fiveDaysLater = new Date();
     fiveDaysLater.setDate(now.getDate() + 5000);
@@ -76,70 +81,85 @@ const Alerts = () => {
                 limit
             };
             const response = await client.models.Form.listByExpiration(params);
-            const synchronisedData = formatDataByFormType(response.data);
             return {
-                data: [synchronisedData],
+                data: response.data,
                 nextToken: response.nextToken || null
             };
         },
-        [client.models.Form, endDate, startDate]
+        [allowedForms, client.models.Form, endDate, startDate, userRole]
     );
 
     // Use the usePagination hook
-    const { items, isLoading } = usePagination<Form>({
+    const { items, isLoading, deleteItem } = usePagination<Form>({
         limit: LIMIT,
         fetchFn: fetchForm,
         idField
     });
 
-    const hasFormAccess = form => {
-        return userRole === 'admin' || allowedForms?.includes(form);
-    };
+    const itemMap = formatDataByFormType({
+        data: items,
+        userRole,
+        allowedForms
+    });
 
-    function validEntry(item, formType) {
-        switch (formType) {
-            case 'buildingInsurance':
-                return item.buildingInsurance_status === 'PENDING';
-
-            case 'buildingMclTax':
-                return item.buildingMclTax_status === 'PENDING';
-            case 'toDoList':
-                return item.toDoList_workStatus !== 'completed';
-
-            default:
-                return true;
-        }
-    }
-    function formatDataByFormType(data) {
-        // Initialize an empty result object
-        const result = {};
-
-        // Iterate through each data item
-        data.forEach(item => {
-            const formType = item.formType.split('#')[0];
-
-            // If this formType doesn't exist in the result yet, create an empty array
-            if (!result[formType] && hasFormAccess(formType)) {
-                result[formType] = [];
-            }
-
-            // Push the current item to the appropriate array
-            result[formType] &&
-                validEntry(item, formType) &&
-                result[formType].push(item);
-        });
-
-        return result;
-    }
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
     const handleEdit = item => {
         console.log(item);
         setIsModalOpen(true);
-        let formType = item.formType.split('#')[0];
+        const formType = item.formType.split('#')[0];
         setSelectedItem({ data: item, formType });
     };
+
+    const updateField = (value: any, key: string, isMultiValue = false) => {
+        if (!isMultiValue) {
+            setSelectedItem((prev: any) => ({
+                ...prev,
+                data: { ...prev.data, [key]: value }
+            }));
+        } else {
+            const keys = key.split('#');
+            const values = value.split('#');
+            setSelectedItem((prev: any) => ({
+                ...prev,
+                data: {
+                    ...prev.data,
+                    [keys[0]]: values[0],
+                    [keys[1]]: values[1]
+                }
+            }));
+        }
+    };
+
+    const onEdit = async (editedForm: any) => {
+        const formType = editedForm.formType.split('#')[0];
+        const params: any = {
+            formId: editedForm.data.formId,
+            completedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            updatedBy: userProfile.userId,
+            ...(formType === 'buildingInsurance' && {
+                buildingInsurance_status: 'PAID'
+            })
+        };
+        deleteItem(editedForm.data);
+        client.models.Form.update(params).catch(error => {
+            console.error(`Failed to update ${formType}:`, error);
+        });
+    };
+
+    const handleComplete = e => {
+        e.preventDefault();
+        onEdit(selectedItem);
+        setIsModalOpen(false);
+        setIsChecked(false);
+    };
+
+    const isModalDisabled =
+        !isChecked ||
+        (selectedItem?.formType === 'buildingInsurance' &&
+            selectedItem?.data?.buildingInsurance_status === 'PENDING');
 
     return (
         <>
@@ -168,10 +188,10 @@ const Alerts = () => {
                     </div>
                 )}
                 <div>
-                    {Object.keys(items?.[0] || []).map(formName => {
+                    {Object.keys(itemMap || []).map(formName => {
                         return (
                             <>
-                                {items?.[0][formName].length > 0 ? (
+                                {itemMap[formName].length > 0 ? (
                                     <div
                                         style={{
                                             border: '1px solid black',
@@ -184,7 +204,7 @@ const Alerts = () => {
                                             heading={
                                                 formColumns[formName].label
                                             }
-                                            items={items?.[0][formName]}
+                                            items={itemMap[formName]}
                                             columns={
                                                 formColumns[formName].columns
                                             }
@@ -206,8 +226,13 @@ const Alerts = () => {
                     heading={selectedItem.formType}
                     isUpdateMode={true}
                 >
-                    <form>
-                        {Modaldata(selectedItem)}
+                    <form onSubmit={handleComplete}>
+                        <ModalData
+                            selectedItem={selectedItem}
+                            updateField={updateField}
+                            isChecked={isChecked}
+                            setIsChecked={setIsChecked}
+                        />
                         <div
                             style={{
                                 display: 'flex',
@@ -216,8 +241,11 @@ const Alerts = () => {
                                 marginTop: '15px'
                             }}
                         >
-                            <ModalButton type="submit">
-                                {true ? 'Update' : 'Save'}
+                            <ModalButton
+                                type="submit"
+                                disabled={isModalDisabled}
+                            >
+                                Complete
                             </ModalButton>
                             <ModalButton onClick={handleCloseModal}>
                                 Cancel
@@ -232,7 +260,50 @@ const Alerts = () => {
 
 export default Alerts;
 
-function Modaldata(selectedItem) {
+const hasFormAccess = ({ formType, userRole, allowedForms }) => {
+    return userRole === 'admin' || allowedForms?.includes(formType);
+};
+function validEntry(item, formType) {
+    switch (formType) {
+        case 'buildingInsurance':
+            return item.buildingInsurance_status === 'PENDING';
+
+        case 'buildingMclTax':
+            return item.buildingMclTax_status === 'PENDING';
+        case 'toDoList':
+            return item.toDoList_workStatus !== 'completed';
+
+        default:
+            return true;
+    }
+}
+
+function formatDataByFormType({ data, userRole, allowedForms }) {
+    // Initialize an empty result object
+    const result = {};
+
+    // Iterate through each data item
+    data.forEach(item => {
+        const formType = item.formType.split('#')[0];
+
+        // If this formType doesn't exist in the result yet, create an empty array
+        if (
+            !result[formType] &&
+            hasFormAccess({ formType, userRole, allowedForms })
+        ) {
+            result[formType] = [];
+        }
+
+        // Push the current item to the appropriate array
+        result[formType] &&
+            validEntry(item, formType) &&
+            result[formType].push(item);
+    });
+
+    return result;
+}
+
+function ModalData({ selectedItem, updateField, isChecked, setIsChecked }) {
     switch (selectedItem.formType) {
         case 'buildingInsurance':
             return (
@@ -267,6 +338,16 @@ function Modaldata(selectedItem) {
                                 Pending
                             </option>
                         </SelectField>
+                    </div>
+
+                    <div className="mb-8px">
+                        <CheckboxField
+                            name="subscribe-controlled"
+                            value="yes"
+                            checked={isChecked}
+                            onChange={e => setIsChecked(e.target.checked)}
+                            label="Please Tick and Confirm"
+                        />
                     </div>
                 </div>
             );
@@ -305,6 +386,16 @@ function Modaldata(selectedItem) {
                             </option>
                         </SelectField>
                     </div>
+
+                    <div className="mb-8px">
+                        <CheckboxField
+                            name="subscribe-controlled"
+                            value="yes"
+                            // checked={selectedItem.data.completedAt}
+                            //   onChange={(e) => setChecked(e.target.checked)}
+                            label="Please Tick and Confirm"
+                        />
+                    </div>
                 </div>
             );
 
@@ -340,41 +431,40 @@ function Modaldata(selectedItem) {
                         <CheckboxField
                             name="subscribe-controlled"
                             value="yes"
-                            checked={selectedItem.data.completedAt}
+                            // checked={selectedItem.data.completedAt}
                             //   onChange={(e) => setChecked(e.target.checked)}
-                            label="Please tick and Confirm"
+                            label="Please Tick and Confirm"
                         />
                     </div>
                 </div>
             );
 
-            case 'documentFileStatus':
-                return (
-                    <div>
-                        <div className="mb-8px">
-                            <Heading>FileName</Heading>
-                            <Input
-                                variation="quiet"
-                                size="small"
-                                isRequired={true}
-                                placeholder="Building Name"
-                                value={selectedItem.data.documentFileStatus_fileName}
-                            />
-                        </div>
-    
-                        <div className="mb-8px">
-                            <Heading>Status</Heading>
-                            <Input
-                                
-                                variation="quiet"
-                                size="small"
-                               
-                                isRequired={true}
-                                value={selectedItem.data.documentFileStatus_status}
-                               
-                            />
-                        </div>
-                        <div className="mb-8px">
+        case 'documentFileStatus':
+            return (
+                <div>
+                    <div className="mb-8px">
+                        <Heading>FileName</Heading>
+                        <Input
+                            variation="quiet"
+                            size="small"
+                            isRequired={true}
+                            placeholder="Building Name"
+                            value={
+                                selectedItem.data.documentFileStatus_fileName
+                            }
+                        />
+                    </div>
+
+                    <div className="mb-8px">
+                        <Heading>Status</Heading>
+                        <Input
+                            variation="quiet"
+                            size="small"
+                            isRequired={true}
+                            value={selectedItem.data.documentFileStatus_status}
+                        />
+                    </div>
+                    <div className="mb-8px">
                         <Heading>Date Expiry</Heading>
                         <Input
                             type="date"
@@ -388,9 +478,7 @@ function Modaldata(selectedItem) {
                             }
                         />
                     </div>
-                    </div>
-                );
-    
-
+                </div>
+            );
     }
 }

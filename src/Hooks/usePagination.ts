@@ -116,7 +116,7 @@ export function usePagination<T>({
 
     // Add method to delete a specific item in the list
     const deleteItem = useCallback(
-        (deletedItem: T & { allowedForms?: string[] }) => {
+        (deletedItem: T) => {
             setItems(prevItems =>
                 prevItems.filter(item => item[idField] !== deletedItem[idField])
             );
