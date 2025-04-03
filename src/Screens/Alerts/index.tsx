@@ -1,9 +1,16 @@
-import { useCallback } from 'react';
-import { Loader } from '@aws-amplify/ui-react';
+import { useCallback, useState, useMemo } from 'react';
+import {
+    Loader,
+    Input,
+    SelectField,
+    CheckboxField
+} from '@aws-amplify/ui-react';
 import useAuth from '../../Hooks/useAuth';
 import { Schema } from '../../../amplify/data/resource';
 import { usePagination } from '../../Hooks/usePagination';
 import UserListItems from '../../components/UserList';
+import Modal from '../../components/Modal';
+import { ModalButton, Heading } from '../../style';
 import {
     buildingInsurance_itemsColumns,
     buildingMclTax_itemsColumns,
@@ -45,9 +52,18 @@ type Form = Schema['Form']['type'];
 
 const Alerts = () => {
     const { userProfile, client } = useAuth();
-
-    const allowedForms = userProfile?.allowedForms || [];
-    const userRole = userProfile?.role || [];
+    const [selectedItem, setSelectedItem] = useState({
+        data: null,
+        formType: null
+    });
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isChecked, setIsChecked] = useState(false);
+    const allowedForms = useMemo(() => userProfile?.allowedForms || [], [
+        userProfile?.allowedForms
+    ]);
+    const userRole = useMemo(() => userProfile?.role || [], [
+        userProfile?.role
+    ]);
     const now = new Date();
     const fiveDaysLater = new Date();
     fiveDaysLater.setDate(now.getDate() + 5000);
@@ -65,9 +81,8 @@ const Alerts = () => {
                 limit
             };
             const response = await client.models.Form.listByExpiration(params);
-            const synchronisedData = formatDataByFormType(response.data);
             return {
-                data: [synchronisedData],
+                data: response.data,
                 nextToken: response.nextToken || null
             };
         },
@@ -75,52 +90,76 @@ const Alerts = () => {
     );
 
     // Use the usePagination hook
-    const { items, isLoading } = usePagination<Form>({
+    const { items, isLoading, deleteItem } = usePagination<Form>({
         limit: LIMIT,
         fetchFn: fetchForm,
         idField
     });
 
-    console.log(items);
-    const hasFormAccess = form => {
-        return userRole === 'admin' || allowedForms?.includes(form);
+    const itemMap = formatDataByFormType({
+        data: items,
+        userRole,
+        allowedForms
+    });
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+    const handleEdit = item => {
+        console.log(item);
+        setIsModalOpen(true);
+        const formType = item.formType.split('#')[0];
+        setSelectedItem({ data: item, formType });
     };
 
-    function validEntry(item, formType) {
-        switch (formType) {
-            case 'buildingInsurance':
-                return item.buildingInsurance_status === 'PENDING';
-
-            case 'buildingMclTax':
-                return item.buildingMclTax_status === 'PENDING';
-            case 'toDoList':
-                return item.toDoList_workStatus !== 'completed';
-
-            default:
-                return true;
+    const updateField = (value: any, key: string, isMultiValue = false) => {
+        if (!isMultiValue) {
+            setSelectedItem((prev: any) => ({
+                ...prev,
+                data: { ...prev.data, [key]: value }
+            }));
+        } else {
+            const keys = key.split('#');
+            const values = value.split('#');
+            setSelectedItem((prev: any) => ({
+                ...prev,
+                data: {
+                    ...prev.data,
+                    [keys[0]]: values[0],
+                    [keys[1]]: values[1]
+                }
+            }));
         }
-    }
-    function formatDataByFormType(data) {
-        // Initialize an empty result object
-        const result = {};
+    };
 
-        // Iterate through each data item
-        data.forEach(item => {
-            const formType = item.formType.split('#')[0];
-
-            // If this formType doesn't exist in the result yet, create an empty array
-            if (!result[formType] && hasFormAccess(formType)) {
-                result[formType] = [];
-            }
-
-            // Push the current item to the appropriate array
-            result[formType] &&
-                validEntry(item, formType) &&
-                result[formType].push(item);
+    const onEdit = async (editedForm: any) => {
+        const formType = editedForm.formType.split('#')[0];
+        const params: any = {
+            formId: editedForm.data.formId,
+            completedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            updatedBy: userProfile.userId,
+            ...(formType === 'buildingInsurance' && {
+                buildingInsurance_status: 'PAID'
+            })
+        };
+        deleteItem(editedForm.data);
+        client.models.Form.update(params).catch(error => {
+            console.error(`Failed to update ${formType}:`, error);
         });
+    };
 
-        return result;
-    }
+    const handleComplete = e => {
+        e.preventDefault();
+        onEdit(selectedItem);
+        setIsModalOpen(false);
+        setIsChecked(false);
+    };
+
+    const isModalDisabled =
+        !isChecked ||
+        (selectedItem?.formType === 'buildingInsurance' &&
+            selectedItem?.data?.buildingInsurance_status === 'PENDING');
 
     return (
         <>
@@ -149,10 +188,10 @@ const Alerts = () => {
                     </div>
                 )}
                 <div>
-                    {Object.keys(items?.[0] || []).map(formName => {
+                    {Object.keys(itemMap || []).map(formName => {
                         return (
                             <>
-                                {items?.[0][formName].length > 0 ? (
+                                {itemMap[formName].length > 0 ? (
                                     <div
                                         style={{
                                             border: '1px solid black',
@@ -165,12 +204,12 @@ const Alerts = () => {
                                             heading={
                                                 formColumns[formName].label
                                             }
-                                            items={items?.[0][formName]}
+                                            items={itemMap[formName]}
                                             columns={
                                                 formColumns[formName].columns
                                             }
                                             addNewEntryAccess={false}
-                                            handleEdit={() => {}}
+                                            handleEdit={handleEdit}
                                         ></UserListItems>
                                     </div>
                                 ) : (
@@ -181,8 +220,265 @@ const Alerts = () => {
                     })}
                 </div>
             </div>
+            {isModalOpen && (
+                <Modal
+                    onCloseHander={handleCloseModal}
+                    heading={selectedItem.formType}
+                    isUpdateMode={true}
+                >
+                    <form onSubmit={handleComplete}>
+                        <ModalData
+                            selectedItem={selectedItem}
+                            updateField={updateField}
+                            isChecked={isChecked}
+                            setIsChecked={setIsChecked}
+                        />
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                marginTop: '15px'
+                            }}
+                        >
+                            <ModalButton
+                                type="submit"
+                                disabled={isModalDisabled}
+                            >
+                                Complete
+                            </ModalButton>
+                            <ModalButton onClick={handleCloseModal}>
+                                Cancel
+                            </ModalButton>
+                        </div>
+                    </form>
+                </Modal>
+            )}
         </>
     );
 };
 
 export default Alerts;
+
+const hasFormAccess = ({ formType, userRole, allowedForms }) => {
+    return userRole === 'admin' || allowedForms?.includes(formType);
+};
+function validEntry(item, formType) {
+    switch (formType) {
+        case 'buildingInsurance':
+            return item.buildingInsurance_status === 'PENDING';
+
+        case 'buildingMclTax':
+            return item.buildingMclTax_status === 'PENDING';
+        case 'toDoList':
+            return item.toDoList_workStatus !== 'completed';
+
+        default:
+            return true;
+    }
+}
+
+function formatDataByFormType({ data, userRole, allowedForms }) {
+    // Initialize an empty result object
+    const result = {};
+
+    // Iterate through each data item
+    data.forEach(item => {
+        const formType = item.formType.split('#')[0];
+
+        // If this formType doesn't exist in the result yet, create an empty array
+        if (
+            !result[formType] &&
+            hasFormAccess({ formType, userRole, allowedForms })
+        ) {
+            result[formType] = [];
+        }
+
+        // Push the current item to the appropriate array
+        result[formType] &&
+            validEntry(item, formType) &&
+            result[formType].push(item);
+    });
+
+    return result;
+}
+
+function ModalData({ selectedItem, updateField, isChecked, setIsChecked }) {
+    switch (selectedItem.formType) {
+        case 'buildingInsurance':
+            return (
+                <div>
+                    <div className="mb-8px">
+                        <Heading>Building Name</Heading>
+                        <Input
+                            variation="quiet"
+                            size="small"
+                            isRequired={true}
+                            placeholder="Building Name"
+                            value={
+                                selectedItem.data.buildingInsurance_buildingName
+                            }
+                        />
+                    </div>
+
+                    <div className="mb-8px">
+                        <Heading>Status</Heading>
+                        <SelectField
+                            label=""
+                            value={selectedItem.data.buildingInsurance_status}
+                            onChange={e =>
+                                updateField(
+                                    e.target.value,
+                                    'buildingInsurance_status'
+                                )
+                            }
+                        >
+                            <option value="PAID">Paid</option>
+                            <option disabled={true} value="PENDING">
+                                Pending
+                            </option>
+                        </SelectField>
+                    </div>
+
+                    <div className="mb-8px">
+                        <CheckboxField
+                            name="subscribe-controlled"
+                            value="yes"
+                            checked={isChecked}
+                            onChange={e => setIsChecked(e.target.checked)}
+                            label="Please Tick and Confirm"
+                        />
+                    </div>
+                </div>
+            );
+
+        case 'buildingMclTax':
+            return (
+                <div>
+                    <div className="mb-8px">
+                        <Heading>Building Name</Heading>
+                        <Input
+                            variation="quiet"
+                            size="small"
+                            isRequired={true}
+                            placeholder="Building Name"
+                            value={
+                                selectedItem.data.buildingMclTax_buildingName
+                            }
+                        />
+                    </div>
+
+                    <div className="mb-8px">
+                        <Heading>Status</Heading>
+                        <SelectField
+                            label=""
+                            value={selectedItem.data.buildingMclTax_status}
+                            onChange={e =>
+                                updateField(
+                                    e.target.value,
+                                    'buildingMclTax_status'
+                                )
+                            }
+                        >
+                            <option value="PAID">Paid</option>
+                            <option disabled={true} value="PENDING">
+                                Pending
+                            </option>
+                        </SelectField>
+                    </div>
+
+                    <div className="mb-8px">
+                        <CheckboxField
+                            name="subscribe-controlled"
+                            value="yes"
+                            // checked={selectedItem.data.completedAt}
+                            //   onChange={(e) => setChecked(e.target.checked)}
+                            label="Please Tick and Confirm"
+                        />
+                    </div>
+                </div>
+            );
+
+        case 'vehicleInsurance':
+            return (
+                <div>
+                    <div className="mb-8px">
+                        <Heading>Vechile No.</Heading>
+                        <Input
+                            variation="quiet"
+                            size="small"
+                            isRequired={true}
+                            placeholder="Building Name"
+                            value={selectedItem.data.vehicleInsurance_vehicleNo}
+                        />
+                    </div>
+
+                    <div className="mb-8px">
+                        <Heading>Insurance Expiry</Heading>
+                        <Input
+                            type="date"
+                            variation="quiet"
+                            size="small"
+                            placeholder="Due Date"
+                            isRequired={true}
+                            value={selectedItem.data.expirationDate}
+                            onChange={e =>
+                                updateField(e.target.value, 'expirationDate')
+                            }
+                        />
+                    </div>
+                    <div className="mb-8px">
+                        <CheckboxField
+                            name="subscribe-controlled"
+                            value="yes"
+                            // checked={selectedItem.data.completedAt}
+                            //   onChange={(e) => setChecked(e.target.checked)}
+                            label="Please Tick and Confirm"
+                        />
+                    </div>
+                </div>
+            );
+
+        case 'documentFileStatus':
+            return (
+                <div>
+                    <div className="mb-8px">
+                        <Heading>FileName</Heading>
+                        <Input
+                            variation="quiet"
+                            size="small"
+                            isRequired={true}
+                            placeholder="Building Name"
+                            value={
+                                selectedItem.data.documentFileStatus_fileName
+                            }
+                        />
+                    </div>
+
+                    <div className="mb-8px">
+                        <Heading>Status</Heading>
+                        <Input
+                            variation="quiet"
+                            size="small"
+                            isRequired={true}
+                            value={selectedItem.data.documentFileStatus_status}
+                        />
+                    </div>
+                    <div className="mb-8px">
+                        <Heading>Date Expiry</Heading>
+                        <Input
+                            type="date"
+                            variation="quiet"
+                            size="small"
+                            placeholder="Due Date"
+                            isRequired={true}
+                            value={selectedItem.data.expirationDate}
+                            onChange={e =>
+                                updateField(e.target.value, 'expirationDate')
+                            }
+                        />
+                    </div>
+                </div>
+            );
+    }
+}
