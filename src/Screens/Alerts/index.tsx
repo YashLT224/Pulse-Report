@@ -1,9 +1,16 @@
-import { useCallback } from 'react';
-import { Loader } from '@aws-amplify/ui-react';
+import { useCallback, useState } from 'react';
+import {
+    Loader,
+    Input,
+    SelectField,
+    CheckboxField
+} from '@aws-amplify/ui-react';
 import useAuth from '../../Hooks/useAuth';
 import { Schema } from '../../../amplify/data/resource';
 import { usePagination } from '../../Hooks/usePagination';
 import UserListItems from '../../components/UserList';
+import Modal from '../../components/Modal';
+import { ModalButton, Heading } from '../../style';
 import {
     buildingInsurance_itemsColumns,
     buildingMclTax_itemsColumns,
@@ -45,7 +52,11 @@ type Form = Schema['Form']['type'];
 
 const Alerts = () => {
     const { userProfile, client } = useAuth();
-
+    const [selectedItem, setSelectedItem] = useState({
+        data: null,
+        formType: null
+    });
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const allowedForms = userProfile?.allowedForms || [];
     const userRole = userProfile?.role || [];
     const now = new Date();
@@ -81,7 +92,6 @@ const Alerts = () => {
         idField
     });
 
-    console.log(items);
     const hasFormAccess = form => {
         return userRole === 'admin' || allowedForms?.includes(form);
     };
@@ -121,6 +131,15 @@ const Alerts = () => {
 
         return result;
     }
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+    const handleEdit = item => {
+        console.log(item);
+        setIsModalOpen(true);
+        let formType = item.formType.split('#')[0];
+        setSelectedItem({ data: item, formType });
+    };
 
     return (
         <>
@@ -170,7 +189,7 @@ const Alerts = () => {
                                                 formColumns[formName].columns
                                             }
                                             addNewEntryAccess={false}
-                                            handleEdit={() => {}}
+                                            handleEdit={handleEdit}
                                         ></UserListItems>
                                     </div>
                                 ) : (
@@ -181,8 +200,197 @@ const Alerts = () => {
                     })}
                 </div>
             </div>
+            {isModalOpen && (
+                <Modal
+                    onCloseHander={handleCloseModal}
+                    heading={selectedItem.formType}
+                    isUpdateMode={true}
+                >
+                    <form>
+                        {Modaldata(selectedItem)}
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                marginTop: '15px'
+                            }}
+                        >
+                            <ModalButton type="submit">
+                                {true ? 'Update' : 'Save'}
+                            </ModalButton>
+                            <ModalButton onClick={handleCloseModal}>
+                                Cancel
+                            </ModalButton>
+                        </div>
+                    </form>
+                </Modal>
+            )}
         </>
     );
 };
 
 export default Alerts;
+
+function Modaldata(selectedItem) {
+    switch (selectedItem.formType) {
+        case 'buildingInsurance':
+            return (
+                <div>
+                    <div className="mb-8px">
+                        <Heading>Building Name</Heading>
+                        <Input
+                            variation="quiet"
+                            size="small"
+                            isRequired={true}
+                            placeholder="Building Name"
+                            value={
+                                selectedItem.data.buildingInsurance_buildingName
+                            }
+                        />
+                    </div>
+
+                    <div className="mb-8px">
+                        <Heading>Status</Heading>
+                        <SelectField
+                            label=""
+                            value={selectedItem.data.buildingInsurance_status}
+                            onChange={e =>
+                                updateField(
+                                    e.target.value,
+                                    'buildingInsurance_status'
+                                )
+                            }
+                        >
+                            <option value="PAID">Paid</option>
+                            <option disabled={true} value="PENDING">
+                                Pending
+                            </option>
+                        </SelectField>
+                    </div>
+                </div>
+            );
+
+        case 'buildingMclTax':
+            return (
+                <div>
+                    <div className="mb-8px">
+                        <Heading>Building Name</Heading>
+                        <Input
+                            variation="quiet"
+                            size="small"
+                            isRequired={true}
+                            placeholder="Building Name"
+                            value={
+                                selectedItem.data.buildingMclTax_buildingName
+                            }
+                        />
+                    </div>
+
+                    <div className="mb-8px">
+                        <Heading>Status</Heading>
+                        <SelectField
+                            label=""
+                            value={selectedItem.data.buildingMclTax_status}
+                            onChange={e =>
+                                updateField(
+                                    e.target.value,
+                                    'buildingMclTax_status'
+                                )
+                            }
+                        >
+                            <option value="PAID">Paid</option>
+                            <option disabled={true} value="PENDING">
+                                Pending
+                            </option>
+                        </SelectField>
+                    </div>
+                </div>
+            );
+
+        case 'vehicleInsurance':
+            return (
+                <div>
+                    <div className="mb-8px">
+                        <Heading>Vechile No.</Heading>
+                        <Input
+                            variation="quiet"
+                            size="small"
+                            isRequired={true}
+                            placeholder="Building Name"
+                            value={selectedItem.data.vehicleInsurance_vehicleNo}
+                        />
+                    </div>
+
+                    <div className="mb-8px">
+                        <Heading>Insurance Expiry</Heading>
+                        <Input
+                            type="date"
+                            variation="quiet"
+                            size="small"
+                            placeholder="Due Date"
+                            isRequired={true}
+                            value={selectedItem.data.expirationDate}
+                            onChange={e =>
+                                updateField(e.target.value, 'expirationDate')
+                            }
+                        />
+                    </div>
+                    <div className="mb-8px">
+                        <CheckboxField
+                            name="subscribe-controlled"
+                            value="yes"
+                            checked={selectedItem.data.completedAt}
+                            //   onChange={(e) => setChecked(e.target.checked)}
+                            label="Please tick and Confirm"
+                        />
+                    </div>
+                </div>
+            );
+
+            case 'documentFileStatus':
+                return (
+                    <div>
+                        <div className="mb-8px">
+                            <Heading>FileName</Heading>
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                isRequired={true}
+                                placeholder="Building Name"
+                                value={selectedItem.data.documentFileStatus_fileName}
+                            />
+                        </div>
+    
+                        <div className="mb-8px">
+                            <Heading>Status</Heading>
+                            <Input
+                                
+                                variation="quiet"
+                                size="small"
+                               
+                                isRequired={true}
+                                value={selectedItem.data.documentFileStatus_status}
+                               
+                            />
+                        </div>
+                        <div className="mb-8px">
+                        <Heading>Date Expiry</Heading>
+                        <Input
+                            type="date"
+                            variation="quiet"
+                            size="small"
+                            placeholder="Due Date"
+                            isRequired={true}
+                            value={selectedItem.data.expirationDate}
+                            onChange={e =>
+                                updateField(e.target.value, 'expirationDate')
+                            }
+                        />
+                    </div>
+                    </div>
+                );
+    
+
+    }
+}

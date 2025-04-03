@@ -113,3 +113,7 @@ width:100% !important;
 .pointer{
      cursor:pointer
 }
+
+.mb-8px{
+    margin-bottom: 8px;
+}
