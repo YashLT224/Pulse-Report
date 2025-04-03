@@ -328,7 +328,7 @@ const BuildingInsurance = () => {
                             <Heading>Status</Heading>
                             <SelectField
                                 label=""
-                                value={selectedItem.buildingMclTax_status}
+                                value={selectedItem.buildingInsurance_status}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,

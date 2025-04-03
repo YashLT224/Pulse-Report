@@ -86,7 +86,7 @@ const Alerts = () => {
                 nextToken: response.nextToken || null
             };
         },
-        [allowedForms, client.models.Form, endDate, startDate, userRole]
+        [client.models.Form, endDate, startDate]
     );
 
     // Use the usePagination hook
