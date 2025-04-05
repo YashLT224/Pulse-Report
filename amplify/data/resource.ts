@@ -80,7 +80,7 @@ const schema = a
                 allow
                     .groups(['ADMINS'])
                     .to(['create', 'read', 'update', 'delete']),
-                // Allow authenticated users to just read people records
+                // Allow authenticated users to just read/update people records
                 allow.authenticated().to(['read', 'update'])
             ]),
         Party: a
@@ -266,12 +266,8 @@ const schema = a
                 allow
                     .groups(['ADMINS'])
                     .to(['create', 'read', 'update', 'delete']),
-                // Allow owner to perform create, read, and update operations
-                allow
-                    .ownerDefinedIn('createdBy')
-                    .to(['create', 'read', 'update']),
-                // Allow authenticated users to just read form records
-                allow.authenticated().to(['read'])
+                // Allow authenticated users to just create, read, and update form records
+                allow.authenticated().to(['create', 'read', 'update'])
             ])
     })
     .authorization(allow => [allow.resource(postConfirmation)]);
