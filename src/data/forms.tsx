@@ -396,7 +396,9 @@ export const vehicleReport_itemsColumns = [
     },
     {
         key: 'vehicleReport_status',
-        header: 'Status'
+        header: 'Status',
+        render: (item: Form) =>
+        workStatusMap[item.vehicleReport_status?.toLowerCase()] || item.vehicleReport_status
     }
 ];
 

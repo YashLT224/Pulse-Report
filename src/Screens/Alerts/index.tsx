@@ -141,6 +141,12 @@ const Alerts = () => {
             updatedBy: userProfile.userId,
             ...(formType === 'buildingInsurance' && {
                 buildingInsurance_status: 'PAID'
+            }),
+            ...(formType === 'buildingMclTax' && {
+                buildingMclTax_status: 'PAID'
+            }),
+            ...(formType === 'toDoList' && {
+                toDoList_workStatus: 'completed'
             })
         };
         deleteItem(editedForm.data);
@@ -233,6 +239,17 @@ const Alerts = () => {
                             isChecked={isChecked}
                             setIsChecked={setIsChecked}
                         />
+
+<div className="mb-8px">
+                        <CheckboxField
+                            name="subscribe-controlled"
+                            value="yes"
+                            checked={isChecked}
+                            onChange={e => setIsChecked(e.target.checked)}
+                            label="Please Tick and Confirm"
+                        />
+                    </div>
+
                         <div
                             style={{
                                 display: 'flex',
@@ -264,6 +281,9 @@ const hasFormAccess = ({ formType, userRole, allowedForms }) => {
     return userRole === 'admin' || allowedForms?.includes(formType);
 };
 function validEntry(item, formType) {
+    if(item.completedAt){
+        return false;
+    }
     switch (formType) {
         case 'buildingInsurance':
             return item.buildingInsurance_status === 'PENDING';
@@ -339,16 +359,6 @@ function ModalData({ selectedItem, updateField, isChecked, setIsChecked }) {
                             </option>
                         </SelectField>
                     </div>
-
-                    <div className="mb-8px">
-                        <CheckboxField
-                            name="subscribe-controlled"
-                            value="yes"
-                            checked={isChecked}
-                            onChange={e => setIsChecked(e.target.checked)}
-                            label="Please Tick and Confirm"
-                        />
-                    </div>
                 </div>
             );
 
@@ -387,15 +397,7 @@ function ModalData({ selectedItem, updateField, isChecked, setIsChecked }) {
                         </SelectField>
                     </div>
 
-                    <div className="mb-8px">
-                        <CheckboxField
-                            name="subscribe-controlled"
-                            value="yes"
-                            // checked={selectedItem.data.completedAt}
-                            //   onChange={(e) => setChecked(e.target.checked)}
-                            label="Please Tick and Confirm"
-                        />
-                    </div>
+                 
                 </div>
             );
 
@@ -427,15 +429,7 @@ function ModalData({ selectedItem, updateField, isChecked, setIsChecked }) {
                             }
                         />
                     </div>
-                    <div className="mb-8px">
-                        <CheckboxField
-                            name="subscribe-controlled"
-                            value="yes"
-                            // checked={selectedItem.data.completedAt}
-                            //   onChange={(e) => setChecked(e.target.checked)}
-                            label="Please Tick and Confirm"
-                        />
-                    </div>
+                 
                 </div>
             );
 
@@ -480,5 +474,104 @@ function ModalData({ selectedItem, updateField, isChecked, setIsChecked }) {
                     </div>
                 </div>
             );
-    }
+
+            case 'requirements':
+                return (
+                    <div>
+                        <div className="mb-8px">
+                            <Heading>Demand From</Heading>
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                isRequired={true}
+                                value={selectedItem.data.requirements_demandFromName}
+                            />
+                        </div>
+                        <div className="mb-8px">
+                            <Heading>Responsible Person
+                            </Heading>
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                isRequired={true}
+                                value={selectedItem.data.requirements_responsiblePersonName}
+                            />
+                        </div>
+                        <div className="mb-8px">
+                            <Heading>Deadline</Heading>
+                            <Input
+                                type="date"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Due Date"
+                                isRequired={true}
+                                value={selectedItem.data.expirationDate}
+                                onChange={e =>
+                                    updateField(e.target.value, 'expirationDate')
+                                }
+                            />
+                        </div>
+                    </div>
+                );
+            case 'toDoList':
+                    return (
+                        <div>
+                            <div className="mb-8px">
+                                <Heading>Assignee</Heading>
+                                <Input
+                                    variation="quiet"
+                                    size="small"
+                                    isRequired={true}
+                                    value={selectedItem.data.toDoList_assignName}
+                                />
+                            </div>
+                            <div className="mb-8px">
+                                <Heading>Work</Heading>
+                                <Input
+                                    variation="quiet"
+                                    size="small"
+                                    isRequired={true}
+                                    value={selectedItem.data.toDoList_work}
+                                />
+                            </div>
+                            <div className="mb-8px">
+                        <Heading>Status</Heading>
+                        <SelectField
+                            label=""
+                            value={selectedItem.data.toDoList_workStatus}
+                            onChange={e =>
+                                updateField(
+                                    e.target.value,
+                                    'toDoList_workStatus'
+                                )
+                            }
+                        >
+                            <option value="completed">Completed</option>
+                            <option disabled={true} value="pending">
+                                Pending
+                            </option>
+                            <option disabled={true} value="inprogress">
+                                In Progress
+                            </option>
+                        </SelectField>
+                    </div>
+                            <div className="mb-8px">
+                                <Heading>Deadline</Heading>
+                                <Input
+                                    type="date"
+                                    variation="quiet"
+                                    size="small"
+                                    placeholder="Due Date"
+                                    isRequired={true}
+                                    value={selectedItem.data.expirationDate}
+                                    onChange={e =>
+                                        updateField(e.target.value, 'expirationDate')
+                                    }
+                                />
+                            </div>
+                        </div>
+                    );
+    
+        
+                }
 }
