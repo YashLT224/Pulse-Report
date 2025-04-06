@@ -262,8 +262,8 @@ const schema = a
                     .name('GSI1')
             ])
             .authorization(allow => [
-                // DEBUG: Allow guest to perform all operations
-                allow.guest().to(['create', 'read', 'update', 'delete'])
+                // Allow authenticated users to perform create, read, update operations
+                allow.authenticated().to(['create', 'read', 'update'])
             ])
     })
     .authorization(allow => [allow.resource(postConfirmation)]);

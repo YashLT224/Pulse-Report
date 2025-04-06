@@ -49,7 +49,7 @@ export function usePagination<T>({
                 const response = await fetchFn(fetchLimit, token);
 
                 // Check if there are more items
-                if (response.data.length > lastItemIndex) {
+                if (response.data?.length > lastItemIndex) {
                     setHasNext(true);
                     setItems([
                         ...(prevExtraItem ? [prevExtraItem] : []),
