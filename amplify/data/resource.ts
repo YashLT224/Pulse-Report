@@ -262,8 +262,10 @@ const schema = a
                     .name('GSI1')
             ])
             .authorization(allow => [
-                // Allow authenticated users to perform create, read, update operations
-                allow.authenticated().to(['create', 'read', 'update'])
+                allow
+                    .groups(['ADMINS'])
+                    .to(['create', 'read', 'update', 'delete']),
+                allow.authenticated('userPools')
             ])
     })
     .authorization(allow => [allow.resource(postConfirmation)]);
