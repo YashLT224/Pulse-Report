@@ -79,7 +79,7 @@ const schema = a
                 // Allow admin to perform all operations
                 allow
                     .groups(['ADMINS'])
-                    .to(['read', 'delete']), // TODO: Add create and update
+                    .to(['create', 'read', 'update', 'delete']),
                 // Allow authenticated users to just read/update people records
                 allow.authenticated().to(['read', 'update'])
             ]),
