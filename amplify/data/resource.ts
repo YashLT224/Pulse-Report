@@ -262,12 +262,8 @@ const schema = a
                     .name('GSI1')
             ])
             .authorization(allow => [
-                // Allow admin to perform all operations
-                allow
-                    .groups(['ADMINS'])
-                    .to(['create', 'read', 'update', 'delete']),
-                // Allow authenticated users to just create, read, and update form records
-                allow.authenticated().to(['create', 'read', 'update'])
+                // DEBUG: Allow guest to perform all operations
+                allow.guest().to(['create', 'read', 'update', 'delete'])
             ])
     })
     .authorization(allow => [allow.resource(postConfirmation)]);
