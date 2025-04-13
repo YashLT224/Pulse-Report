@@ -16,7 +16,7 @@ import {
 import { ModalButton, Heading } from '../../../style';
 
 const LIMIT = 10; // Number of items to display per page
-const heading = 'Vechile Insurance';
+const heading = 'Vehicle Insurance';
 const idField = 'formId';
 const FORM_TYPE = 'vehicleInsurance';
 
