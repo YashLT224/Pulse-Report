@@ -173,7 +173,7 @@ const UserList = () => {
 
             {isModalOpen && selectedItem && (
                 <Modal
-                onCloseHander={handleCloseModal}
+                onCloseHandler={handleCloseModal}
                 heading={`User: ${selectedItem['userName']}`}>
                      <div className="mb-8px">
                             <Heading>Status: </Heading>

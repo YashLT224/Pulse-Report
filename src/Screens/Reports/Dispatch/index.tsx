@@ -154,8 +154,9 @@ const Dispatch = () => {
     const isSubmitDisabled =
         !selectedItem.dispatchInstructions_partyName ||
         !selectedItem.dispatchInstructions_instructions ||
-        !selectedItem.dispatchInstructions_responsiblePersonName ||
-        !selectedItem.dispatchInstructions_remarks;
+        !selectedItem.dispatchInstructions_responsiblePersonName 
+        // ||
+        // !selectedItem.dispatchInstructions_remarks;
 
     return (
         <>
@@ -202,7 +203,10 @@ const Dispatch = () => {
             </div>
             {viewDescription.isOpen && (
                 <Modal
-                onCloseHander={handleCloseModal}
+                onCloseHandler={()=> setViewDescription({
+                    value: '',
+                    isOpen: false
+                })}
                 heading={'Instructions'} isViewMode={true}>
                     <div className="mb-8px">
                         <TextAreaField
@@ -234,7 +238,7 @@ const Dispatch = () => {
             )}
 
             {isModalOpen && (
-                <Modal heading={heading} isUpdateMode={isUpdateMode}>
+                <Modal onCloseHandler={handleCloseModal} heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
                             <Heading>Party Name</Heading>
@@ -288,7 +292,7 @@ const Dispatch = () => {
                                 }}
                             />
                         </div>
-                        <div className="mb-8px">
+                        {/* <div className="mb-8px">
                             <Heading>Remarks</Heading>
                             <Input
                                 type="text"
@@ -306,7 +310,7 @@ const Dispatch = () => {
                                     )
                                 }
                             />
-                        </div>
+                        </div> */}
 
                         <div
                             style={{

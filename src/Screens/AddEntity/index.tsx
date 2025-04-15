@@ -251,7 +251,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
 
             {isModalOpen && (
                 <Modal 
-                onCloseHander={handleCloseModal}
+                onCloseHandler={handleCloseModal}
                 heading={`${NameEntity}`} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">

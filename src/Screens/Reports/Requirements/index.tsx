@@ -246,7 +246,7 @@ const Requirements = () => {
 
             {isModalOpen && (
                 <Modal
-                    onCloseHander={handleCloseModal}
+                onCloseHandler={handleCloseModal}
                     heading={heading}
                     isUpdateMode={isUpdateMode}
                 >

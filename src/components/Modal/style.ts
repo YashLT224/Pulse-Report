@@ -21,11 +21,30 @@ export const ModalContent = styled.div`
     max-height: 70vh;
     overflow-y: auto;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative; /* To position the close button inside */
 `;
 
 export const ModalHeader = styled.h3`
     margin: 0px;
     margin-bottom: 15px;
+    padding-right: 30px; /* Space for the close button */
+    // border-bottom: 1px solid #ddd; /* Border under the header */
+`;
+export const CloseButton = styled.button`
+    position: absolute;
+    top: -3px;
+    right: 0px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #aaa;
+    &:hover {
+        color: #333;
+    }
+    &:focus{
+        outline:unset;
+    }
 `;
 
 export const ModalInput = styled.input`

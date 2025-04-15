@@ -725,10 +725,10 @@ export function dispatchInstructionsHeader(setViewDescription) {
             key: 'dispatchInstructions_responsiblePersonName',
             header: 'Responsible Person'
         },
-        {
-            key: 'dispatchInstructions_remarks',
-            header: 'Remarks'
-        }
+        // {
+        //     key: 'dispatchInstructions_remarks',
+        //     header: 'Remarks'
+        // }
     ];
     return itemsColumns;
 }
