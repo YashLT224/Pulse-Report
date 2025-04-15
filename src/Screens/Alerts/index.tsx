@@ -243,7 +243,7 @@ const Alerts = () => {
             </div>
             {isModalOpen && (
                 <Modal
-                    onCloseHander={handleCloseModal}
+                onCloseHandler={handleCloseModal}
                     heading={selectedItem.formType}
                     isUpdateMode={true}
                 >

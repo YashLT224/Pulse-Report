@@ -212,7 +212,7 @@ const BuildingMCLTax = () => {
 
             {isModalOpen && (
                 <Modal 
-                onCloseHander={handleCloseModal}
+                onCloseHandler={handleCloseModal}
                 heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
