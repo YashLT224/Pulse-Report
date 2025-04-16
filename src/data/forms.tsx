@@ -578,10 +578,10 @@ export const requirements_itemsColumns = [
         key: 'expirationDate',
         header: 'Deadline'
     },
-    {
-        key: 'requirements_remarks',
-        header: 'Remarks'
-    }
+    // {
+    //     key: 'requirements_remarks',
+    //     header: 'Remarks'
+    // }
 ];
 
 export const salesManPerformance_itemsColumns = [
