@@ -13,7 +13,7 @@ import { formatDateForInput, getEarliestDate } from '../../../utils/helpers';
 import { ModalButton, Heading } from '../../../style';
 
 const LIMIT = 10; // Number of items to display per page
-const heading = 'Vechile Report';
+const heading = 'Vehicle Report';
 const idField = 'formId';
 const FORM_TYPE = 'vehicleReport';
 

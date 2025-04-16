@@ -451,7 +451,7 @@ const Requirements = () => {
                             </ModalButton>
                         </div>
 
-                        <div className="mb-8px">
+                        {/* <div className="mb-8px">
                             <Heading>Remarks</Heading>
                             <Input
                                 type="text"
@@ -467,7 +467,7 @@ const Requirements = () => {
                                     )
                                 }
                             />
-                        </div>
+                        </div> */}
                         <div
                             style={{
                                 display: 'flex',
