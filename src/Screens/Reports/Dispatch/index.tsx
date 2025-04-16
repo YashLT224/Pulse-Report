@@ -103,7 +103,8 @@ const Dispatch = () => {
             const params: any = {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
-                updatedBy: userProfile.userId
+                updatedBy: userProfile.userId,
+                updatedByName:userProfile.userName,
             };
             updateItem(editedForm);
 
@@ -117,7 +118,8 @@ const Dispatch = () => {
                 createdAt: new Date().toISOString(),
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
-                createdBy: userProfile.userId
+                createdBy: userProfile.userId,
+                createdByName:userProfile.userName
             };
             initiateLoding();
             client.models.Form.create(params)
