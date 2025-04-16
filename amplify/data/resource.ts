@@ -122,8 +122,10 @@ const schema = a
                 state: a.string().default('active'), // e.g., 'active', 'inactive'
                 createdAt: a.datetime().required(),
                 createdBy: a.string().required(),
+                createdByName: a.string(),
                 updatedAt: a.datetime(),
                 updatedBy: a.string(),
+                updatedByName: a.string(),
                 hasExpiration: a.string(), // Encodes expiration status and state, e.g., 'yes#active'
                 expirationDate: a.date(),
                 completedAt: a.datetime(),

@@ -691,6 +691,11 @@ export function dispatchInstructionsHeader(setViewDescription) {
             render: (item: Form) => new Date(item.createdAt).toLocaleString()
         },
         {
+            key: 'createdBy',
+            header: 'Created By',
+            render: (item: Form) => <>{item.createdBy}</>
+        },
+        {
             key: 'dispatchInstructions_partyName',
             header: 'Party Name'
         },
