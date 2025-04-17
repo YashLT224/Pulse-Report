@@ -167,6 +167,7 @@ const VechileReport = () => {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
                 updatedBy: userProfile.userId,
+                updatedByName:userProfile.userName,
                 expirationDate,
                 vehicleReport_billPhoto
             };
@@ -184,6 +185,7 @@ const VechileReport = () => {
                 [idField]: ulid(),
                 hasExpiration: 'yes#active',
                 createdAt: new Date().toISOString(),
+                createdByName:userProfile.userName,
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,

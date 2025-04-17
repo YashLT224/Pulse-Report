@@ -693,7 +693,7 @@ export function dispatchInstructionsHeader(setViewDescription) {
         {
             key: 'createdBy',
             header: 'Created By',
-            render: (item: Form) => <>{item.createdBy}</>
+            render: (item: Form) => <>{item.createdByName||item.createdBy}</>
         },
         {
             key: 'dispatchInstructions_partyName',

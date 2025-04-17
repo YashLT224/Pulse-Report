@@ -132,6 +132,7 @@ const DocumentFileStatus = () => {
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,
+                createdByName:userProfile.userName,
                 expirationDate: expirationDate || null,
                 hasExpiration: expirationDate ? 'yes#active' : null
             };
@@ -140,6 +141,7 @@ const DocumentFileStatus = () => {
                 [idField]: editedForm[idField],
                 updatedAt: new Date().toISOString(),
                 updatedBy: userProfile.userId,
+                updatedByName:userProfile.userName,
                 documentFileStatus_statusChangeDate: new Date().toISOString()
             };
             const promises = [
@@ -165,6 +167,7 @@ const DocumentFileStatus = () => {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
                 updatedBy: userProfile.userId,
+                updatedByName:userProfile.userName,
                 expirationDate: expirationDate || null,
                 hasExpiration: expirationDate ? 'yes#active' : null
             };

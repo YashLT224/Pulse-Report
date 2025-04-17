@@ -158,6 +158,7 @@ const VechileInsurance = () => {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
                 updatedBy: userProfile.userId,
+                updatedByName:userProfile.userName,
                 vehicleInsurance_insuranceCopy
             };
             updateItem({
@@ -177,6 +178,7 @@ const VechileInsurance = () => {
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,
+                createdByName:userProfile.userName,
                 vehicleInsurance_insuranceCopy
             };
             initiateLoding();

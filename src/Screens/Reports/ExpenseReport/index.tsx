@@ -132,7 +132,8 @@ const ExpenseReport = () => {
             const params: any = {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
-                updatedBy: userProfile.userId
+                updatedBy: userProfile.userId,
+                updatedByName:userProfile.userName,
             };
             updateItem(editedForm);
 
@@ -151,6 +152,7 @@ const ExpenseReport = () => {
                 ...restForm,
                 [idField]: ulid(),
                 createdAt: new Date().toISOString(),
+                createdByName:userProfile.userName,
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,
