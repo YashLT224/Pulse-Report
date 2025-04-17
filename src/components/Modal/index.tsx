@@ -1,4 +1,4 @@
-import { ModalOverlay, ModalContent, ModalHeader,CloseButton } from './style';
+import { ModalOverlay, ModalContent, ModalHeader, CloseButton } from './style';
 
 const Modal = ({
     children,
@@ -9,7 +9,7 @@ const Modal = ({
 }) => {
     return (
         <ModalOverlay
-            onClick={e => {
+            onClick={() => {
                 onCloseHandler();
             }}
         >
@@ -19,9 +19,10 @@ const Modal = ({
                 }}
             >
                 <ModalHeader>
-          {isViewMode ? 'View' : isUpdateMode ? 'Edit' : 'Add'} {heading}
-          <CloseButton onClick={onCloseHandler}>&times;</CloseButton>
-        </ModalHeader>
+                    {isViewMode ? 'View' : isUpdateMode ? 'Edit' : 'Add'}{' '}
+                    {heading}
+                    <CloseButton onClick={onCloseHandler}>&times;</CloseButton>
+                </ModalHeader>
 
                 {children}
             </ModalContent>
