@@ -9,19 +9,27 @@ export const ModalOverlay = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index:1000;
+    z-index: 1000;
 `;
 
 export const ModalContent = styled.div`
     background: white;
     padding: 20px;
     border-radius: 8px;
+    width: 90%;
     max-width: 500px;
-    min-width: 500px;
-    max-height: 70vh;
+    min-width: unset;
+    max-height: 80vh;
     overflow-y: auto;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: relative; /* To position the close button inside */
+    position: relative;
+    margin: 20px;
+
+    @media (max-width: 480px) {
+        width: 95%;
+        margin: 10px;
+        padding: 15px;
+    }
 `;
 
 export const ModalHeader = styled.h3`
@@ -42,8 +50,8 @@ export const CloseButton = styled.button`
     &:hover {
         color: #333;
     }
-    &:focus{
-        outline:unset;
+    &:focus {
+        outline: unset;
     }
 `;
 
