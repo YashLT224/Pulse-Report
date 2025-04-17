@@ -177,6 +177,7 @@ const SalesManPerformance = () => {
             const params: any = {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
+                updatedByName:userProfile.userName,
                 updatedBy: userProfile.userId,
                 GSI1PK,
                 GSI1SK_Metric
@@ -194,6 +195,7 @@ const SalesManPerformance = () => {
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,
+                createdByName:userProfile.userName,
                 GSI1PK,
                 GSI1SK_Metric
             };
