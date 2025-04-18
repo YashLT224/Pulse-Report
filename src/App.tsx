@@ -52,13 +52,13 @@ function App() {
                 loginMechanisms={['phone_number']}
                 signUpAttributes={['name']}
                 formFields={formFields}
-                components={{
-                    SignIn: {
-                        Footer() {
-                            return null; // This removes the Forgot Password link
-                        }
-                    }
-                }}
+                // components={{
+                //     SignIn: {
+                //         Footer() {
+                //             return null; // This removes the Forgot Password link
+                //         }
+                //     }
+                // }}
             >
                 <AuthenticatorWrapper>
                     <MainContent>
