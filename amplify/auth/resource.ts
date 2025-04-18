@@ -20,7 +20,7 @@ export const auth = defineAuth({
     },
     groups: ["ADMINS"],
     triggers: {
-        preSignUp,
+        // preSignUp,
         postConfirmation
     }
 });
