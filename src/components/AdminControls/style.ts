@@ -19,9 +19,10 @@ export const Bar = styled.div`
     }
 
     @media (max-width: 480px) {
-        flex-direction: column;
         height: auto;
         padding: 12px 0;
+        gap:0px;
+         flex-wrap: nowrap; 
     }
 `;
 
@@ -49,8 +50,8 @@ export const MenuItem = styled.div<{ $active?: boolean }>`
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        width: 100%;
         padding: 8px;
+        gap:0px;
     }
 `;
 
