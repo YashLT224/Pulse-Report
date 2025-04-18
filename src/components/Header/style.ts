@@ -39,7 +39,6 @@ export const FlexBox = styled.div`
     gap: 16px;
 
     @media (max-width: 768px) {
-        // flex-direction: column;
         gap: 8px;
         width:100%;
         flex-wrap:wrap;
