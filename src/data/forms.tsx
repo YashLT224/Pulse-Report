@@ -398,7 +398,8 @@ export const vehicleReport_itemsColumns = [
         key: 'vehicleReport_status',
         header: 'Status',
         render: (item: Form) =>
-        workStatusMap[item.vehicleReport_status?.toLowerCase()] || item.vehicleReport_status
+            workStatusMap[item.vehicleReport_status?.toLowerCase()] ||
+            item.vehicleReport_status
     }
 ];
 
@@ -499,6 +500,17 @@ export const toDoList_itemsColumns = [
         key: 'createdAt',
         header: 'Created At',
         render: (item: Form) => new Date(item.createdAt).toLocaleString()
+    },
+    {
+        key: 'updatedAt',
+        header: 'Updated At',
+        render: (item: Form) =>
+            item.updatedBy && new Date(item.updatedAt).toLocaleString()
+    },
+    {
+        key: 'updatedBy',
+        header: 'Updated By',
+        render: (item: Form) => <>{item.updatedByName || item.updatedBy}</>
     },
     {
         key: 'toDoList_assignName',
@@ -693,7 +705,7 @@ export function dispatchInstructionsHeader(setViewDescription) {
         {
             key: 'createdBy',
             header: 'Created By',
-            render: (item: Form) => <>{item.createdByName||item.createdBy}</>
+            render: (item: Form) => <>{item.createdByName || item.createdBy}</>
         },
         {
             key: 'dispatchInstructions_partyName',
