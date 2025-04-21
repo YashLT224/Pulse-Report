@@ -41,6 +41,7 @@ const Header = () => {
 
     const handleLogout = () => {
         signOut();
+        dispatch(resetActiveTile());
         navigate('/');
     };
 

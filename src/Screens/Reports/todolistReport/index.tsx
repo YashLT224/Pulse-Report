@@ -10,7 +10,7 @@ import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
 import { ModalButton, Heading } from '../../../style';
 import SelectSearch from 'react-select-search';
-import {toDoList_itemsColumns as itemsColumns} from '../../../data/forms'
+import { toDoList_itemsColumns as itemsColumns } from '../../../data/forms';
 
 const LIMIT = 10; // Number of items to display per page
 const heading = 'Todo List';
@@ -18,8 +18,6 @@ const idField = 'formId';
 const FORM_TYPE = 'toDoList';
 
 type Form = Schema['Form']['type'];
-
-
 
 const ToDoList = () => {
     const { userProfile, client } = useAuth();
@@ -30,8 +28,6 @@ const ToDoList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
-
-    
 
     // fetch function for usePagination
     const fetchForm = useCallback(
@@ -106,6 +102,11 @@ const ToDoList = () => {
     };
 
     const onEdit = async (editedForm: Form) => {
+        if (editedForm.toDoList_jointWork !== 'yes') {
+            editedForm.toDoList_jointAssignId = null;
+            editedForm.toDoList_jointAssignName = null;
+        }
+
         const {
             createdAt,
             updatedAt,
@@ -115,14 +116,18 @@ const ToDoList = () => {
             createdBy,
             ...restForm
         } = editedForm;
+
         if (isUpdateMode) {
-            const params: any = {
-                ...restForm,
+            const updateParams = {
                 updatedAt: new Date().toISOString(),
                 updatedBy: userProfile.userId,
-                updatedByName:userProfile.userName,
+                updatedByName: userProfile.userName
             };
-            updateItem(editedForm);
+            const params: any = {
+                ...restForm,
+                ...updateParams
+            };
+            updateItem({ ...editedForm, ...updateParams } as any);
 
             client.models.Form.update(params).catch(error => {
                 console.error(`Failed to update ${heading}:`, error);
@@ -136,7 +141,7 @@ const ToDoList = () => {
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,
-                createdByName:userProfile.userName
+                createdByName: userProfile.userName
             };
             initiateLoding();
             client.models.Form.create(params)
@@ -173,9 +178,10 @@ const ToDoList = () => {
     const isSubmitDisabled =
         !selectedItem.toDoList_assignName ||
         !selectedItem.toDoList_assignId ||
-        !selectedItem.toDoList_jointAssignName ||
-        !selectedItem.toDoList_jointAssignId ||
         !selectedItem.toDoList_jointWork ||
+        (selectedItem.toDoList_jointWork === 'yes' &&
+            (!selectedItem.toDoList_jointAssignName ||
+                !selectedItem.toDoList_jointAssignId)) ||
         !selectedItem.toDoList_work ||
         !selectedItem.toDoList_reportToName ||
         !selectedItem.toDoList_reportToId ||
@@ -229,9 +235,11 @@ const ToDoList = () => {
             </div>
 
             {isModalOpen && (
-                <Modal 
-                onCloseHandler={handleCloseModal}
-                heading={heading} isUpdateMode={isUpdateMode}>
+                <Modal
+                    onCloseHandler={handleCloseModal}
+                    heading={heading}
+                    isUpdateMode={isUpdateMode}
+                >
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
                             <Heading>Assign</Heading>
@@ -252,24 +260,26 @@ const ToDoList = () => {
                             />
                         </div>
 
-                        <div className="mb-8px selectSearch">
-                            <Heading>Joint Assign</Heading>
-                            {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
-                            <SelectSearch
-                                search={true}
-                                options={personsList}
-                                value={`${selectedItem.toDoList_jointAssignName}#${selectedItem.toDoList_jointAssignId}`}
-                                // name="Person Name"
-                                placeholder="Joint Assign To"
-                                onChange={selectedValue => {
-                                    updateField(
-                                        selectedValue,
-                                        'toDoList_jointAssignName#toDoList_jointAssignId',
-                                        true
-                                    );
-                                }}
-                            />
-                        </div>
+                        {selectedItem.toDoList_jointWork === 'yes' && (
+                            <div className="mb-8px selectSearch">
+                                <Heading>Joint Assign</Heading>
+                                {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
+                                <SelectSearch
+                                    search={true}
+                                    options={personsList}
+                                    value={`${selectedItem.toDoList_jointAssignName}#${selectedItem.toDoList_jointAssignId}`}
+                                    // name="Person Name"
+                                    placeholder="Joint Assign To"
+                                    onChange={selectedValue => {
+                                        updateField(
+                                            selectedValue,
+                                            'toDoList_jointAssignName#toDoList_jointAssignId',
+                                            true
+                                        );
+                                    }}
+                                />
+                            </div>
+                        )}
 
                         <div className="mb-8px">
                             <Heading>Joint Work</Heading>
