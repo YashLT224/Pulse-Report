@@ -1,16 +1,23 @@
 import { useCallback, useState } from 'react';
-import { Loader } from '@aws-amplify/ui-react';
+import { Loader, SelectField } from '@aws-amplify/ui-react';
 import UserListItems from '../../components/UserList';
 import useAuth from '../../Hooks/useAuth';
 import { usePagination } from '../../Hooks/usePagination';
 import PaginationControls from '../../components/PaginationControls';
-import { formTypes, formLabelMap } from '../../data/forms';
+import { formTypes } from '../../data/forms';
 import Modal from '../../components/Modal';
 import {
     ModalButton,
     CheckboxContainer,
     CheckboxLabel,
-    CheckboxInput
+    CheckboxInput,
+    Heading,
+    FormItemContainer,
+    AccessBadge,
+    FormsTable,
+    FormRow,
+    FormName,
+    FormAccess
 } from './style';
 
 const LIMIT = 10; // Number of items to display per page
@@ -20,6 +27,7 @@ const PendingApprovals = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>(null); // selected user to update
     const [selectedForms, setSelectedForms] = useState([]);
+    const [formAccessTypes, setFormAccessTypes] = useState({}); // store access type (Read/Write/Update) for each form
 
     // fetch function for usePagination
     const fetchStaffMembers = useCallback(
@@ -28,7 +36,6 @@ const PendingApprovals = () => {
                 access: 'none',
                 nextToken: token,
                 limit,
-                // filter: { allowedForms: { size: { eq: 0 } } },
                 sortDirection: 'DESC'
             };
             const response = await client.models.UserProfile.listByAccess(
@@ -70,10 +77,39 @@ const PendingApprovals = () => {
         {
             key: 'allowedForms',
             header: 'Allowed Forms',
-            render: (item: any) =>
-                item.allowedForms
-                    ?.map((label: string) => formLabelMap[label] || label)
-                    .join(', ') || 'None 🚫'
+            render: (item: any) => {
+                if (!item.allowedForms?.length) return 'None 🚫';
+
+                return (
+                    <FormsTable>
+                        {item.allowedForms.map((formAccess: string) => {
+                            const [formLabel, accessType] = formAccess.split(
+                                '#'
+                            );
+                            const formName =
+                                formTypes.find(f => f.label === formLabel)
+                                    ?.name || formLabel;
+                            return (
+                                <FormRow key={formAccess}>
+                                    <FormName>{formName}</FormName>
+                                    <FormAccess>
+                                        <AccessBadge
+                                            type={
+                                                (accessType || 'READ') as
+                                                    | 'READ'
+                                                    | 'WRITE'
+                                                    | 'UPDATE'
+                                            }
+                                        >
+                                            {accessType || 'READ'}
+                                        </AccessBadge>
+                                    </FormAccess>
+                                </FormRow>
+                            );
+                        })}
+                    </FormsTable>
+                );
+            }
         },
         {
             key: 'createdAt',
@@ -101,7 +137,16 @@ const PendingApprovals = () => {
 
     const handleEdit = item => {
         setSelectedItem(item);
-        setSelectedForms(item.allowedForms); // Initialize with current values
+        setSelectedForms(item.allowedForms || []); // Initialize with current values
+
+        // Initialize formAccessTypes based on the allowedForms and their corresponding access types
+        const initialFormAccessTypes: Record<string, string> = {};
+        (item.allowedForms || []).forEach((form: string) => {
+            const [formName, accessType] = form.split('#');
+            initialFormAccessTypes[formName] = accessType || 'READ';
+        });
+        setFormAccessTypes(initialFormAccessTypes);
+
         setIsModalOpen(true);
     };
 
@@ -109,12 +154,57 @@ const PendingApprovals = () => {
         setIsModalOpen(false);
     };
 
-    const handleFormChange = formLabel => {
-        setSelectedForms(
-            prevSelectedForms =>
-                prevSelectedForms.includes(formLabel)
-                    ? prevSelectedForms.filter(form => form !== formLabel) // Deselect
-                    : [...prevSelectedForms, formLabel] // Select
+    const handleFormChange = (formLabel: string) => {
+        // Initialize the default access type if not already set
+        if (!formAccessTypes[formLabel]) {
+            setFormAccessTypes(prev => ({
+                ...prev,
+                [formLabel]: 'READ'
+            }));
+        }
+
+        // Check if the formLabel includes any access type
+        const formWithAccess = selectedForms.find(form =>
+            form.startsWith(formLabel)
+        );
+
+        if (!formWithAccess) {
+            // If the form is not already selected, add it with the default access type
+            setSelectedForms(prevSelectedForms => [
+                ...prevSelectedForms,
+                `${formLabel}#READ`
+            ]);
+        } else {
+            // If the form is selected, remove it when unticked
+            setSelectedForms(prevSelectedForms =>
+                prevSelectedForms.filter(form => !form.startsWith(formLabel))
+            );
+        }
+    };
+
+    const handleAccessTypeChange = (
+        formLabel: string,
+        newAccessType: string
+    ) => {
+        // Update the access type of the form
+        setFormAccessTypes(prev => ({
+            ...prev,
+            [formLabel]: newAccessType
+        }));
+
+        // Update the form with the new access type
+        setSelectedForms(prevSelectedForms => {
+            const updatedForms = prevSelectedForms.filter(
+                form => form !== formLabel && !form.startsWith(`${formLabel}#`)
+            );
+            updatedForms.push(`${formLabel}#${newAccessType}`);
+            return updatedForms;
+        });
+    };
+
+    const accessGrantedHandler = (form, selectedForms) => {
+        return selectedForms.some(formWithAccess =>
+            formWithAccess.startsWith(form.label)
         );
     };
 
@@ -170,22 +260,59 @@ const PendingApprovals = () => {
 
             {isModalOpen && selectedItem && (
                 <Modal
-                onCloseHandler={handleCloseModal}
-                heading={`User: ${selectedItem['userName']}`}>
-                    {formTypes.map(form => (
-                        <CheckboxContainer key={form.id}>
-                            <CheckboxLabel>
-                                <CheckboxInput
-                                    type="checkbox"
-                                    checked={selectedForms.includes(form.label)}
-                                    onChange={() =>
-                                        handleFormChange(form.label)
-                                    }
-                                />
-                                {form.name}
-                            </CheckboxLabel>
-                        </CheckboxContainer>
-                    ))}
+                    onCloseHandler={handleCloseModal}
+                    heading={`User: ${selectedItem['userName']}`}
+                >
+                    <div>
+                        <Heading>Allowed Forms: </Heading>
+                        {formTypes.map(form => (
+                            <FormItemContainer key={form.id}>
+                                <CheckboxContainer>
+                                    <CheckboxLabel>
+                                        <CheckboxInput
+                                            type="checkbox"
+                                            checked={selectedForms.some(
+                                                formWithAccess =>
+                                                    formWithAccess.startsWith(
+                                                        form.label
+                                                    )
+                                            )}
+                                            onChange={() =>
+                                                handleFormChange(form.label)
+                                            }
+                                        />
+                                        {form.name}
+                                    </CheckboxLabel>
+                                </CheckboxContainer>
+                                {accessGrantedHandler(form, selectedForms) && (
+                                    <div className="mb-8px">
+                                        <Heading>
+                                            {form.name} Access Type
+                                        </Heading>
+                                        <SelectField
+                                            label=""
+                                            value={
+                                                formAccessTypes[form.label] ||
+                                                'READ'
+                                            }
+                                            onChange={e =>
+                                                handleAccessTypeChange(
+                                                    form.label,
+                                                    e.target.value
+                                                )
+                                            }
+                                        >
+                                            <option value="READ">Read</option>
+                                            <option value="WRITE">Write</option>
+                                            <option value="UPDATE">
+                                                Update
+                                            </option>
+                                        </SelectField>
+                                    </div>
+                                )}
+                            </FormItemContainer>
+                        ))}
+                    </div>
 
                     <div
                         style={{
