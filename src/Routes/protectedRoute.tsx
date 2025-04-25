@@ -12,7 +12,10 @@ const ProtectedRoute = ({
     );
     const isLoading = useSelector((state: any) => state.authReducer.isLoading);
     const userProfileRole = userProfile?.role;
-    const allowedForms = userProfile?.allowedForms || [];
+
+    const formsHaveAccess = userProfile?.allowedForms || [];
+    const allowedForms = formsHaveAccess.map(form => form.split('#')[0]);
+
 
     // Show loading indicator while checking permissions
     if (isLoading) {
@@ -36,6 +39,7 @@ const ProtectedRoute = ({
     }
 
     if (requiredFormId) {
+        // allowedForms.some(formWithAccess => formWithAccess.startsWith(requiredFormId))}
         if (allowedForms.includes(requiredFormId)) {
             return element;
         }

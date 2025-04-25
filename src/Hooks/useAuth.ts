@@ -10,7 +10,13 @@ const useAuth = () => {
     const userProfile = useSelector(
         (state: any) => state.authReducer.userProfile
     );
-    return { user, userProfile, client };
+    const isAdmin = userProfile?.role === 'admin';
+    const formAccess =userProfile?.allowedForms.reduce((acc, form) => {
+        const [formName, accessType] = form.split('#');
+        acc[formName] = accessType || 'read'; // Default to 'read' if there's no access type
+        return acc;
+    }, {});
+    return { user, userProfile,isAdmin,formAccess, client };
 };
 
 export default useAuth;

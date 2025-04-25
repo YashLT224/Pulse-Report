@@ -10,23 +10,32 @@ const Home = () => {
     );
 
     const allowedForms = userProfile?.allowedForms || [];
+    const FilteredAccessedForm = allowedForms.map(form => form.split('#')[0]);
     const isAdmin = userProfile?.role === 'admin';
+
+    console.log(allowedForms)
 
     return (
         <div>
             <CardContainer>
-                {(allowedForms.length > 0 || isAdmin) &&
+                {(FilteredAccessedForm.length > 0 || isAdmin) &&
                     !isLoading &&
                     formTypes
                         .filter(
-                            form => allowedForms.includes(form.label) || isAdmin
+                            form => FilteredAccessedForm.includes(form.label) || isAdmin
                         )
-                        .map(form => (
-                            <CardWrapper to={form.route} key={form.id}>
-                                <CardIcon src={form.icon} alt={form.name} />
-                                <CardTitle>{form.name}</CardTitle>
-                            </CardWrapper>
-                        ))}
+                        .map(form => {
+                            // Get access type (if present) from allowedForms
+                            const accessType = allowedForms.find(f => f.startsWith(form.label))?.split('#')[1] || 'READ'; // Default to 'READ'
+                
+                            return (
+                                <CardWrapper to={form.route} key={form.id}>
+                                    <CardIcon src={form.icon} alt={form.name} />
+                                    <CardTitle>{form.name}</CardTitle>
+                                </CardWrapper>
+                            );
+                        })
+                }
                 {!allowedForms.length && !isLoading && !isAdmin && (
                     <Message
                         variation="filled"

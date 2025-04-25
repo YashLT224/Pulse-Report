@@ -38,8 +38,8 @@ function getExpenseReportBalanceBF(
 
 const ExpenseReport = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { userProfile, client } = useAuth();
-
+    const { userProfile, client,isAdmin,formAccess } = useAuth();
+    const accessType=isAdmin?'update': formAccess[FORM_TYPE]?.toLowerCase()
     const personsList = useSelector(
         (state: any) => state.globalReducer.persons
     );
@@ -257,9 +257,10 @@ const ExpenseReport = () => {
                     heading={heading}
                     items={items}
                     columns={itemsColumns}
-                    addNewEntryAccess={true}
+                    addNewEntryAccess={accessType!=='read'}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
+                    haveEditAccess={accessType==='update'}
                 />
             </div>
 
