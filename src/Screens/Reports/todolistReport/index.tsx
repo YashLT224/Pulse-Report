@@ -20,7 +20,8 @@ const FORM_TYPE = 'toDoList';
 type Form = Schema['Form']['type'];
 
 const ToDoList = () => {
-    const { userProfile, client } = useAuth();
+    const { userProfile, client,isAdmin,formAccess } = useAuth();
+    const accessType=isAdmin?'update': formAccess[FORM_TYPE]?.toLowerCase()
     const personsList = useSelector(
         (state: any) => state.globalReducer.persons
     );
@@ -221,9 +222,10 @@ const ToDoList = () => {
                     heading={heading}
                     items={items}
                     columns={itemsColumns}
-                    addNewEntryAccess={true}
+                    addNewEntryAccess={accessType!=='read'}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
+                    haveEditAccess={accessType==='update'}
                 />
                 {/* Pagination Controls */}
                 <PaginationControls

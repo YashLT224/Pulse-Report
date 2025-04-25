@@ -29,7 +29,8 @@ interface UserListProps<T> {
     addNewEntryAccess?: boolean;
     handleEdit: (item: T) => void;
     addNewItemHandler?: () => void;
-    children?:React.ReactNode
+    children?:React.ReactNode;
+    haveEditAccess?:boolean;
 }
 
 function UserList<T extends EditableItem>({
@@ -39,7 +40,8 @@ function UserList<T extends EditableItem>({
     addNewEntryAccess = false,
     handleEdit,
     addNewItemHandler = () => {},
-    children
+    children,
+    haveEditAccess=true
 }: UserListProps<T>) {
     // Default columns if none provided
     const defaultColumns: TableColumn<T>[] = [
@@ -82,7 +84,7 @@ function UserList<T extends EditableItem>({
                                     {column.header}
                                 </TableHeaderCell>
                             ))}
-                            <TableHeaderCell>Edit</TableHeaderCell>
+                           {haveEditAccess&& <TableHeaderCell>Edit</TableHeaderCell>}
                         </TableRow>
                     </TableHeader>
                     <tbody>
@@ -95,11 +97,11 @@ function UserList<T extends EditableItem>({
                                             : item[column.key as string]}
                                     </TableCell>
                                 ))}
-                                <TableCell>
+                                {haveEditAccess&&<TableCell>
                                     <EditIcon onClick={() => handleEdit(item)}>
                                         ✏️
                                     </EditIcon>
-                                </TableCell>
+                                </TableCell>}
                             </TableRow>
                         ))}
                     </tbody>

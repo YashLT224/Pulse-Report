@@ -23,8 +23,8 @@ const FORM_TYPE = 'vehicleInsurance';
 type Form = Schema['Form']['type'];
 
 const VechileInsurance = () => {
-    const { userProfile, client } = useAuth();
-
+    const { userProfile, client,isAdmin,formAccess } = useAuth();
+    const accessType=isAdmin?'update': formAccess[FORM_TYPE]?.toLowerCase()
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
@@ -258,9 +258,10 @@ const VechileInsurance = () => {
                     heading={heading}
                     items={items}
                     columns={itemsColumns}
-                    addNewEntryAccess={true}
+                    addNewEntryAccess={accessType!=='read'}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
+                    haveEditAccess={accessType==='update'}
                 />
             </div>
 

@@ -20,8 +20,8 @@ type Form = Schema['Form']['type'];
 const FORM_TYPE = 'dispatchInstructions';
 
 const Dispatch = () => {
-    const { userProfile, client } = useAuth();
-
+    const { userProfile, client,isAdmin,formAccess } = useAuth();
+    const accessType=isAdmin?'update': formAccess[FORM_TYPE]?.toLowerCase()
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
@@ -191,9 +191,10 @@ const Dispatch = () => {
                     heading={heading}
                     items={items}
                     columns={itemsColumns(setViewDescription)}
-                    addNewEntryAccess={true}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
+                    haveEditAccess={accessType==='update'}
+                    addNewEntryAccess={accessType!=='read'}
                 />
                 {/* Pagination Controls */}
                 <PaginationControls

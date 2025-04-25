@@ -22,7 +22,8 @@ type Form = Schema['Form']['type'];
 
 ////
 const VechileReport = () => {
-    const { userProfile, client } = useAuth();
+    const { userProfile, client ,isAdmin,formAccess} = useAuth();
+    const accessType=isAdmin?'update': formAccess[FORM_TYPE]?.toLowerCase()
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
@@ -268,9 +269,10 @@ const VechileReport = () => {
                     heading={heading}
                     items={items}
                     columns={itemsColumns}
-                    addNewEntryAccess={true}
+                    addNewEntryAccess={accessType!=='read'}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
+                    haveEditAccess={accessType==='update'}
                 />
             </div>
             {/* Pagination Controls */}

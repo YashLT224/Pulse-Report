@@ -21,6 +21,7 @@ const UserList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>(null); // selected user to update
     const [selectedForms, setSelectedForms] = useState([]);
+    const [formAccessTypes, setFormAccessTypes] = useState({}); // store access type (Read/Write/Update) for each form
     // fetch function for usePagination
     const fetchStaffMembers = useCallback(
         async (limit: number, token?: string) => {
@@ -68,7 +69,11 @@ const UserList = () => {
             header: 'Allowed Forms',
             render: (item: any) =>
                 item.allowedForms
-                    ?.map((label: string) => formLabelMap[label] || label)
+                    ?.map((label: string) => {
+                        // Split at the '#' and take the first part
+                        const formLabel = label.split('#')[0];
+                        return formLabel ? formLabel : label;
+                    })
                     .join(', ') || 'None 🚫'
         },
         {
@@ -102,30 +107,79 @@ const UserList = () => {
             console.error('Failed to update user profile:', error);
         });
     };
-
     const handleEdit = (item: any) => {
         setSelectedItem(item);
         setSelectedForms(item.allowedForms); // Initialize with current values
+    
+        // Initialize formAccessTypes based on the allowedForms and their corresponding access types
+        const initialFormAccessTypes: Record<string, string> = {};
+        
+        item.allowedForms.forEach((form: string) => {
+            const [formName, accessType] = form.split('#');
+            initialFormAccessTypes[formName] = accessType || 'READ'; // Default to 'READ' if no access type is found
+        });
+    
+        setFormAccessTypes(initialFormAccessTypes); // Set the form access types
+    
         setIsModalOpen(true);
-    };
-
+    }; 
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
 
-    const handleFormChange = formLabel => {
-        setSelectedForms(
-            prevSelectedForms =>
-                prevSelectedForms.includes(formLabel)
-                    ? prevSelectedForms.filter(form => form !== formLabel) // Deselect
-                    : [...prevSelectedForms, formLabel] // Select
-        );
+    const handleFormChange = (formLabel: string) => {
+        // Initialize the default access type if not already set
+        if (!formAccessTypes[formLabel]) {
+            setFormAccessTypes(prev => ({
+                ...prev,
+                [formLabel]: 'read' // default value is 'read'
+            }));
+        }
+    
+        // Check if the formLabel includes any access type (e.g., '#edit', '#WRITE')
+        const formWithAccess = selectedForms.find(form => form.startsWith(formLabel));
+    
+        if (!formWithAccess) {
+            // If the form is not already selected, add it with the default access type
+            setSelectedForms(prevSelectedForms => [...prevSelectedForms, formLabel]);
+        } else {
+            // If the form is selected, remove it (including the access type suffix) when unticked
+            setSelectedForms(prevSelectedForms =>
+                prevSelectedForms.filter(form => !form.startsWith(formLabel)) // Remove form with any access type
+            );
+        }
     };
+    
+    console.log(selectedForms);
 
     const handleSave = () => {
         if (!selectedItem) return;
         onEdit({ ...selectedItem, allowedForms: selectedForms });
         setIsModalOpen(false);
+    };
+
+    const accessGrantedHandler=(form,selectedForms)=>{
+        return selectedForms.some(formWithAccess => formWithAccess.startsWith(form.label))
+        
+    }
+    const handleAccessTypeChange = (formLabel: string, newAccessType: string) => {
+        // Update the access type of the form
+        setFormAccessTypes(prev => ({
+            ...prev,
+            [formLabel]: newAccessType
+        }));
+
+        // Remove the old form value (without the access type) and add the updated one
+        setSelectedForms(prevSelectedForms => {
+            // Remove the form label without access type (e.g., 'dispatchInstructions')
+            const updatedForms = prevSelectedForms.filter(
+                form => form !== formLabel && !form.startsWith(`${formLabel}#`)
+            );
+
+            // Add the updated form with the access type (e.g., 'dispatchInstructions#WRITE')
+            updatedForms.push(`${formLabel}#${newAccessType}`);
+            return updatedForms;
+        });
     };
     return (
         <>
@@ -157,7 +211,7 @@ const UserList = () => {
 
                 {/* User List Items */}
                 <UserListItems
-                    heading={'Staff Members'}
+                    heading={"Nikit's Chem Team"}
                     items={staffMembers}
                     columns={userColumns}
                     handleEdit={handleEdit}
@@ -192,11 +246,13 @@ const UserList = () => {
                     <div>
                     <Heading>Allowed Forms: </Heading>
                     {formTypes.map(form => (
+                        <>
                         <CheckboxContainer key={form.id}>
                             <CheckboxLabel>
                                 <CheckboxInput
                                     type="checkbox"
-                                    checked={selectedForms.includes(form.label)}
+                                    // checked={selectedForms.includes(form.label)}
+                                    checked={selectedForms.some(formWithAccess => formWithAccess.startsWith(form.label))}
                                     onChange={() =>
                                         handleFormChange(form.label)
                                     }
@@ -204,6 +260,20 @@ const UserList = () => {
                                 {form.name}
                             </CheckboxLabel>
                         </CheckboxContainer>
+                        {accessGrantedHandler(form,selectedForms)&& <div className="mb-8px">
+                                                    <Heading>{form.name} Access Type</Heading>
+                                                    <SelectField
+                                                        label=""
+                                                        value={formAccessTypes[form.label] || 'read'}
+                                                        onChange={e => handleAccessTypeChange(form.label, e.target.value)}
+                                                    >
+                                                        <option value="READ">Read</option>
+                                                        <option value="WRITE">Write</option>
+                                                        <option value="UPDATE">Update</option>m
+                                                    </SelectField>
+                                                </div>}
+
+                        </>
                     ))}
                     </div>
                     
