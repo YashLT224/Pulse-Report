@@ -72,11 +72,12 @@ const Requirements = () => {
         setUpdateMode(false);
         setIsModalOpen(true);
         setSelectedItem({
-            requirements_demandFromId: '',
-            requirements_demandFromName: '',
+            requirements_demandFromId: userProfile?.userId,
+            requirements_demandFromName: userProfile?.userName,
             requirements_responsiblePersonId: '',
             requirements_responsiblePersonName: '',
             requirements_remarks: '',
+            requirements_estimatedAmount:0,
             expirationDate: formatDateForInput(new Date()),
             requirements_itemList: []
         });
@@ -194,14 +195,14 @@ const Requirements = () => {
     };
 
     const isSubmitDisabled =
-        !selectedItem.requirements_demandFromId ||
-        !selectedItem.requirements_demandFromName ||
+        // !selectedItem.requirements_demandFromId ||
+        // !selectedItem.requirements_demandFromName ||
         !selectedItem.requirements_responsiblePersonId ||
         !selectedItem.requirements_responsiblePersonName ||
-        !selectedItem.requirements_remarks ||
+        // !selectedItem.requirements_remarks ||
+        !selectedItem.requirements_estimatedAmount||
         !selectedItem.expirationDate ||
         !selectedItem.requirements_itemList.length;
-
     return (
         <>
             <div style={{ position: 'relative' }}>
@@ -257,7 +258,7 @@ const Requirements = () => {
                         <div className="mb-8px selectSearch">
                             <Heading>Demand From</Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
-                            <SelectSearch
+                            {/* <SelectSearch
                                 search={true}
                                 options={personsList}
                                 value={`${selectedItem.requirements_demandFromName}#${selectedItem.requirements_demandFromId}`}
@@ -270,6 +271,15 @@ const Requirements = () => {
                                         true
                                     );
                                 }}
+                            /> */}
+                              <Input
+                                type="text"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Deadline"
+                                isRequired={true}
+                                value={selectedItem.requirements_demandFromName}
+                              
                             />
                         </div>
                         <div className="mb-8px selectSearch">
@@ -453,24 +463,23 @@ const Requirements = () => {
                                 + Add Requirement
                             </ModalButton>
                         </div>
-
-                        {/* <div className="mb-8px">
-                            <Heading>Remarks</Heading>
+                        <div className="mb-8px">
+                            <Heading>Estimation Amount</Heading>
                             <Input
-                                type="text"
+                                type="number"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Remarks"
+                                placeholder="Deadline"
                                 isRequired={true}
-                                value={selectedItem.requirements_remarks}
+                                value={selectedItem.requirements_estimatedAmount}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'requirements_remarks'
+                                        'requirements_estimatedAmount'
                                     )
                                 }
                             />
-                        </div> */}
+                        </div>
                         <div
                             style={{
                                 display: 'flex',

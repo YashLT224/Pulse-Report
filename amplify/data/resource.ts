@@ -220,6 +220,7 @@ const schema = a
                 requirements_responsiblePersonId: a.string(),
                 requirements_responsiblePersonName: a.string(),
                 requirements_remarks: a.string(),
+                requirements_estimatedAmount: a.float(),
                 requirements_itemList: a.ref('ProductEntry').array(),
 
                 // Document File Status
