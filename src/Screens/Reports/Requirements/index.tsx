@@ -469,7 +469,7 @@ const Requirements = () => {
                                 type="number"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Deadline"
+                                placeholder="Estimation Amount"
                                 isRequired={true}
                                 value={selectedItem.requirements_estimatedAmount}
                                 onChange={e =>
