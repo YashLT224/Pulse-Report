@@ -382,6 +382,9 @@ const ToDoList = () => {
                         <div className="mb-8px">
                             <Heading>Work Status</Heading>
                             <SelectField
+                                disabled={
+                                    !!selectedItem.toDoList_workStatusChangeDate
+                                }
                                 label=""
                                 value={selectedItem.toDoList_workStatus}
                                 onChange={e =>
