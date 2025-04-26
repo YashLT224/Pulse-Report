@@ -48,12 +48,25 @@ export const handler: PostConfirmationTriggerHandler = async event => {
         phoneNumber,
         allowedForms: [],
         access: 'none',
-        status:'active' as const
+        status: 'active' as const
+    };
+
+    const peopleItemInput = {
+        personId: userId,
+        createdAt,
+        personName: userName,
+        phoneNumber,
+        designation: '',
+        status: 'active' as const,
+        isAutoCreated: true
     };
 
     try {
         // Use the Amplify Client to save the user profile
-        await client.models.UserProfile.create(userProfileInput);
+        await Promise.all([
+            client.models.UserProfile.create(userProfileInput),
+            client.models.People.create(peopleItemInput)
+        ]);
 
         console.log(`User profile created successfully for userId ${userId}`);
     } catch (error) {
