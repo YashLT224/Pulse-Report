@@ -214,6 +214,8 @@ const schema = a
                 toDoList_nextDate: a.string(),
                 toDoList_remarks: a.string(),
                 toDoList_workStatusChangeDate: a.datetime(),
+                toDoList_workStatusChangeBy: a.string(),
+                toDoList_workStatusChangeByName: a.string(),
 
                 // Requirements
                 requirements_demandFromId: a.string(),
