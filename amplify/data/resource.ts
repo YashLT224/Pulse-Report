@@ -213,6 +213,7 @@ const schema = a
                 ]),
                 toDoList_nextDate: a.string(),
                 toDoList_remarks: a.string(),
+                toDoList_workStatusChangeDate: a.datetime(),
 
                 // Requirements
                 requirements_demandFromId: a.string(),

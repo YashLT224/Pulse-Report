@@ -20,8 +20,10 @@ const FORM_TYPE = 'toDoList';
 type Form = Schema['Form']['type'];
 
 const ToDoList = () => {
-    const { userProfile, client,isAdmin,formAccess } = useAuth();
-    const accessType=isAdmin?'update': formAccess[FORM_TYPE]?.toLowerCase()
+    const { userProfile, client, isAdmin, formAccess } = useAuth();
+    const accessType = isAdmin
+        ? 'update'
+        : formAccess[FORM_TYPE]?.toLowerCase();
     const personsList = useSelector(
         (state: any) => state.globalReducer.persons
     );
@@ -115,37 +117,48 @@ const ToDoList = () => {
             formType,
             state,
             createdBy,
+            updatedBy,
             ...restForm
         } = editedForm;
 
-        if (isUpdateMode) {
-            const updateParams = {
-                updatedAt: new Date().toISOString(),
-                updatedBy: userProfile.userId,
-                updatedByName: userProfile.userName
-            };
-            const params: any = {
-                ...restForm,
-                ...updateParams
-            };
-            updateItem({ ...editedForm, ...updateParams } as any);
+        // Check if we need to create a new record instead of updating
+        const hasStatusChanged =
+            isUpdateMode && // It's an update but status changed
+            items.find(item => item[idField] === editedForm[idField])
+                ?.toDoList_workStatus !== editedForm.toDoList_workStatus;
+        const shouldCreateNewRecord = !isUpdateMode || hasStatusChanged; // It's a new record or status has changed
 
-            client.models.Form.update(params).catch(error => {
-                console.error(`Failed to update ${heading}:`, error);
-            });
-        } else {
-            const params: any = {
+        if (shouldCreateNewRecord) {
+            // Create a new record params
+            const newParams: any = {
                 ...restForm,
                 [idField]: ulid(),
-                hasExpiration: 'yes#active',
                 createdAt: new Date().toISOString(),
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,
-                createdByName: userProfile.userName
+                createdByName: userProfile.userName,
+                expirationDate: editedForm.expirationDate || null,
+                hasExpiration: editedForm.expirationDate ? 'yes#active' : null
             };
+            // Update record params
+            const updatedParams: any = {
+                [idField]: editedForm[idField],
+                updatedAt: new Date().toISOString(),
+                updatedBy: userProfile.userId,
+                updatedByName: userProfile.userName,
+                toDoList_workStatusChangeDate: new Date().toISOString()
+            };
+            const promises = [
+                client.models.Form.create(newParams),
+                ...(hasStatusChanged
+                    ? [client.models.Form.update(updatedParams)]
+                    : [])
+            ];
+
             initiateLoding();
-            client.models.Form.create(params)
+
+            Promise.all(promises)
                 .then(() => {
                     refreshList();
                 })
@@ -153,6 +166,21 @@ const ToDoList = () => {
                     console.error(`Failed to create ${heading}:`, error);
                     stopLoding();
                 });
+        } else {
+            // Update existing record
+            const params: any = {
+                ...restForm,
+                updatedAt: new Date().toISOString(),
+                updatedBy: userProfile.userId,
+                updatedByName: userProfile.userName,
+                expirationDate: editedForm.expirationDate || null,
+                hasExpiration: editedForm.expirationDate ? 'yes#active' : null
+            };
+            updateItem(editedForm);
+
+            client.models.Form.update(params).catch(error => {
+                console.error(`Failed to update ${heading}:`, error);
+            });
         }
     };
 
@@ -222,10 +250,10 @@ const ToDoList = () => {
                     heading={heading}
                     items={items}
                     columns={itemsColumns}
-                    addNewEntryAccess={accessType!=='read'}
+                    addNewEntryAccess={accessType !== 'read'}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
-                    haveEditAccess={accessType==='update'}
+                    haveEditAccess={accessType === 'update'}
                 />
                 {/* Pagination Controls */}
                 <PaginationControls
