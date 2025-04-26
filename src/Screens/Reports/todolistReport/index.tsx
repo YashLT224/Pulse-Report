@@ -118,6 +118,9 @@ const ToDoList = () => {
             state,
             createdBy,
             updatedBy,
+            expirationDate,
+            GSI1PK,
+            GSI1SK_Metric,
             ...restForm
         } = editedForm;
 
