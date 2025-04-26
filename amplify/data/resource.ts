@@ -59,6 +59,7 @@ const schema = a
                 designation: a.string().required(),
                 status: a.enum(['active', 'inactive']),
                 entityType: a.string().default('PERSON'), // Constant attribute, e.g., "PERSON"
+                isAutoCreated: a.boolean().default(false), // Indicates if created by post-confirmation handler
                 balanceBF: a.float().default(0)
             })
             .identifier(['personId'])
