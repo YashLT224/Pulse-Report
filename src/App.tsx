@@ -17,6 +17,11 @@ const formFields = {
         phone_number: {
             dialCode: '+91'
         }
+    },
+    forgotPassword: {
+        username: {
+            dialCode: '+91'
+        }
     }
 };
 
