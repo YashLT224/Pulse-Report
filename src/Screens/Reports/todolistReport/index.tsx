@@ -150,7 +150,9 @@ const ToDoList = () => {
                 updatedAt: new Date().toISOString(),
                 updatedBy: userProfile.userId,
                 updatedByName: userProfile.userName,
-                toDoList_workStatusChangeDate: new Date().toISOString()
+                toDoList_workStatusChangeDate: new Date().toISOString(),
+                toDoList_workStatusChangeBy: userProfile.userId,
+                toDoList_workStatusChangeByName: userProfile.userName
             };
             const promises = [
                 client.models.Form.create(newParams),
