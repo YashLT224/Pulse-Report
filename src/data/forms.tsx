@@ -98,7 +98,15 @@ export const expenseReport_itemsColumns = [
     {
         key: 'createdAt',
         header: 'Created At',
-        render: (item: Form) => new Date(item.createdAt).toLocaleString()
+        render: (item: Form) =>
+            new Date(item.createdAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
     },
     {
         key: 'expenseReport_personName',
@@ -134,7 +142,15 @@ export const buildingInsurance_itemsColumns = [
     {
         key: 'createdAt',
         header: 'Created At',
-        render: (item: Form) => new Date(item.createdAt).toLocaleString()
+        render: (item: Form) =>
+            new Date(item.createdAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
     },
     {
         key: 'buildingInsurance_buildingName',
@@ -226,7 +242,15 @@ export const buildingMclTax_itemsColumns = [
     {
         key: 'createdAt',
         header: 'Created At',
-        render: (item: Form) => new Date(item.createdAt).toLocaleString()
+        render: (item: Form) =>
+            new Date(item.createdAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
     }
 ];
 
@@ -235,7 +259,14 @@ export const documentFileStatus_itemsColumns = [
         key: 'createdAt',
         header: 'Created At',
         render: (item: Form) =>
-            new Date(item.createdAt).toLocaleString().split(',')?.[0]
+            new Date(item.createdAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
     },
     {
         key: 'documentFileStatus_status',
@@ -276,7 +307,6 @@ export const documentFileStatus_itemsColumns = [
         header: 'Document Type'
     },
 
- 
     {
         key: 'expirationDate',
         header: 'Date Expiry'
@@ -299,7 +329,15 @@ export const vehicleReport_itemsColumns = [
     {
         key: 'createdAt',
         header: 'Created At',
-        render: (item: Form) => new Date(item.createdAt).toLocaleString()
+        render: (item: Form) =>
+            new Date(item.createdAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
     },
     {
         key: 'vehicleReport_vehicleNo',
@@ -407,7 +445,15 @@ export const vehicleInsurance_itemsColumns = [
     {
         key: 'createdAt',
         header: 'Created At',
-        render: (item: Form) => new Date(item.createdAt).toLocaleString()
+        render: (item: Form) =>
+            new Date(item.createdAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
     },
     {
         key: 'vehicleInsurance_vehicleNo',
@@ -499,13 +545,29 @@ export const toDoList_itemsColumns = [
     {
         key: 'createdAt',
         header: 'Created At',
-        render: (item: Form) => new Date(item.createdAt).toLocaleString()
+        render: (item: Form) =>
+            new Date(item.createdAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
     },
     {
         key: 'updatedAt',
         header: 'Updated At',
         render: (item: Form) =>
-            item.updatedBy && new Date(item.updatedAt).toLocaleString()
+            item.updatedBy &&
+            new Date(item.updatedAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
     },
     {
         key: 'updatedBy',
@@ -557,7 +619,15 @@ export const requirements_itemsColumns = [
     {
         key: 'createdAt',
         header: 'Created At',
-        render: (item: Form) => new Date(item.createdAt).toLocaleString()
+        render: (item: Form) =>
+            new Date(item.createdAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
     },
     {
         key: 'requirements_demandFromName',
@@ -571,13 +641,15 @@ export const requirements_itemsColumns = [
         key: 'requirements_itemList',
         header: 'Requirements',
         render: (item: Form) => {
-            const totalPrice = item.requirements_itemList.reduce((acc, req) => {
-                const price = req.itemPrice;
-                const quantity = req.itemQuantity;
-                const total = price * quantity;
-                return acc + total;
-            }, 0).toFixed(2);  // Calculate the total sum
-        
+            const totalPrice = item.requirements_itemList
+                .reduce((acc, req) => {
+                    const price = req.itemPrice;
+                    const quantity = req.itemQuantity;
+                    const total = price * quantity;
+                    return acc + total;
+                }, 0)
+                .toFixed(2); // Calculate the total sum
+
             return (
                 <div>
                     <ul>
@@ -587,13 +659,16 @@ export const requirements_itemsColumns = [
                             const total = (price * quantity).toFixed(2);
                             return (
                                 <li key={index}>
-                                    {req.itemName} - ₹{price.toFixed(2)} x {quantity} =
-                                    ₹{total}
+                                    {req.itemName} - ₹{price.toFixed(2)} x{' '}
+                                    {quantity} = ₹{total}
                                 </li>
                             );
                         })}
                     </ul>
-                    <p><strong>Total: ₹{totalPrice}</strong></p> {/* Display total at the end */}
+                    <p>
+                        <strong>Total: ₹{totalPrice}</strong>
+                    </p>{' '}
+                    {/* Display total at the end */}
                 </div>
             );
         }
@@ -605,7 +680,7 @@ export const requirements_itemsColumns = [
     {
         key: 'expirationDate',
         header: 'Deadline'
-    },
+    }
     // {
     //     key: 'requirements_remarks',
     //     header: 'Remarks'
@@ -617,7 +692,14 @@ export const salesManPerformance_itemsColumns = [
         key: 'createdAt',
         header: 'Created At',
         render: (item: Form) =>
-            new Date(item.createdAt).toLocaleString().split(',')?.[0]
+            new Date(item.createdAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
     },
     {
         key: 'salesManPerformance_year_month',
@@ -716,7 +798,15 @@ export function dispatchInstructionsHeader(setViewDescription) {
         {
             key: 'createdAt',
             header: 'Created At',
-            render: (item: Form) => new Date(item.createdAt).toLocaleString()
+            render: (item: Form) =>
+                new Date(item.createdAt).toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
         },
         {
             key: 'createdBy',
@@ -757,7 +847,7 @@ export function dispatchInstructionsHeader(setViewDescription) {
         {
             key: 'dispatchInstructions_responsiblePersonName',
             header: 'Responsible Person'
-        },
+        }
         // {
         //     key: 'dispatchInstructions_remarks',
         //     header: 'Remarks'
