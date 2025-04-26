@@ -101,7 +101,9 @@ const PendingApprovals = () => {
                                                     | 'UPDATE'
                                             }
                                         >
-                                            {accessType || 'READ'}
+                                            {(accessType === 'UPDATE'
+                                                ? 'BOTH'
+                                                : accessType) || 'READ'}
                                         </AccessBadge>
                                     </FormAccess>
                                 </FormRow>
@@ -305,7 +307,7 @@ const PendingApprovals = () => {
                                             <option value="READ">Read</option>
                                             <option value="WRITE">Write</option>
                                             <option value="UPDATE">
-                                                Update
+                                                Both
                                             </option>
                                         </SelectField>
                                     </div>

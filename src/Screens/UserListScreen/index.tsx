@@ -76,14 +76,16 @@ const UserList = () => {
             header: 'Allowed Forms',
             render: (item: any) => {
                 if (!item.allowedForms?.length) return 'None 🚫';
-                
+
                 return (
                     <FormsTable>
                         {item.allowedForms.map((formAccess: string) => {
-                            const [formLabel, accessType] = formAccess.split('#');
+                            const [formLabel, accessType] = formAccess.split(
+                                '#'
+                            );
                             const formName =
-                                formTypes.find(f => f.label === formLabel)?.name ||
-                                formLabel;
+                                formTypes.find(f => f.label === formLabel)
+                                    ?.name || formLabel;
                             return (
                                 <FormRow key={formAccess}>
                                     <FormName>{formName}</FormName>
@@ -96,7 +98,9 @@ const UserList = () => {
                                                     | 'UPDATE'
                                             }
                                         >
-                                            {accessType || 'READ'}
+                                            {(accessType === 'UPDATE'
+                                                ? 'BOTH'
+                                                : accessType) || 'READ'}
                                         </AccessBadge>
                                     </FormAccess>
                                 </FormRow>
@@ -333,9 +337,7 @@ const UserList = () => {
                                         >
                                             <option value="READ">Read</option>
                                             <option value="WRITE">Write</option>
-                                            <option value="UPDATE">
-                                                Update
-                                            </option>
+                                            <option value="UPDATE">Both</option>
                                         </SelectField>
                                     </div>
                                 )}
