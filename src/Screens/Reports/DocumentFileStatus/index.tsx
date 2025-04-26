@@ -203,7 +203,7 @@ const DocumentFileStatus = () => {
         !selectedItem.documentFileStatus_status ||
         !selectedItem.documentFileStatus_inDate_outDate ||
         !selectedItem.documentFileStatus_fileName ||
-        !selectedItem.documentFileStatus_documentName ||
+        // !selectedItem.documentFileStatus_documentName ||
         !selectedItem.documentFileStatus_year ||
         !selectedItem.documentFileStatus_window ||
         !selectedItem.documentFileStatus_documentType ||
@@ -328,7 +328,7 @@ const DocumentFileStatus = () => {
                             />
                         </div>
 
-                        <div className="mb-8px">
+                        {/* <div className="mb-8px">
                             <Heading>Document Name</Heading>
                             <Input
                                 type="text"
@@ -346,7 +346,7 @@ const DocumentFileStatus = () => {
                                     )
                                 }
                             />
-                        </div>
+                        </div> */}
 
                         <div className="mb-8px">
                             <Heading>Year</Heading>

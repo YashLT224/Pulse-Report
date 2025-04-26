@@ -254,29 +254,29 @@ export const documentFileStatus_itemsColumns = [
         key: 'documentFileStatus_fileName',
         header: 'File Name'
     },
-
-    {
-        key: 'documentFileStatus_documentName',
-        header: 'Document Name'
-    },
     {
         key: 'documentFileStatus_year',
         header: 'Year'
     },
-
+    {
+        key: 'documentFileStatus_fileNo',
+        header: 'File No.'
+    },
     {
         key: 'documentFileStatus_window',
         header: 'Window Name'
     },
+
+    // {
+    //     key: 'documentFileStatus_documentName',
+    //     header: 'Document Name'
+    // },
     {
         key: 'documentFileStatus_documentType',
         header: 'Document Type'
     },
 
-    {
-        key: 'documentFileStatus_fileNo',
-        header: 'File No.'
-    },
+ 
     {
         key: 'expirationDate',
         header: 'Date Expiry'
@@ -570,21 +570,37 @@ export const requirements_itemsColumns = [
     {
         key: 'requirements_itemList',
         header: 'Requirements',
-        render: (item: Form) => (
-            <ul>
-                {item.requirements_itemList.map((req, index) => {
-                    const price = req.itemPrice;
-                    const quantity = req.itemQuantity;
-                    const total = (price * quantity).toFixed(2);
-                    return (
-                        <li key={index}>
-                            {req.itemName} - ₹{price.toFixed(2)} x {quantity} =
-                            ₹{total}
-                        </li>
-                    );
-                })}
-            </ul>
-        )
+        render: (item: Form) => {
+            const totalPrice = item.requirements_itemList.reduce((acc, req) => {
+                const price = req.itemPrice;
+                const quantity = req.itemQuantity;
+                const total = price * quantity;
+                return acc + total;
+            }, 0).toFixed(2);  // Calculate the total sum
+        
+            return (
+                <div>
+                    <ul>
+                        {item.requirements_itemList.map((req, index) => {
+                            const price = req.itemPrice;
+                            const quantity = req.itemQuantity;
+                            const total = (price * quantity).toFixed(2);
+                            return (
+                                <li key={index}>
+                                    {req.itemName} - ₹{price.toFixed(2)} x {quantity} =
+                                    ₹{total}
+                                </li>
+                            );
+                        })}
+                    </ul>
+                    <p><strong>Total: ₹{totalPrice}</strong></p> {/* Display total at the end */}
+                </div>
+            );
+        }
+    },
+    {
+        key: 'requirements_estimatedAmount',
+        header: 'Estimated Amount'
     },
     {
         key: 'expirationDate',
