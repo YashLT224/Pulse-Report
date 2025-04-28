@@ -125,10 +125,13 @@ const ToDoList = () => {
         } = editedForm;
 
         // Check if we need to create a new record instead of updating
+        const originalItem = items.find(
+            item => item[idField] === editedForm[idField]
+        );
         const hasStatusChanged =
             isUpdateMode && // It's an update but status changed
-            items.find(item => item[idField] === editedForm[idField])
-                ?.toDoList_workStatus !== editedForm.toDoList_workStatus;
+            originalItem?.toDoList_workStatus !==
+                editedForm.toDoList_workStatus;
         const shouldCreateNewRecord = !isUpdateMode || hasStatusChanged; // It's a new record or status has changed
 
         if (shouldCreateNewRecord) {
@@ -142,7 +145,17 @@ const ToDoList = () => {
                 createdBy: userProfile.userId,
                 createdByName: userProfile.userName,
                 expirationDate: editedForm.expirationDate || null,
-                hasExpiration: editedForm.expirationDate ? 'yes#active' : null
+                hasExpiration: editedForm.expirationDate ? 'yes#active' : null,
+                ...(hasStatusChanged && {
+                    toDoList_originalId:
+                        originalItem?.toDoList_originalId ||
+                        originalItem?.[idField],
+                    toDoList_workStatusChangeFrom:
+                        originalItem?.toDoList_workStatus,
+                    updatedAt: new Date().toISOString(),
+                    updatedBy: userProfile.userId,
+                    updatedByName: userProfile.userName
+                })
             };
             // Update record params
             const updatedParams: any = {
@@ -150,6 +163,7 @@ const ToDoList = () => {
                 updatedAt: new Date().toISOString(),
                 updatedBy: userProfile.userId,
                 updatedByName: userProfile.userName,
+                toDoList_workStatusChangeTo: editedForm.toDoList_workStatus,
                 toDoList_workStatusChangeDate: new Date().toISOString(),
                 toDoList_workStatusChangeBy: userProfile.userId,
                 toDoList_workStatusChangeByName: userProfile.userName
