@@ -291,7 +291,7 @@ const VechileReport = () => {
                 >
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
-                            <Heading>Vehicle No.</Heading>
+                            <Heading>Vehicle No.<span className='textRed'>*</span></Heading>
                             <Input
                                 variation="quiet"
                                 size="small"
@@ -308,7 +308,7 @@ const VechileReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Road Tax Due</Heading>
+                            <Heading>Road Tax Due<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -326,7 +326,7 @@ const VechileReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>State Tax Due</Heading>
+                            <Heading>State Tax Due<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -344,7 +344,7 @@ const VechileReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Fitness Due</Heading>
+                            <Heading>Fitness Due<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -362,7 +362,7 @@ const VechileReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Challan</Heading>
+                            <Heading>Challan </Heading>
                             <SelectField
                                 label=""
                                 value={selectedItem.vehicleReport_challan}
@@ -379,7 +379,7 @@ const VechileReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Challan Date</Heading>
+                            <Heading>Challan Date<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -397,7 +397,7 @@ const VechileReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Challan Due</Heading>
+                            <Heading>Challan Due </Heading>
                             <SelectField
                                 label=""
                                 value={selectedItem.vehicleReport_challanDue}
@@ -432,7 +432,7 @@ const VechileReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Battery Warranty</Heading>
+                            <Heading>Battery Warranty<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -452,7 +452,7 @@ const VechileReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Bill No.</Heading>
+                            <Heading>Bill No.<span className='textRed'>*</span></Heading>
 
                             <Input
                                 variation="quiet"
@@ -470,7 +470,7 @@ const VechileReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Bill Date</Heading>
+                            <Heading>Bill Date<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -488,7 +488,7 @@ const VechileReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Bill Photo</Heading>
+                            <Heading>Bill Photo<span className='textRed'>*</span></Heading>
                             <FileUploader
                                 defaultFiles={defaultFiles}
                                 path={({ identityId }) =>
@@ -545,7 +545,7 @@ const VechileReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Status</Heading>
+                            <Heading>Status<span className='textRed'>*</span></Heading>
                             <SelectField
                                 label=""
                                 value={selectedItem.vehicleReport_status}

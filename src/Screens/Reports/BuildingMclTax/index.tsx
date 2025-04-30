@@ -219,7 +219,7 @@ const BuildingMCLTax = () => {
                 heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
-                            <Heading>Building Name</Heading>
+                            <Heading>Building Name<span className='textRed'>*</span></Heading>
                             <Input
                                 variation="quiet"
                                 size="small"
@@ -236,7 +236,7 @@ const BuildingMCLTax = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Balance Tax</Heading>
+                            <Heading>Balance Tax<span className='textRed'>*</span></Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -254,7 +254,7 @@ const BuildingMCLTax = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Due Date</Heading>
+                            <Heading>Due Date<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -272,7 +272,7 @@ const BuildingMCLTax = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Tax Type</Heading>
+                            <Heading>Tax Type<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
@@ -305,7 +305,7 @@ const BuildingMCLTax = () => {
                             </SelectField>
                         </div>
                         <div className="mb-8px">
-                            <Heading>Paid Date</Heading>
+                            <Heading>Paid Date<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -324,7 +324,7 @@ const BuildingMCLTax = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Document File No</Heading>
+                            <Heading>Document File No<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"

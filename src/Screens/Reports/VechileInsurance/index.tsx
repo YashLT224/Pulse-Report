@@ -281,7 +281,7 @@ const VechileInsurance = () => {
                 >
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
-                            <Heading>Vehicle No.</Heading>
+                            <Heading>Vehicle No.<span className='textRed'>*</span></Heading>
                             <Input
                                 variation="quiet"
                                 size="small"
@@ -298,7 +298,7 @@ const VechileInsurance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Insurance Date</Heading>
+                            <Heading>Insurance Date<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -318,7 +318,7 @@ const VechileInsurance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Insurance Expiry</Heading>
+                            <Heading>Insurance Expiry<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -336,7 +336,7 @@ const VechileInsurance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Insurance Company</Heading>
+                            <Heading>Insurance Company<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
@@ -356,7 +356,7 @@ const VechileInsurance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Insure Amount</Heading>
+                            <Heading>Insure Amount<span className='textRed'>*</span></Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -376,7 +376,7 @@ const VechileInsurance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Insurance Amount</Heading>
+                            <Heading>Insurance Amount<span className='textRed'>*</span></Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -395,7 +395,7 @@ const VechileInsurance = () => {
                             />
                         </div>
                         <div className="mb-8px">
-                            <Heading>Insurance Copy</Heading>
+                            <Heading>Insurance Copy<span className='textRed'>*</span></Heading>
                             <FileUploader
                                 defaultFiles={defaultFiles}
                                 path={({ identityId }) =>
@@ -464,7 +464,7 @@ const VechileInsurance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Vehicle Type</Heading>
+                            <Heading>Vehicle Type<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
@@ -484,7 +484,7 @@ const VechileInsurance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Remarks</Heading>
+                            <Heading>Remarks<span className='textRed'>*</span></Heading>
 
                             <Input
                                 variation="quiet"

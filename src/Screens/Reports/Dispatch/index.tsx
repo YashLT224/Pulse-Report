@@ -244,7 +244,7 @@ const Dispatch = () => {
                 <Modal onCloseHandler={handleCloseModal} heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
-                            <Heading>Party Name</Heading>
+                            <Heading>Party Name<span className='textRed'>*</span></Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
@@ -262,7 +262,7 @@ const Dispatch = () => {
                             />
                         </div>
                         <div className="mb-8px">
-                            <Heading>Instructions</Heading>
+                            <Heading>Instructions<span className='textRed'>*</span></Heading>
                             <TextAreaField
                                 label=""
                                 placeholder="Enter Instructions"
@@ -279,7 +279,7 @@ const Dispatch = () => {
                             />
                         </div>
                         <div className="mb-8px selectSearch">
-                            <Heading>Responsible person</Heading>
+                            <Heading>Responsible person<span className='textRed'>*</span></Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}

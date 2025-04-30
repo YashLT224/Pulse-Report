@@ -236,7 +236,7 @@ const BuildingInsurance = () => {
                 heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
-                            <Heading>Building Name</Heading>
+                            <Heading>Building Name<span className='textRed'>*</span></Heading>
                             <Input
                                 variation="quiet"
                                 size="small"
@@ -254,7 +254,7 @@ const BuildingInsurance = () => {
                             />
                         </div>
                         <div className="mb-8px">
-                            <Heading>Insure Date</Heading>
+                            <Heading>Insure Date<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -273,7 +273,7 @@ const BuildingInsurance = () => {
                             />
                         </div>
                         <div className="mb-8px">
-                            <Heading>Insure Amount</Heading>
+                            <Heading>Insure Amount<span className='textRed'>*</span></Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -292,7 +292,7 @@ const BuildingInsurance = () => {
                             />
                         </div>
                         <div className="mb-8px">
-                            <Heading>Insurance Amount</Heading>
+                            <Heading>Insurance Amount<span className='textRed'>*</span></Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -311,7 +311,7 @@ const BuildingInsurance = () => {
                             />
                         </div>
                         <div className="mb-8px">
-                            <Heading>Due Date</Heading>
+                            <Heading>Due Date<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -345,7 +345,7 @@ const BuildingInsurance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Document No.</Heading>
+                            <Heading>Document No.<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
@@ -365,7 +365,7 @@ const BuildingInsurance = () => {
                         </div>
 
                         <div className="mb-8px selectSearch">
-                            <Heading>Mark To</Heading>
+                            <Heading>Mark To<span className='textRed'>*</span></Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}

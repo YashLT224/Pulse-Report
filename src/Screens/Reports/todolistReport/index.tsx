@@ -291,7 +291,7 @@ const ToDoList = () => {
                 >
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
-                            <Heading>Assign</Heading>
+                            <Heading>Assign<span className='textRed'>*</span></Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
@@ -308,6 +308,23 @@ const ToDoList = () => {
                                 }}
                             />
                         </div>
+                        <div className="mb-8px">
+                            <Heading>Joint Work</Heading>
+                            <SelectField
+                                label=""
+                                value={selectedItem.toDoList_jointWork}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'toDoList_jointWork'
+                                    )
+                                }
+                            >
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </SelectField>
+                        </div>
+
 
                         {selectedItem.toDoList_jointWork === 'yes' && (
                             <div className="mb-8px selectSearch">
@@ -330,25 +347,9 @@ const ToDoList = () => {
                             </div>
                         )}
 
+                       
                         <div className="mb-8px">
-                            <Heading>Joint Work</Heading>
-                            <SelectField
-                                label=""
-                                value={selectedItem.toDoList_jointWork}
-                                onChange={e =>
-                                    updateField(
-                                        e.target.value,
-                                        'toDoList_jointWork'
-                                    )
-                                }
-                            >
-                                <option value="yes">Yes</option>
-                                <option value="no">No</option>
-                            </SelectField>
-                        </div>
-
-                        <div className="mb-8px">
-                            <Heading>Work</Heading>
+                            <Heading>Work<span className='textRed'>*</span></Heading>
                             <Input
                                 variation="quiet"
                                 size="small"
@@ -362,7 +363,7 @@ const ToDoList = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Due Date</Heading>
+                            <Heading>Due Date<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -380,7 +381,7 @@ const ToDoList = () => {
                         </div>
 
                         <div className="mb-8px selectSearch">
-                            <Heading>Report To</Heading>
+                            <Heading>Report To<span className='textRed'>*</span></Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
@@ -419,7 +420,7 @@ const ToDoList = () => {
                             </SelectField>
                         </div>
                         <div className="mb-8px">
-                            <Heading>Next Date</Heading>
+                            <Heading>Next Date<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -437,7 +438,7 @@ const ToDoList = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Remarks</Heading>
+                            <Heading>Remarks<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
