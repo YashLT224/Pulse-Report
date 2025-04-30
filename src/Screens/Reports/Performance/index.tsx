@@ -337,14 +337,14 @@ const SalesManPerformance = () => {
                             />
                         </div>
                         <div className="mb-8px selectSearch">
-                            <Heading>Sales Man</Heading>
+                            <Heading>Sales Man<span className='textRed'>*</span></Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
                                 options={personsList}
                                 value={`${selectedItem.salesManPerformance_salesManName}#${selectedItem.salesManPerformance_salesManId}`}
                                 // name="Person Name"
-                                placeholder="Demand From"
+                                placeholder="Select Sales Man"
                                 onChange={selectedValue => {
                                     updateField(
                                         selectedValue,
@@ -355,7 +355,7 @@ const SalesManPerformance = () => {
                             />
                         </div>
                         <div className="mb-8px">
-                            <Heading>Salary</Heading>
+                            <Heading>Salary<span className='textRed'>*</span></Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -374,7 +374,7 @@ const SalesManPerformance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Expense</Heading>
+                            <Heading>Expense<span className='textRed'>*</span></Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -405,7 +405,7 @@ const SalesManPerformance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Sales in Rupees</Heading>
+                            <Heading>Sales in Rupees<span className='textRed'>*</span></Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -425,7 +425,7 @@ const SalesManPerformance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Sales in kgs</Heading>
+                            <Heading>Sales in kgs<span className='textRed'>*</span></Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -445,7 +445,7 @@ const SalesManPerformance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Add SKUs</Heading>
+                            <Heading>Add SKUs<span className='textRed'>*</span></Heading>
                             {selectedItem.salesManPerformance_skus?.map(
                                 (item, index) => (
                                     <div

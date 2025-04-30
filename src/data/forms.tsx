@@ -287,7 +287,7 @@ export const documentFileStatus_itemsColumns = [
     },
     {
         key: 'documentFileStatus_year',
-        header: 'Year'
+        header: 'File Year'
     },
     {
         key: 'documentFileStatus_fileNo',

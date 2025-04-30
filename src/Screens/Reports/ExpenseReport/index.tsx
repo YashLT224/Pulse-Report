@@ -278,7 +278,7 @@ const ExpenseReport = () => {
                 heading={heading} isUpdateMode={isUpdateMode}>
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
-                            <Heading>Person Name</Heading>
+                            <Heading>Person Name<span className='textRed'>*</span></Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
@@ -298,7 +298,7 @@ const ExpenseReport = () => {
                             />
                         </div>
                         <div className="mb-8px">
-                            <Heading>Work Assign</Heading>
+                            <Heading>Work Assign<span className='textRed'>*</span></Heading>
                             <Input
                                 variation="quiet"
                                 size="small"
@@ -335,7 +335,7 @@ const ExpenseReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Expense</Heading>
+                            <Heading>Expense<span className='textRed'>*</span></Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -395,7 +395,7 @@ const ExpenseReport = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Remarks</Heading>
+                            <Heading>Remarks<span className='textRed'>*</span></Heading>
 
                             <Input
                                 variation="quiet"

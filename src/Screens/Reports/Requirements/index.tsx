@@ -283,7 +283,7 @@ const Requirements = () => {
                             />
                         </div>
                         <div className="mb-8px selectSearch">
-                            <Heading>Responsible Person</Heading>
+                            <Heading>Responsible Person<span className='textRed'>*</span></Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
@@ -301,7 +301,7 @@ const Requirements = () => {
                             />
                         </div>
                         <div className="mb-8px">
-                            <Heading>Deadline</Heading>
+                            <Heading>Deadline<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -319,7 +319,7 @@ const Requirements = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Requirements</Heading>
+                            <Heading>Requirements<span className='textRed'>*</span></Heading>
                             {selectedItem.requirements_itemList?.map(
                                 (item, index) => (
                                     <div
@@ -464,7 +464,7 @@ const Requirements = () => {
                             </ModalButton>
                         </div>
                         <div className="mb-8px">
-                            <Heading>Estimation Amount</Heading>
+                            <Heading>Estimation Amount<span className='textRed'>*</span></Heading>
                             <Input
                                 type="number"
                                 variation="quiet"

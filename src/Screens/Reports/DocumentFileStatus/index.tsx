@@ -81,14 +81,15 @@ const DocumentFileStatus = () => {
             documentFileStatus_fileNo: '',
             // Expiration Date is optional for Document File Status
             // expirationDate: formatDateForInput(new Date()),
-            documentFileStatus_receivedFrom_givenById: '',
-            documentFileStatus_receivedFrom_givenByName: '',
+            documentFileStatus_receivedFrom_givenById:  userProfile?.userId,
+            documentFileStatus_receivedFrom_givenByName: userProfile?.userName,
             documentFileStatus_receivedBy_givenToId: '',
             documentFileStatus_receivedBy_givenToName: '',
             documentFileStatus_remarks: '',
             documentFileStatus_status: 'in'
         });
     };
+    
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -291,7 +292,7 @@ const DocumentFileStatus = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>In Date / Out Date</Heading>
+                            <Heading>In Date / Out Date<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -311,7 +312,7 @@ const DocumentFileStatus = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>File Name</Heading>
+                            <Heading>File Name<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
@@ -349,7 +350,7 @@ const DocumentFileStatus = () => {
                         </div> */}
 
                         <div className="mb-8px">
-                            <Heading>Year</Heading>
+                            <Heading>File Year<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
@@ -367,7 +368,7 @@ const DocumentFileStatus = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Window Name</Heading>
+                            <Heading>Window Name<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
@@ -385,7 +386,7 @@ const DocumentFileStatus = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Document Type</Heading>
+                            <Heading>Document Type<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
@@ -405,7 +406,7 @@ const DocumentFileStatus = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>File No.</Heading>
+                            <Heading>File No.<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
@@ -423,7 +424,7 @@ const DocumentFileStatus = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Date Expiry</Heading>
+                            <Heading>Date Expiry<span className='textRed'>*</span></Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -441,9 +442,9 @@ const DocumentFileStatus = () => {
                         </div>
 
                         <div className="mb-8px selectSearch">
-                            <Heading>Received From / Given By</Heading>
+                            <Heading>Received From / Given By<span className='textRed'>*</span></Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
-                            <SelectSearch
+                            {/* <SelectSearch
                                 search={true}
                                 options={personsList}
                                 value={`${selectedItem.documentFileStatus_receivedFrom_givenByName}#${selectedItem.documentFileStatus_receivedFrom_givenById}`}
@@ -456,11 +457,20 @@ const DocumentFileStatus = () => {
                                         true
                                     );
                                 }}
+                            /> */}
+                              <Input
+                                type="text"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Received From / Given By"
+                                // isRequired={true}
+                                value={selectedItem.documentFileStatus_receivedFrom_givenByName}
+                                 
                             />
                         </div>
 
                         <div className="mb-8px selectSearch">
-                            <Heading>Received By / Given To</Heading>
+                            <Heading>Received By / Given To<span className='textRed'>*</span></Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
@@ -479,7 +489,7 @@ const DocumentFileStatus = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Remarks</Heading>
+                            <Heading>Remarks<span className='textRed'>*</span></Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
