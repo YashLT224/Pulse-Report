@@ -89,7 +89,7 @@ const DocumentFileStatus = () => {
             documentFileStatus_status: 'in'
         });
     };
-    
+
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
