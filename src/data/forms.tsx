@@ -612,7 +612,7 @@ export const toDoList_itemsColumns = [
     {
         key: 'toDoList_remarks',
         header: 'Remarks'
-    }
+    },
 ];
 
 export const requirements_itemsColumns = [

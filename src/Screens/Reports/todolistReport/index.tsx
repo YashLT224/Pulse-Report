@@ -294,6 +294,8 @@ const ToDoList = () => {
                     addNewEntryAccess={accessType !== 'read'}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
+                    handleHistory={(item:any)=>{console.log(item)}}
+                    haveHistory={true}
                     haveEditAccess={accessType === 'update'}>
                          {/* Filters */}
                          <div style={{width:'200px'}}>
