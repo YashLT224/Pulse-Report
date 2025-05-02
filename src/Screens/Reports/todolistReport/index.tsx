@@ -31,6 +31,9 @@ const ToDoList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
+    const [filters,setFilters]=useState({
+        status:'all'
+    })
 
     // fetch function for usePagination
     const fetchForm = useCallback(
@@ -39,15 +42,21 @@ const ToDoList = () => {
                 formType: `${FORM_TYPE}#active`,
                 nextToken: token,
                 limit,
-                sortDirection: 'DESC'
+                sortDirection: 'DESC',
             };
-            const response = await client.models.Form.listFormByType(params);
+            if(filters.status!=='all'){
+                delete params.formType;
+                params.GSI1PK = `${FORM_TYPE}#${filters.status}#active`;
+            }
+            
+             const response = filters.status==='all'? await client.models.Form.listFormByType(params):await client.models.Form.listByGSI1(params);
+            
             return {
                 data: response.data,
                 nextToken: response.nextToken || null
             };
         },
-        [client.models.Form]
+        [client.models.Form,filters]
     );
 
     // Use the usePagination hook
@@ -119,10 +128,14 @@ const ToDoList = () => {
             createdBy,
             updatedBy,
             expirationDate,
-            GSI1PK,
-            GSI1SK_Metric,
             ...restForm
         } = editedForm;
+
+        const formId=ulid();
+        const GSI1PK = `${FORM_TYPE}#${restForm.toDoList_workStatus}#active`;
+        const GSI1SK_Metric = Date.now();
+        const GSI2PK = `${FORM_TYPE}#${formId}`;
+        const GSI2SK =new Date().toISOString();
 
         // Check if we need to create a new record instead of updating
         const originalItem = items.find(
@@ -138,23 +151,28 @@ const ToDoList = () => {
             // Create a new record params
             const newParams: any = {
                 ...restForm,
-                [idField]: ulid(),
+                [idField]:formId,
                 createdAt: new Date().toISOString(),
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,
                 createdByName: userProfile.userName,
+                updatedAt: new Date().toISOString(),
+                updatedBy: userProfile.userId,
+                updatedByName: userProfile.userName,
                 expirationDate: editedForm.expirationDate || null,
                 hasExpiration: editedForm.expirationDate ? 'yes#active' : null,
-                ...(hasStatusChanged && {
+                GSI1PK,
+                GSI1SK_Metric,
+                GSI2SK,
+                GSI2PK,
+               ...(hasStatusChanged && {
                     toDoList_originalId:
                         originalItem?.toDoList_originalId ||
                         originalItem?.[idField],
                     toDoList_workStatusChangeFrom:
                         originalItem?.toDoList_workStatus,
-                    updatedAt: new Date().toISOString(),
-                    updatedBy: userProfile.userId,
-                    updatedByName: userProfile.userName
+                    
                 })
             };
             // Update record params
@@ -166,7 +184,11 @@ const ToDoList = () => {
                 toDoList_workStatusChangeTo: editedForm.toDoList_workStatus,
                 toDoList_workStatusChangeDate: new Date().toISOString(),
                 toDoList_workStatusChangeBy: userProfile.userId,
-                toDoList_workStatusChangeByName: userProfile.userName
+                toDoList_workStatusChangeByName: userProfile.userName,
+                state: 'inactive',
+                formType: `${FORM_TYPE}#inactive`,
+                GSI1PK:`${FORM_TYPE}#${originalItem?.toDoList_workStatus}#inactive`,
+                hasExpiration:null
             };
             const promises = [
                 client.models.Form.create(newParams),
@@ -272,8 +294,26 @@ const ToDoList = () => {
                     addNewEntryAccess={accessType !== 'read'}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
-                    haveEditAccess={accessType === 'update'}
-                />
+                    haveEditAccess={accessType === 'update'}>
+                         {/* Filters */}
+                         <div style={{width:'200px'}}>
+                         <SelectField
+                                label=""
+                                value={filters.status}
+                                onChange={e =>{
+                                    setFilters((prev)=>({...prev,status:e.target.value}));
+                                }
+                                }
+                            >
+                                 <option value="all">All</option>
+                                <option value="pending">Pending</option>
+                                <option value="inprogress">In Progress</option>
+                                <option value="completed">Completed</option>
+                            </SelectField>
+                            </div>
+
+                    </UserListItems>
+                 
                 {/* Pagination Controls */}
                 <PaginationControls
                     onPrevious={goToPrevious}

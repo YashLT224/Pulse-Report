@@ -200,6 +200,7 @@ const DocumentFileStatus = () => {
         }
     };
 
+    console.log(selectedItem)
     const isSubmitDisabled =
         !selectedItem.documentFileStatus_status ||
         !selectedItem.documentFileStatus_inDate_outDate ||
