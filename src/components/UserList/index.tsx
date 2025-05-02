@@ -27,7 +27,7 @@ interface UserListProps<T> {
     items: T[];
     columns?: TableColumn<T>[];
     addNewEntryAccess?: boolean;
-    handleEdit: (item: T) => void;
+    handleEdit?: (item: T) => void;
     addNewItemHandler?: () => void;
     children?:React.ReactNode;
     haveEditAccess?:boolean;
