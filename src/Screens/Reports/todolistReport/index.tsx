@@ -31,9 +31,12 @@ const ToDoList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
-    const [filters,setFilters]=useState({
-        status:'all'
-    })
+    const [filters, setFilters] = useState({
+        status: 'all'
+    });
+    const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+    const [historyItems, setHistoryItems] = useState<Form[]>([]);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
     // fetch function for usePagination
     const fetchForm = useCallback(
@@ -42,21 +45,24 @@ const ToDoList = () => {
                 formType: `${FORM_TYPE}#active`,
                 nextToken: token,
                 limit,
-                sortDirection: 'DESC',
+                sortDirection: 'DESC'
             };
-            if(filters.status!=='all'){
+            if (filters.status !== 'all') {
                 delete params.formType;
                 params.GSI1PK = `${FORM_TYPE}#${filters.status}#active`;
             }
-            
-             const response = filters.status==='all'? await client.models.Form.listFormByType(params):await client.models.Form.listByGSI1(params);
-            
+
+            const response =
+                filters.status === 'all'
+                    ? await client.models.Form.listFormByType(params)
+                    : await client.models.Form.listByGSI1(params);
+
             return {
                 data: response.data,
                 nextToken: response.nextToken || null
             };
         },
-        [client.models.Form,filters]
+        [client.models.Form, filters]
     );
 
     // Use the usePagination hook
@@ -131,16 +137,17 @@ const ToDoList = () => {
             ...restForm
         } = editedForm;
 
-        const formId=ulid();
-        const GSI1PK = `${FORM_TYPE}#${restForm.toDoList_workStatus}#active`;
-        const GSI1SK_Metric = Date.now();
-        const GSI2PK = `${FORM_TYPE}#${formId}`;
-        const GSI2SK =new Date().toISOString();
-
-        // Check if we need to create a new record instead of updating
         const originalItem = items.find(
             item => item[idField] === editedForm[idField]
         );
+
+        const formId = ulid();
+        const GSI1PK = `${FORM_TYPE}#${restForm.toDoList_workStatus}#active`;
+        const GSI1SK_Metric = Date.now();
+        const GSI2PK = originalItem?.GSI2PK || `${FORM_TYPE}#${formId}`;
+        const GSI2SK = new Date().toISOString();
+
+        // Check if we need to create a new record instead of updating
         const hasStatusChanged =
             isUpdateMode && // It's an update but status changed
             originalItem?.toDoList_workStatus !==
@@ -151,7 +158,7 @@ const ToDoList = () => {
             // Create a new record params
             const newParams: any = {
                 ...restForm,
-                [idField]:formId,
+                [idField]: formId,
                 createdAt: new Date().toISOString(),
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
@@ -164,15 +171,14 @@ const ToDoList = () => {
                 hasExpiration: editedForm.expirationDate ? 'yes#active' : null,
                 GSI1PK,
                 GSI1SK_Metric,
-                GSI2SK,
                 GSI2PK,
-               ...(hasStatusChanged && {
+                GSI2SK,
+                ...(hasStatusChanged && {
                     toDoList_originalId:
                         originalItem?.toDoList_originalId ||
                         originalItem?.[idField],
                     toDoList_workStatusChangeFrom:
-                        originalItem?.toDoList_workStatus,
-                    
+                        originalItem?.toDoList_workStatus
                 })
             };
             // Update record params
@@ -187,8 +193,8 @@ const ToDoList = () => {
                 toDoList_workStatusChangeByName: userProfile.userName,
                 state: 'inactive',
                 formType: `${FORM_TYPE}#inactive`,
-                GSI1PK:`${FORM_TYPE}#${originalItem?.toDoList_workStatus}#inactive`,
-                hasExpiration:null
+                GSI1PK: `${FORM_TYPE}#${originalItem?.toDoList_workStatus}#inactive`,
+                hasExpiration: null
             };
             const promises = [
                 client.models.Form.create(newParams),
@@ -260,6 +266,24 @@ const ToDoList = () => {
         !selectedItem.toDoList_remarks ||
         !selectedItem.expirationDate;
 
+    const handleHistory = async (item: any) => {
+        setIsHistoryLoading(true);
+        setIsHistoryModalOpen(true);
+
+        try {
+            const response = await client.models.Form.listByGSI2({
+                GSI2PK: item.GSI2PK,
+                sortDirection: 'DESC',
+                limit: 100
+            } as any);
+            setHistoryItems(response.data);
+        } catch (error) {
+            console.error('Failed to fetch history:', error);
+        } finally {
+            setIsHistoryLoading(false);
+        }
+    };
+
     return (
         <>
             <div style={{ position: 'relative' }}>
@@ -294,26 +318,30 @@ const ToDoList = () => {
                     addNewEntryAccess={accessType !== 'read'}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
-                    haveEditAccess={accessType === 'update'}>
-                         {/* Filters */}
-                         <div style={{width:'200px'}}>
-                         <SelectField
-                                label=""
-                                value={filters.status}
-                                onChange={e =>{
-                                    setFilters((prev)=>({...prev,status:e.target.value}));
-                                }
-                                }
-                            >
-                                 <option value="all">All</option>
-                                <option value="pending">Pending</option>
-                                <option value="inprogress">In Progress</option>
-                                <option value="completed">Completed</option>
-                            </SelectField>
-                            </div>
+                    handleHistory={handleHistory}
+                    haveHistory={true}
+                    haveEditAccess={accessType === 'update'}
+                >
+                    {/* Filters */}
+                    <div style={{ width: '200px' }}>
+                        <SelectField
+                            label=""
+                            value={filters.status}
+                            onChange={e => {
+                                setFilters(prev => ({
+                                    ...prev,
+                                    status: e.target.value
+                                }));
+                            }}
+                        >
+                            <option value="all">All</option>
+                            <option value="pending">Pending</option>
+                            <option value="inprogress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </SelectField>
+                    </div>
+                </UserListItems>
 
-                    </UserListItems>
-                 
                 {/* Pagination Controls */}
                 <PaginationControls
                     onPrevious={goToPrevious}
@@ -331,7 +359,9 @@ const ToDoList = () => {
                 >
                     <form onSubmit={handleSave}>
                         <div className="mb-8px selectSearch">
-                            <Heading>Assign<span className='textRed'>*</span></Heading>
+                            <Heading>
+                                Assign<span className="textRed">*</span>
+                            </Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
@@ -365,7 +395,6 @@ const ToDoList = () => {
                             </SelectField>
                         </div>
 
-
                         {selectedItem.toDoList_jointWork === 'yes' && (
                             <div className="mb-8px selectSearch">
                                 <Heading>Joint Assign</Heading>
@@ -387,9 +416,10 @@ const ToDoList = () => {
                             </div>
                         )}
 
-                       
                         <div className="mb-8px">
-                            <Heading>Work<span className='textRed'>*</span></Heading>
+                            <Heading>
+                                Work<span className="textRed">*</span>
+                            </Heading>
                             <Input
                                 variation="quiet"
                                 size="small"
@@ -403,7 +433,9 @@ const ToDoList = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Due Date<span className='textRed'>*</span></Heading>
+                            <Heading>
+                                Due Date<span className="textRed">*</span>
+                            </Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -421,7 +453,9 @@ const ToDoList = () => {
                         </div>
 
                         <div className="mb-8px selectSearch">
-                            <Heading>Report To<span className='textRed'>*</span></Heading>
+                            <Heading>
+                                Report To<span className="textRed">*</span>
+                            </Heading>
                             {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
                             <SelectSearch
                                 search={true}
@@ -460,7 +494,9 @@ const ToDoList = () => {
                             </SelectField>
                         </div>
                         <div className="mb-8px">
-                            <Heading>Next Date<span className='textRed'>*</span></Heading>
+                            <Heading>
+                                Next Date<span className="textRed">*</span>
+                            </Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -478,7 +514,9 @@ const ToDoList = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Remarks<span className='textRed'>*</span></Heading>
+                            <Heading>
+                                Remarks<span className="textRed">*</span>
+                            </Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
@@ -514,6 +552,48 @@ const ToDoList = () => {
                             </ModalButton>
                         </div>
                     </form>
+                </Modal>
+            )}
+
+            {isHistoryModalOpen && (
+                <Modal
+                    onCloseHandler={() => setIsHistoryModalOpen(false)}
+                    heading="History"
+                    isViewMode={true}
+                >
+                    {isHistoryLoading ? (
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                padding: '20px'
+                            }}
+                        >
+                            <Loader size="large" />
+                        </div>
+                    ) : (
+                        <UserListItems
+                            heading="History"
+                            items={historyItems}
+                            columns={itemsColumns}
+                            haveEditAccess={false}
+                            addNewEntryAccess={false}
+                        />
+                    )}
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '10px',
+                            marginTop: '15px'
+                        }}
+                    >
+                        <ModalButton
+                            onClick={() => setIsHistoryModalOpen(false)}
+                        >
+                            Close
+                        </ModalButton>
+                    </div>
                 </Modal>
             )}
         </>
