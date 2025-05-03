@@ -592,7 +592,15 @@ export const toDoList_itemsColumns = [
     },
     {
         key: 'expirationDate',
-        header: 'Dead Line'
+        header: 'Dead Line',
+        render: (item: Form) =>
+            item.updatedBy &&
+            new Date(item.expirationDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                 day: 'numeric',
+            })
     },
 
     {
@@ -607,7 +615,15 @@ export const toDoList_itemsColumns = [
     },
     {
         key: 'toDoList_nextDate',
-        header: 'Next Date'
+        header: 'Next Date',
+        render: (item: Form) =>
+            item.updatedBy &&
+            new Date(item.toDoList_nextDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            })
     },
     {
         key: 'toDoList_remarks',
