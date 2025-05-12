@@ -45,24 +45,34 @@ const ToDoList = () => {
                 formType: `${FORM_TYPE}#active`,
                 nextToken: token,
                 limit,
-                sortDirection: 'DESC'
+                sortDirection: 'DESC',
+                ...(!isAdmin && {
+                    formType: undefined,
+                    GSI3PK: `${FORM_TYPE}#${userProfile.userId}#active`
+                })
             };
             if (filters.status !== 'all') {
                 delete params.formType;
-                params.GSI1PK = `${FORM_TYPE}#${filters.status}#active`;
+                params[isAdmin ? 'GSI1PK' : 'GSI4PK'] = `${FORM_TYPE}#${
+                    !isAdmin ? `${userProfile.userId}#` : ''
+                }${filters.status}#active`;
             }
 
             const response =
                 filters.status === 'all'
-                    ? await client.models.Form.listFormByType(params)
-                    : await client.models.Form.listByGSI1(params);
+                    ? await client.models.Form[
+                          isAdmin ? 'listFormByType' : 'listByGSI3'
+                      ](params)
+                    : await client.models.Form[
+                          isAdmin ? 'listByGSI1' : 'listByGSI4'
+                      ](params);
 
             return {
                 data: response.data,
                 nextToken: response.nextToken || null
             };
         },
-        [client.models.Form, filters]
+        [client.models.Form, filters.status, isAdmin, userProfile.userId]
     );
 
     // Use the usePagination hook
@@ -146,6 +156,10 @@ const ToDoList = () => {
         const GSI1SK_Metric = Date.now();
         const GSI2PK = originalItem?.GSI2PK || `${FORM_TYPE}#${formId}`;
         const GSI2SK = new Date().toISOString();
+        const GSI3PK = `${FORM_TYPE}#${userProfile.userId}#active`;
+        const GSI3SK = new Date().toISOString();
+        const GSI4PK = `${FORM_TYPE}#${userProfile.userId}#${restForm.toDoList_workStatus}#active`;
+        const GSI4SK = new Date().toISOString();
 
         // Check if we need to create a new record instead of updating
         const hasStatusChanged =
@@ -173,6 +187,10 @@ const ToDoList = () => {
                 GSI1SK_Metric,
                 GSI2PK,
                 GSI2SK,
+                GSI3PK,
+                GSI3SK,
+                GSI4PK,
+                GSI4SK,
                 ...(hasStatusChanged && {
                     toDoList_originalId:
                         originalItem?.toDoList_originalId ||
@@ -194,6 +212,8 @@ const ToDoList = () => {
                 state: 'inactive',
                 formType: `${FORM_TYPE}#inactive`,
                 GSI1PK: `${FORM_TYPE}#${originalItem?.toDoList_workStatus}#inactive`,
+                GSI3PK: `${FORM_TYPE}#${userProfile.userId}#inactive`,
+                GSI4PK: `${FORM_TYPE}#${userProfile.userId}#${originalItem?.toDoList_workStatus}#inactive`,
                 hasExpiration: null
             };
             const promises = [
