@@ -132,8 +132,12 @@ const schema = a
                 completedAt: a.datetime(),
                 GSI1PK: a.string(), // Partition key for the GSI1
                 GSI1SK_Metric: a.float(), // Sort key for the GSI1
-                GSI2PK: a.string(), // Partition key for the GSI1
-                GSI2SK: a.string(), // Sort key for the GSI1
+                GSI2PK: a.string(), // Partition key for the GSI2
+                GSI2SK: a.string(), // Sort key for the GSI2
+                GSI3PK: a.string(), // Partition key for the GSI3
+                GSI3SK: a.string(), // Sort key for the GSI3
+                GSI4PK: a.string(), // Partition key for the GSI4
+                GSI4SK: a.string(), // Sort key for the GSI4
 
                 // Expense Report fields
                 expenseReport_balanceBF: a.float(),
@@ -278,11 +282,19 @@ const schema = a
                 index('GSI1PK')
                     .sortKeys(['GSI1SK_Metric'])
                     .queryField('listByGSI1')
-                    .name('GSI1'), 
+                    .name('GSI1'),
                 index('GSI2PK')
                     .sortKeys(['GSI2SK'])
                     .queryField('listByGSI2')
-                    .name('GSI2'),       
+                    .name('GSI2'),
+                index('GSI3PK')
+                    .sortKeys(['GSI3SK'])
+                    .queryField('listByGSI3')
+                    .name('GSI3'),
+                index('GSI4PK')
+                    .sortKeys(['GSI4SK'])
+                    .queryField('listByGSI4')
+                    .name('GSI4')
             ])
             .authorization(allow => [
                 allow
