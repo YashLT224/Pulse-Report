@@ -175,6 +175,16 @@ const schema = a
                 dispatchInstructions_responsiblePersonName: a.string(),
                 dispatchInstructions_remarks: a.string(),
 
+                // Stock Insurance
+                stockInsurance_vehicleNo: a.string(),
+                stockInsurance_insuranceDate: a.date(),
+                stockInsurance_insuranceCompany: a.string(),
+                stockInsurance_insureAmount: a.float(),
+                stockInsurance_insuranceAmount: a.float(),
+                stockInsurance_insuranceCopy: a.ref('File').array(),
+                stockInsurance_vehicleType: a.string(),
+                stockInsurance_remarks: a.string(),
+
                 // Vehicle Insurance
                 vehicleInsurance_vehicleNo: a.string(),
                 vehicleInsurance_insuranceDate: a.date(),
