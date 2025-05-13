@@ -4,7 +4,7 @@ import { FileUploader } from '@aws-amplify/ui-react-storage';
 import { Loader, Input } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
-import { vehicleInsurance_itemsColumns as itemsColumns } from '../../../data/forms';
+import { stockInsurance_itemsColumns as itemsColumns } from '../../../data/forms';
 import useAuth from '../../../Hooks/useAuth';
 import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
@@ -16,13 +16,13 @@ import {
 import { ModalButton, Heading } from '../../../style';
 
 const LIMIT = 10; // Number of items to display per page
-const heading = 'Vehicle Insurance';
+const heading = 'Stock Insurance';
 const idField = 'formId';
-const FORM_TYPE = 'vehicleInsurance';
+const FORM_TYPE = 'stockInsurance';
 
 type Form = Schema['Form']['type'];
 
-const VechileInsurance = () => {
+const StockInsurance = () => {
     const { userProfile, client,isAdmin,formAccess } = useAuth();
     const accessType=isAdmin?'update': formAccess[FORM_TYPE]?.toLowerCase()
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -101,14 +101,14 @@ const VechileInsurance = () => {
         setUpdateMode(false);
         setIsModalOpen(true);
         setSelectedItem({
-            vehicleInsurance_vehicleNo: '',
-            vehicleInsurance_insuranceDate: formatDateForInput(new Date()),
+            stockInsurance_vehicleNo: '',
+            stockInsurance_insuranceDate: formatDateForInput(new Date()),
             expirationDate: getNextYearExpirationDate(),
-            vehicleInsurance_insuranceCompany: '',
-            vehicleInsurance_insureAmount: 0,
-            vehicleInsurance_insuranceAmount: 0,
-            vehicleInsurance_vehicleType: '',
-            vehicleInsurance_remarks: ''
+            stockInsurance_insuranceCompany: '',
+            stockInsurance_insureAmount: 0,
+            stockInsurance_insuranceAmount: 0,
+            stockInsurance_vehicleType: '',
+            stockInsurance_remarks: ''
         });
         setFiles({});
     };
@@ -121,7 +121,7 @@ const VechileInsurance = () => {
         setSelectedItem(item);
         setFiles({});
         setDefaultFiles(
-            item.vehicleInsurance_insuranceCopy?.map((data: any) => ({
+            item.stockInsurance_insuranceCopy?.map((data: any) => ({
                 ...data,
                 path: data.key,
                 key: data.name,
@@ -143,7 +143,7 @@ const VechileInsurance = () => {
             ...restForm
         } = editedForm;
 
-        const vehicleInsurance_insuranceCopy = defaultFiles
+        const stockInsurance_insuranceCopy = defaultFiles
             .map(({ path: key, name, type }) => ({ key, name, type }))
             .concat(
                 Object.keys(files).reduce((acc, key) => {
@@ -159,11 +159,11 @@ const VechileInsurance = () => {
                 updatedAt: new Date().toISOString(),
                 updatedBy: userProfile.userId,
                 updatedByName:userProfile.userName,
-                vehicleInsurance_insuranceCopy
+                stockInsurance_insuranceCopy
             };
             updateItem({
                 ...editedForm,
-                vehicleInsurance_insuranceCopy
+                stockInsurance_insuranceCopy
             } as any);
 
             client.models.Form.update(params).catch(error => {
@@ -179,7 +179,7 @@ const VechileInsurance = () => {
                 state: 'active',
                 createdBy: userProfile.userId,
                 createdByName:userProfile.userName,
-                vehicleInsurance_insuranceCopy
+                stockInsurance_insuranceCopy
             };
             initiateLoding();
             client.models.Form.create(params)
@@ -216,12 +216,12 @@ const VechileInsurance = () => {
     const filesData = Object.values(files).filter(Boolean);
 
     const isSubmitDisabled =
-        !selectedItem.vehicleInsurance_vehicleNo ||
-        !selectedItem.vehicleInsurance_insuranceCompany ||
-        selectedItem.vehicleInsurance_insureAmount === '' ||
-        selectedItem.vehicleInsurance_insuranceAmount === '' ||
-        !selectedItem.vehicleInsurance_vehicleType ||
-        !selectedItem.vehicleInsurance_remarks ||
+        !selectedItem.stockInsurance_vehicleNo ||
+        !selectedItem.stockInsurance_insuranceCompany ||
+        selectedItem.stockInsurance_insureAmount === '' ||
+        selectedItem.stockInsurance_insuranceAmount === '' ||
+        !selectedItem.stockInsurance_vehicleType ||
+        !selectedItem.stockInsurance_remarks ||
         !selectedItem.expirationDate ||
         (defaultFiles.length === 0 &&
             (filesData.length === 0 ||
@@ -287,11 +287,11 @@ const VechileInsurance = () => {
                                 size="small"
                                 isRequired={true}
                                 placeholder="Vehicle No."
-                                value={selectedItem.vehicleInsurance_vehicleNo}
+                                value={selectedItem.stockInsurance_vehicleNo}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'vehicleInsurance_vehicleNo'
+                                        'stockInsurance_vehicleNo'
                                     )
                                 }
                             />
@@ -306,12 +306,12 @@ const VechileInsurance = () => {
                                 placeholder="Insurance Date"
                                 isRequired={true}
                                 value={
-                                    selectedItem.vehicleInsurance_insuranceDate
+                                    selectedItem.stockInsurance_insuranceDate
                                 }
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'vehicleInsurance_insuranceDate'
+                                        'stockInsurance_insuranceDate'
                                     )
                                 }
                             />
@@ -344,12 +344,12 @@ const VechileInsurance = () => {
                                 placeholder="Insurance Company"
                                 isRequired={true}
                                 value={
-                                    selectedItem.vehicleInsurance_insuranceCompany
+                                    selectedItem.stockInsurance_insuranceCompany
                                 }
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'vehicleInsurance_insuranceCompany'
+                                        'stockInsurance_insuranceCompany'
                                     )
                                 }
                             />
@@ -364,12 +364,12 @@ const VechileInsurance = () => {
                                 placeholder="Insure Amount"
                                 isRequired={true}
                                 value={
-                                    selectedItem.vehicleInsurance_insureAmount
+                                    selectedItem.stockInsurance_insureAmount
                                 }
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'vehicleInsurance_insureAmount'
+                                        'stockInsurance_insureAmount'
                                     )
                                 }
                             />
@@ -384,12 +384,12 @@ const VechileInsurance = () => {
                                 placeholder="Insurance Amount"
                                 isRequired={true}
                                 value={
-                                    selectedItem.vehicleInsurance_insuranceAmount
+                                    selectedItem.stockInsurance_insuranceAmount
                                 }
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'vehicleInsurance_insuranceAmount'
+                                        'stockInsurance_insuranceAmount'
                                     )
                                 }
                             />
@@ -399,7 +399,7 @@ const VechileInsurance = () => {
                             <FileUploader
                                 defaultFiles={defaultFiles}
                                 path={({ identityId }) =>
-                                    `forms/vehicleInsurance/${identityId}/`
+                                    `forms/stockInsurance/${identityId}/`
                                 }
                                 maxFileCount={5}
                                 isResumable
@@ -472,12 +472,12 @@ const VechileInsurance = () => {
                                 placeholder="Vehicle Type"
                                 isRequired={true}
                                 value={
-                                    selectedItem.vehicleInsurance_vehicleType
+                                    selectedItem.stockInsurance_vehicleType
                                 }
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'vehicleInsurance_vehicleType'
+                                        'stockInsurance_vehicleType'
                                     )
                                 }
                             />
@@ -490,12 +490,12 @@ const VechileInsurance = () => {
                                 variation="quiet"
                                 size="small"
                                 placeholder={'Remarks'}
-                                value={selectedItem.vehicleInsurance_remarks}
+                                value={selectedItem.stockInsurance_remarks}
                                 isRequired={true}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'vehicleInsurance_remarks'
+                                        'stockInsurance_remarks'
                                     )
                                 }
                             />
@@ -526,4 +526,4 @@ const VechileInsurance = () => {
     );
 };
 
-export default VechileInsurance;
+export default StockInsurance;
