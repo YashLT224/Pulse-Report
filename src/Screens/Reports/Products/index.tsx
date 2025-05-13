@@ -249,6 +249,22 @@ const Products = () => {
                             />
                         </div>
                         <div className="mb-8px">
+                            <Heading>Price<span className='textRed'>*</span></Heading>
+                            <Input
+                                variation="quiet"
+                                size="small"
+                                isRequired={true}
+                                placeholder="Price"
+                                value={selectedItem.products_price}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'products_price'
+                                    )
+                                }
+                            />
+                        </div>
+                        <div className="mb-8px">
                             <Heading>Issue Date<span className='textRed'>*</span></Heading>
                             <Input
                                 type='date'
