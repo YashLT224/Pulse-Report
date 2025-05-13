@@ -267,7 +267,16 @@ const schema = a
                 salesManPerformance_expense: a.float(),
                 salesManPerformance_salesInRupees: a.float(),
                 salesManPerformance_salesInKgs: a.float(),
-                salesManPerformance_skus: a.ref('SKU').array()
+                salesManPerformance_skus: a.ref('SKU').array(),
+
+                // products
+                products_name: a.string(),
+                products_company: a.string(),
+                products_price: a.float(),
+                products_warranty: a.string(),
+                products_issueDate: a.date(),
+                products_remarks: a.string(),
+
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [

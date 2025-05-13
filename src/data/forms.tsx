@@ -82,6 +82,20 @@ export const formTypes = [
         name: 'Sales Man Performance',
         icon: performance,
         route: '/performance'
+    },
+    {
+        id: '10',
+        label: 'stockInsurance',
+        name: 'Stock Insurance',
+        icon: vechileInsurance,
+        route: '/stock-insurance'
+    },
+    {
+        id: '11',
+        label: 'products',
+        name: 'Products',
+        icon: performance,
+        route: '/products'
     }
 ];
 
@@ -809,6 +823,45 @@ export const salesManPerformance_itemsColumns = [
     }
 ];
 
+export const products_itemsColumns = [
+    {
+        key: 'products_name',
+        header: 'Product Name'
+    },
+    {
+        key: 'products_company',
+        header: 'Company'
+    },
+    {
+        key: 'products_price',
+        header: 'Price'
+    },
+    {
+        key: 'products_warranty',
+        header: 'Warranty'
+    },
+    {
+        key: 'products_issueDate',
+        header: 'Issue Date'
+    },
+    {
+        key: 'createdAt',
+        header: 'Created At',
+        render: (item: Form) =>
+            new Date(item.createdAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
+    },
+    {
+        key: 'products_remarks',
+        header: 'Remarks'
+    },
+];
 export function dispatchInstructionsHeader(setViewDescription) {
     const itemsColumns = [
         {
