@@ -21,6 +21,8 @@ import Todolist from '../Screens/Reports/todolistReport/index';
 import Requirements from '../Screens/Reports/Requirements/index';
 import Dispatch from '../Screens/Reports/Dispatch/index';
 import Performance from '../Screens/Reports/Performance/index';
+import StockInsurance from '../Screens/Reports/StockInsurance/index';
+import Products from '../Screens/Reports/Products/index';
 import 'react-select-search/style.css';
 
 const AppRoutes = () => {
@@ -197,6 +199,26 @@ const AppRoutes = () => {
                     <ProtectedRoute
                         element={<Performance />}
                         requiredFormId="salesManPerformance"
+                        requiredRole="admin"
+                    />
+                }
+            />
+            <Route
+                path="/stock-insurance"
+                element={
+                    <ProtectedRoute
+                        element={<StockInsurance />}
+                        requiredFormId="vehicleInsurance"
+                        requiredRole="admin"
+                    />
+                }
+            />
+            <Route
+                path="/products"
+                element={
+                    <ProtectedRoute
+                        element={<Products />}
+                        requiredFormId="vehicleInsurance"
                         requiredRole="admin"
                     />
                 }
