@@ -131,7 +131,7 @@ const UserList = () => {
         }
     ];
 
-    const onEdit = (editedUser: any) => {
+    const onEdit = async (editedUser: any) => {
         const { userId, allowedForms = [], status } = editedUser;
         updateItem(editedUser);
 
@@ -142,9 +142,15 @@ const UserList = () => {
             status
         };
 
-        client.models.UserProfile.update(params).catch(error => {
-            console.error('Failed to update user profile:', error);
-        });
+        const promises = [
+            client.models.UserProfile.update(params),
+            client.models.People.update({
+                personId: userId,
+                status
+            })
+        ];
+
+        await Promise.all(promises);
     };
     const handleEdit = (item: any) => {
         setSelectedItem(item);
