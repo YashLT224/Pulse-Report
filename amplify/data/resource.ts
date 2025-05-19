@@ -56,7 +56,7 @@ const schema = a
                 personId: a.id().required(),
                 personName: a.string().required(),
                 phoneNumber: a.phone().required(), // Enforce uniqueness using the PhoneIndex
-                designation: a.string().required(),
+                designation: a.string(),
                 status: a.enum(['active', 'inactive']),
                 entityType: a.string().default('PERSON'), // Constant attribute, e.g., "PERSON"
                 isAutoCreated: a.boolean().default(false), // Indicates if created by post-confirmation handler
