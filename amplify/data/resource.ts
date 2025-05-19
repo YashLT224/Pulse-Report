@@ -176,14 +176,18 @@ const schema = a
                 dispatchInstructions_remarks: a.string(),
 
                 // Stock Insurance
-                stockInsurance_vehicleNo: a.string(),
+                stockInsurance_name: a.string(),
                 stockInsurance_insuranceDate: a.date(),
-                stockInsurance_insuranceCompany: a.string(),
                 stockInsurance_insureAmount: a.float(),
                 stockInsurance_insuranceAmount: a.float(),
-                stockInsurance_insuranceCopy: a.ref('File').array(),
-                stockInsurance_vehicleType: a.string(),
-                stockInsurance_remarks: a.string(),
+                stockInsurance_documentNo: a.string(),
+                stockInsurance_markToName: a.string(),
+                stockInsurance_markToId: a.string(),
+                stockInsurance_status: a.enum([
+                    'PENDING',
+                    'PAID',
+                ]),
+
 
                 // Vehicle Insurance
                 vehicleInsurance_vehicleNo: a.string(),
@@ -194,6 +198,7 @@ const schema = a
                 vehicleInsurance_insuranceCopy: a.ref('File').array(),
                 vehicleInsurance_vehicleType: a.string(),
                 vehicleInsurance_remarks: a.string(),
+
 
                 // Vehicle Report
                 vehicleReport_vehicleNo: a.string(),

@@ -563,20 +563,12 @@ export const stockInsurance_itemsColumns = [
             })
     },
     {
-        key: 'stockInsurance_vehicleNo',
-        header: 'Vehicle No.'
+        key: 'stockInsurance_name',
+        header: 'Name'
     },
     {
         key: 'stockInsurance_insuranceDate',
         header: 'Insurance Date'
-    },
-    {
-        key: 'expirationDate',
-        header: 'Insurance Expiry'
-    },
-    {
-        key: 'stockInsurance_insuranceCompany',
-        header: 'Insurance Company'
     },
     {
         key: 'stockInsurance_insureAmount',
@@ -586,59 +578,33 @@ export const stockInsurance_itemsColumns = [
         key: 'stockInsurance_insuranceAmount',
         header: 'Insurance Amount'
     },
+      {
+        key: 'expirationDate',
+        header: 'Due Date'
+    },
+  
     {
-        key: 'stockInsurance_insuranceCopy',
-        header: 'Insurance Copy',
-        render: (item: Form) => {
-            return (
-                <div>
-                    {item.stockInsurance_insuranceCopy.map(fileItem => (
-                        <div key={fileItem.key} className="flexbox-between">
-                            <p>{fileItem.name}</p>
-                            <img
-                                className="pointer"
-                                src={eyeIcon}
-                                alt="View"
-                                width="30"
-                                height="30"
-                                onClick={async () => {
-                                    try {
-                                        const linkToStorageFile = await getUrl({
-                                            path: fileItem.key
-                                        });
-                                        const url = linkToStorageFile.url.toString();
-                                        // Create an anchor element and trigger a download
-                                        const a = document.createElement('a');
-                                        a.href = url;
-                                        a.target = '_blank';
-                                        a.rel = 'noopener noreferrer';
-                                        a.download =
-                                            fileItem.name || 'downloaded-file'; // Ensure a valid filename
-                                        document.body.appendChild(a);
-                                        a.click();
-                                        document.body.removeChild(a);
-                                    } catch (error) {
-                                        console.error(
-                                            'Error fetching URL:',
-                                            error
-                                        );
-                                    }
-                                }}
-                            />
-                        </div>
-                    ))}
-                </div>
-            );
-        }
+        key: 'stockInsurance_documentNo',
+        header: 'Document No.'
     },
     {
-        key: 'stockInsurance_vehicleType',
-        header: 'Vehicle Type'
+        key: 'stockInsurance_status',
+        header: 'Status',
+        render: item => (
+            <div
+                style={{
+                    color:
+                        item.stockInsurance_status === 'PAID' ? 'green' : 'red'
+                }}
+            >
+                {item.buildingMclTax_status}
+            </div>
+        )
     },
     {
-        key: 'stockInsurance_remarks',
-        header: 'Remarks'
-    }
+        key: 'stockInsurance_markToName',
+        header: 'Mark To'
+    },
 ];
 
 const workStatusMap = {
@@ -918,6 +884,19 @@ export const salesManPerformance_itemsColumns = [
 
 export const products_itemsColumns = [
     {
+        key: 'createdAt',
+        header: 'Created At',
+        render: (item: Form) =>
+            new Date(item.createdAt).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
+    },
+    {
         key: 'products_name',
         header: 'Product Name'
     },
@@ -937,19 +916,7 @@ export const products_itemsColumns = [
         key: 'products_issueDate',
         header: 'Issue Date'
     },
-    {
-        key: 'createdAt',
-        header: 'Created At',
-        render: (item: Form) =>
-            new Date(item.createdAt).toLocaleString('en-IN', {
-                timeZone: 'Asia/Kolkata',
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            })
-    },
+   
     {
         key: 'products_remarks',
         header: 'Remarks'

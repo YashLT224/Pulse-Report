@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react';
 import { ulid } from 'ulid';
-import { FileUploader } from '@aws-amplify/ui-react-storage';
-import { Loader, Input } from '@aws-amplify/ui-react';
+import { useSelector } from 'react-redux';
+import { Loader, Input, SelectField } from '@aws-amplify/ui-react';
 import { Schema } from '../../../../amplify/data/resource';
 import UserListItems from '../../../components/UserList';
 import { stockInsurance_itemsColumns as itemsColumns } from '../../../data/forms';
 import useAuth from '../../../Hooks/useAuth';
+import SelectSearch from 'react-select-search';
 import { usePagination } from '../../../Hooks/usePagination';
 import PaginationControls from '../../../components/PaginationControls';
 import Modal from '../../../components/Modal';
@@ -23,13 +24,16 @@ const FORM_TYPE = 'stockInsurance';
 type Form = Schema['Form']['type'];
 
 const StockInsurance = () => {
-    const { userProfile, client,isAdmin,formAccess } = useAuth();
-    const accessType=isAdmin?'update': formAccess[FORM_TYPE]?.toLowerCase()
+    const { userProfile, client, isAdmin, formAccess } = useAuth();
+        const personsList = useSelector(
+            (state: any) => state.globalReducer.persons
+        );
+    const accessType = isAdmin
+        ? 'update'
+        : formAccess[FORM_TYPE]?.toLowerCase();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<any>({});
     const [isUpdateMode, setUpdateMode] = useState(false);
-    const [files, setFiles] = useState({});
-    const [defaultFiles, setDefaultFiles] = useState([]);
 
     // fetch function for usePagination
     const fetchForm = useCallback(
@@ -67,50 +71,20 @@ const StockInsurance = () => {
         idField
     });
 
-    const processFile = async ({ file }) => {
-        const fileName = file.name;
-        const fileType = file.type;
-        const fileExtension = file.name.split('.').pop();
-
-        return file
-            .arrayBuffer()
-            .then((filebuffer: Buffer) =>
-                window.crypto.subtle.digest('SHA-1', filebuffer)
-            )
-            .then((hashBuffer: Buffer) => {
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                const hashHex = hashArray
-                    .map(a => a.toString(16).padStart(2, '0'))
-                    .join('');
-                const key = `${hashHex}.${fileExtension}`;
-                setFiles(prevFiles => {
-                    return {
-                        ...prevFiles,
-                        [key]: {
-                            status: 'uploading',
-                            type: fileType,
-                            name: fileName
-                        }
-                    };
-                });
-                return { file, key };
-            });
-    };
-
     const addNewItemHandler = () => {
         setUpdateMode(false);
         setIsModalOpen(true);
         setSelectedItem({
-            stockInsurance_vehicleNo: '',
+            stockInsurance_name: '',
             stockInsurance_insuranceDate: formatDateForInput(new Date()),
             expirationDate: getNextYearExpirationDate(),
-            stockInsurance_insuranceCompany: '',
             stockInsurance_insureAmount: 0,
             stockInsurance_insuranceAmount: 0,
-            stockInsurance_vehicleType: '',
-            stockInsurance_remarks: ''
+            stockInsurance_documentNo: '',
+            stockInsurance_status: 'PENDING',
+            stockInsurance_markToName: '',
+            stockInsurance_markToId: ''
         });
-        setFiles({});
     };
 
     const handleCloseModal = () => {
@@ -119,15 +93,6 @@ const StockInsurance = () => {
 
     const handleEdit = (item: any) => {
         setSelectedItem(item);
-        setFiles({});
-        setDefaultFiles(
-            item.stockInsurance_insuranceCopy?.map((data: any) => ({
-                ...data,
-                path: data.key,
-                key: data.name,
-                status: 'uploaded'
-            })) || []
-        );
         setUpdateMode(true);
         setIsModalOpen(true);
     };
@@ -143,27 +108,15 @@ const StockInsurance = () => {
             ...restForm
         } = editedForm;
 
-        const stockInsurance_insuranceCopy = defaultFiles
-            .map(({ path: key, name, type }) => ({ key, name, type }))
-            .concat(
-                Object.keys(files).reduce((acc, key) => {
-                    const { status, ...fileData } = files[key] || {};
-                    if (status !== 'success') return acc;
-                    return [...acc, fileData];
-                }, [])
-            );
-
         if (isUpdateMode) {
             const params: any = {
                 ...restForm,
                 updatedAt: new Date().toISOString(),
                 updatedBy: userProfile.userId,
-                updatedByName:userProfile.userName,
-                stockInsurance_insuranceCopy
+                updatedByName: userProfile.userName
             };
             updateItem({
-                ...editedForm,
-                stockInsurance_insuranceCopy
+                ...editedForm
             } as any);
 
             client.models.Form.update(params).catch(error => {
@@ -178,8 +131,7 @@ const StockInsurance = () => {
                 formType: `${FORM_TYPE}#active`,
                 state: 'active',
                 createdBy: userProfile.userId,
-                createdByName:userProfile.userName,
-                stockInsurance_insuranceCopy
+                createdByName: userProfile.userName
             };
             initiateLoding();
             client.models.Form.create(params)
@@ -213,19 +165,14 @@ const StockInsurance = () => {
         }
     };
 
-    const filesData = Object.values(files).filter(Boolean);
-
     const isSubmitDisabled =
-        !selectedItem.stockInsurance_vehicleNo ||
-        !selectedItem.stockInsurance_insuranceCompany ||
+        selectedItem.stockInsurance_name === '' ||
         selectedItem.stockInsurance_insureAmount === '' ||
         selectedItem.stockInsurance_insuranceAmount === '' ||
-        !selectedItem.stockInsurance_vehicleType ||
-        !selectedItem.stockInsurance_remarks ||
         !selectedItem.expirationDate ||
-        (defaultFiles.length === 0 &&
-            (filesData.length === 0 ||
-                !filesData.every((file: any) => file?.status === 'success')));
+        !selectedItem.stockInsurance_documentNo ||
+        !selectedItem.stockInsurance_markToName ||
+        !selectedItem.stockInsurance_markToId;
 
     return (
         <>
@@ -258,10 +205,10 @@ const StockInsurance = () => {
                     heading={heading}
                     items={items}
                     columns={itemsColumns}
-                    addNewEntryAccess={accessType!=='read'}
+                    addNewEntryAccess={accessType !== 'read'}
                     addNewItemHandler={addNewItemHandler}
                     handleEdit={handleEdit}
-                    haveEditAccess={accessType==='update'}
+                    haveEditAccess={accessType === 'update'}
                 />
             </div>
 
@@ -281,24 +228,28 @@ const StockInsurance = () => {
                 >
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
-                            <Heading>Vehicle No.<span className='textRed'>*</span></Heading>
+                            <Heading>
+                                Name<span className="textRed">*</span>
+                            </Heading>
                             <Input
                                 variation="quiet"
                                 size="small"
                                 isRequired={true}
-                                placeholder="Vehicle No."
-                                value={selectedItem.stockInsurance_vehicleNo}
+                                placeholder="Name"
+                                value={selectedItem.stockInsurance_name}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'stockInsurance_vehicleNo'
+                                        'stockInsurance_name'
                                     )
                                 }
                             />
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Insurance Date<span className='textRed'>*</span></Heading>
+                            <Heading>
+                                Insurance Date<span className="textRed">*</span>
+                            </Heading>
                             <Input
                                 type="date"
                                 variation="quiet"
@@ -316,56 +267,17 @@ const StockInsurance = () => {
                                 }
                             />
                         </div>
-
                         <div className="mb-8px">
-                            <Heading>Insurance Expiry<span className='textRed'>*</span></Heading>
-                            <Input
-                                type="date"
-                                variation="quiet"
-                                size="small"
-                                placeholder="Payment"
-                                isRequired={true}
-                                value={selectedItem.expirationDate}
-                                onChange={e =>
-                                    updateField(
-                                        e.target.value,
-                                        'expirationDate'
-                                    )
-                                }
-                            />
-                        </div>
-
-                        <div className="mb-8px">
-                            <Heading>Insurance Company<span className='textRed'>*</span></Heading>
-                            <Input
-                                type="text"
-                                variation="quiet"
-                                size="small"
-                                placeholder="Insurance Company"
-                                isRequired={true}
-                                value={
-                                    selectedItem.stockInsurance_insuranceCompany
-                                }
-                                onChange={e =>
-                                    updateField(
-                                        e.target.value,
-                                        'stockInsurance_insuranceCompany'
-                                    )
-                                }
-                            />
-                        </div>
-
-                        <div className="mb-8px">
-                            <Heading>Insure Amount<span className='textRed'>*</span></Heading>
+                            <Heading>
+                                Insure Amount<span className="textRed">*</span>
+                            </Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
                                 size="small"
                                 placeholder="Insure Amount"
                                 isRequired={true}
-                                value={
-                                    selectedItem.stockInsurance_insureAmount
-                                }
+                                value={selectedItem.stockInsurance_insureAmount}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
@@ -376,7 +288,10 @@ const StockInsurance = () => {
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Insurance Amount<span className='textRed'>*</span></Heading>
+                            <Heading>
+                                Insurance Amount
+                                <span className="textRed">*</span>
+                            </Heading>
                             <Input
                                 type="number"
                                 variation="quiet"
@@ -394,113 +309,83 @@ const StockInsurance = () => {
                                 }
                             />
                         </div>
+
                         <div className="mb-8px">
-                            <Heading>Insurance Copy<span className='textRed'>*</span></Heading>
-                            <FileUploader
-                                defaultFiles={defaultFiles}
-                                path={({ identityId }) =>
-                                    `forms/stockInsurance/${identityId}/`
+                            <Heading>
+                                Due Date<span className="textRed">*</span>
+                            </Heading>
+                            <Input
+                                type="date"
+                                variation="quiet"
+                                size="small"
+                                placeholder="Payment"
+                                isRequired={true}
+                                value={selectedItem.expirationDate}
+                                onChange={e =>
+                                    updateField(
+                                        e.target.value,
+                                        'expirationDate'
+                                    )
                                 }
-                                maxFileCount={5}
-                                isResumable
-                                processFile={processFile}
-                                onFileRemove={({ key }) => {
-                                    const fileNameHash = key.split('/').pop();
-                                    setFiles(prevFiles => {
-                                        return {
-                                            ...prevFiles,
-                                            [fileNameHash]: undefined
-                                        };
-                                    });
-                                    setDefaultFiles(prevFiles => {
-                                        return prevFiles.filter(
-                                            file => file.key !== key
-                                        );
-                                    });
-                                }}
-                                onUploadError={(error, { key }) => {
-                                    const fileNameHash = key.split('/').pop();
-                                    console.error(
-                                        `Failed to upload file with key: ${key}`,
-                                        error
-                                    );
-                                    setFiles(prevFiles => {
-                                        return {
-                                            ...prevFiles,
-                                            [fileNameHash]: {
-                                                ...prevFiles[fileNameHash],
-                                                key,
-                                                status: 'error'
-                                            }
-                                        };
-                                    });
-                                }}
-                                onUploadSuccess={({ key }) => {
-                                    const fileNameHash = key.split('/').pop();
-                                    setFiles(prevFiles => {
-                                        return {
-                                            ...prevFiles,
-                                            [fileNameHash]: {
-                                                ...prevFiles[fileNameHash],
-                                                key,
-                                                status: 'success'
-                                            }
-                                        };
-                                    });
-                                }}
-                                // onUploadStart={({ key }) => {
-                                //     const fileKey = key.split('/').pop();
-                                //     setFiles(prevFiles => {
-                                //         return {
-                                //             ...prevFiles,
-                                //             [key]: {
-                                //                 ...prevFiles[fileKey],
-                                //                 status: 'uploading'
-                                //             }
-                                //         };
-                                //     });
-                                // }}
                             />
                         </div>
 
                         <div className="mb-8px">
-                            <Heading>Vehicle Type<span className='textRed'>*</span></Heading>
+                            <Heading>
+                                Document No.<span className="textRed">*</span>
+                            </Heading>
                             <Input
                                 type="text"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Vehicle Type"
+                                placeholder="Insurance Company"
                                 isRequired={true}
-                                value={
-                                    selectedItem.stockInsurance_vehicleType
-                                }
+                                value={selectedItem.stockInsurance_documentNo}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'stockInsurance_vehicleType'
+                                        'stockInsurance_documentNo'
                                     )
                                 }
                             />
                         </div>
-
                         <div className="mb-8px">
-                            <Heading>Remarks<span className='textRed'>*</span></Heading>
-
-                            <Input
-                                variation="quiet"
-                                size="small"
-                                placeholder={'Remarks'}
-                                value={selectedItem.stockInsurance_remarks}
-                                isRequired={true}
+                            <Heading> Status</Heading>
+                            <SelectField
+                            label=''
+                                value={selectedItem.stockInsurance_status}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
-                                        'stockInsurance_remarks'
+                                        'stockInsurance_status'
                                     )
                                 }
-                            />
+                            >
+                                <option value="PENDING">Pending</option>
+                                <option value="PAID">Paid</option>
+                            </SelectField>
                         </div>
 
+                           <div className="mb-8px selectSearch">
+                                                    <Heading>
+                                                        Mark To<span className="textRed">*</span>
+                                                    </Heading>
+                                                    {/** @ts-expect-error: Ignoring TypeScript error for SelectSearch component usage  */}
+                                                    <SelectSearch
+                                                        search={true}
+                                                        options={personsList}
+                                                        value={`${selectedItem.stockInsurance_markToName}#${selectedItem.stockInsurance_markToId}`}
+                                                        // name="Person Name"
+                                                        placeholder="Mark To"
+                                                        onChange={selectedValue => {
+                                                            updateField(
+                                                                selectedValue,
+                                                                'stockInsurance_markToName#stockInsurance_markToId',
+                                                                true
+                                                            );
+                                                        }}
+                                                    />
+                                                </div>
                         <div
                             style={{
                                 display: 'flex',
