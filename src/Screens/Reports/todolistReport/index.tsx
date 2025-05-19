@@ -441,6 +441,9 @@ const ToDoList = () => {
                                 Work<span className="textRed">*</span>
                             </Heading>
                             <Input
+                            disabled={
+                                isUpdateMode&&!isAdmin
+                            }
                                 variation="quiet"
                                 size="small"
                                 isRequired={true}
