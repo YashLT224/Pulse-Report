@@ -125,7 +125,10 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
             updateItem({ ...editedEntity, ...modifiedEntity } as any);
 
             model
-                .update(modifiedEntity as any)
+                .update({
+                    ...modifiedEntity,
+                    updatedAt: new Date().toISOString()
+                } as any)
                 .then(() => {
                     dispatch(fetchEntityAsyncThunk() as any);
                 })
@@ -135,6 +138,7 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         } else {
             const params: any = {
                 ...modifiedEntity,
+                createdAt: new Date().toISOString(),
                 [idField]: ulid()
             };
             initiateLoding();
@@ -250,9 +254,11 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
             />
 
             {isModalOpen && (
-                <Modal 
-                onCloseHandler={handleCloseModal}
-                heading={`${NameEntity}`} isUpdateMode={isUpdateMode}>
+                <Modal
+                    onCloseHandler={handleCloseModal}
+                    heading={`${NameEntity}`}
+                    isUpdateMode={isUpdateMode}
+                >
                     <form onSubmit={handleSave}>
                         <div className="mb-8px">
                             <Heading>{NameEntity} Name</Heading>

@@ -54,6 +54,8 @@ const schema = a
         People: a
             .model({
                 personId: a.id().required(),
+                createdAt: a.datetime(),
+                updatedAt: a.datetime(),
                 personName: a.string().required(),
                 phoneNumber: a.phone().required(), // Enforce uniqueness using the PhoneIndex
                 designation: a.string(),
@@ -183,11 +185,7 @@ const schema = a
                 stockInsurance_documentNo: a.string(),
                 stockInsurance_markToName: a.string(),
                 stockInsurance_markToId: a.string(),
-                stockInsurance_status: a.enum([
-                    'PENDING',
-                    'PAID',
-                ]),
-
+                stockInsurance_status: a.enum(['PENDING', 'PAID']),
 
                 // Vehicle Insurance
                 vehicleInsurance_vehicleNo: a.string(),
@@ -198,7 +196,6 @@ const schema = a
                 vehicleInsurance_insuranceCopy: a.ref('File').array(),
                 vehicleInsurance_vehicleType: a.string(),
                 vehicleInsurance_remarks: a.string(),
-
 
                 // Vehicle Report
                 vehicleReport_vehicleNo: a.string(),
@@ -290,8 +287,7 @@ const schema = a
                 products_price: a.float(),
                 products_warranty: a.string(),
                 products_issueDate: a.date(),
-                products_remarks: a.string(),
-
+                products_remarks: a.string()
             })
             .identifier(['formId'])
             .secondaryIndexes(index => [
