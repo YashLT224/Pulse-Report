@@ -19,31 +19,42 @@ import {
     toDoList_itemsColumns,
     requirements_itemsColumns,
     vehicleReport_itemsColumns,
-    vehicleInsurance_itemsColumns
+    vehicleInsurance_itemsColumns,
+    stockInsurance_itemsColumns
 } from '../../data/forms';
 
 const formColumns = {
     buildingInsurance: {
         columns: buildingInsurance_itemsColumns,
-        label: 'Building Insurance'
+        label: 'Building Insurance',
+        SpecificUserData:false
     },
     buildingMclTax: {
         columns: buildingMclTax_itemsColumns,
-        label: 'Building MCL Tax'
+        label: 'Building MCL Tax',
+        SpecificUserData:false
     },
     documentFileStatus: {
         columns: documentFileStatus_itemsColumns,
-        label: 'Document File Status'
+        label: 'Document File Status',
+        SpecificUserData:false
     },
-    toDoList: { columns: toDoList_itemsColumns, label: 'Todo List' },
-    requirements: { columns: requirements_itemsColumns, label: 'Requirements' },
+    toDoList: { columns: toDoList_itemsColumns, label: 'Todo List', SpecificUserData:true },
+    requirements: { columns: requirements_itemsColumns, label: 'Requirements', SpecificUserData:false },
     vehicleReport: {
         columns: vehicleReport_itemsColumns,
-        label: 'Vehicle Report'
+        label: 'Vehicle Report',
+        SpecificUserData:false
     },
     vehicleInsurance: {
         columns: vehicleInsurance_itemsColumns,
-        label: 'Vehicle Insurance'
+        label: 'Vehicle Insurance',
+        SpecificUserData:false
+    },
+    stockInsurance: {
+        columns: stockInsurance_itemsColumns,
+        label: 'Stock Insurance',
+        SpecificUserData:false,
     }
 };
 
@@ -52,7 +63,7 @@ const idField = 'formId';
 type Form = Schema['Form']['type'];
 
 const Alerts = () => {
-    const { userProfile, client } = useAuth();
+    const { userProfile, client,isAdmin } = useAuth();
     const [selectedItem, setSelectedItem] = useState({
         data: null,
         formType: null
@@ -100,14 +111,16 @@ const Alerts = () => {
     const itemMap = formatDataByFormType({
         data: items,
         userRole,
-        allowedForms
+        allowedForms,
+        isAdmin,
+        userProfile
+
     });
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
     const handleEdit = item => {
-        console.log(item);
         setIsModalOpen(true);
         const formType = item.formType.split('#')[0];
         setSelectedItem({ data: item, formType });
@@ -210,7 +223,7 @@ const Alerts = () => {
                         Object.keys(itemMap || []).map(formName => {
                             return (
                                 <>
-                                    {itemMap[formName].length > 0 ? (
+                                    {itemMap?.[formName].length > 0 ? (
                                         <div
                                             style={{
                                                 border: '1px solid black',
@@ -291,11 +304,20 @@ const Alerts = () => {
 export default Alerts;
 
 const hasFormAccess = ({ formType, userRole, allowedForms }) => {
-    return userRole === 'admin' || allowedForms?.includes(formType);
-};
-function validEntry(item, formType) {
+    if (userRole === 'admin') return true;
+    if (!allowedForms) return false;
+    
+    return allowedForms.some(item => item.includes(formType));
+  };
+  
+function validEntry(item, formType,isAdmin,userProfile) {
+   
+    let formName=formType.split('#')[0]
     if (item.completedAt) {
         return false;
+    }
+    if(!isAdmin&&formColumns[formName].SpecificUserData){
+        return item.createdBy === userProfile?.userId
     }
     switch (formType) {
         case 'buildingInsurance':
@@ -311,7 +333,9 @@ function validEntry(item, formType) {
     }
 }
 
-function formatDataByFormType({ data, userRole, allowedForms }) {
+function formatDataByFormType({ data, userRole, allowedForms, isAdmin,
+    userProfile
+}) {
     // Initialize an empty result object
     const result = {};
 
@@ -319,6 +343,8 @@ function formatDataByFormType({ data, userRole, allowedForms }) {
     data.forEach(item => {
         const formType = item.formType.split('#')[0];
 
+
+       
         // If this formType doesn't exist in the result yet, create an empty array
         if (
             !result[formType] &&
@@ -329,7 +355,7 @@ function formatDataByFormType({ data, userRole, allowedForms }) {
 
         // Push the current item to the appropriate array
         result[formType] &&
-            validEntry(item, formType) &&
+            validEntry(item, formType,isAdmin,userProfile) &&
             result[formType].push(item);
     });
 

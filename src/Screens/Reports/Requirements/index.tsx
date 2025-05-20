@@ -309,6 +309,7 @@ const Requirements = () => {
                                 placeholder="Deadline"
                                 isRequired={true}
                                 value={selectedItem.expirationDate}
+                                min={formatDateForInput(new Date())}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,

@@ -464,6 +464,7 @@ const ToDoList = () => {
                                 variation="quiet"
                                 size="small"
                                 placeholder="Due Date"
+                                  min={formatDateForInput(new Date())}
                                 isRequired={true}
                                 value={selectedItem.expirationDate}
                                 onChange={e =>

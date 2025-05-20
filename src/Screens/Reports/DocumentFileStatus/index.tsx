@@ -433,6 +433,7 @@ const DocumentFileStatus = () => {
                                 placeholder="Date Expiry"
                                 // isRequired={true}
                                 value={selectedItem.expirationDate}
+                                min={formatDateForInput(new Date())}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
