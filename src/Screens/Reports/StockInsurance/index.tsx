@@ -77,7 +77,7 @@ const StockInsurance = () => {
         setSelectedItem({
             stockInsurance_name: '',
             stockInsurance_insuranceDate: formatDateForInput(new Date()),
-            expirationDate: getNextYearExpirationDate(),
+            expirationDate:formatDateForInput(new Date()),
             stockInsurance_insureAmount: 0,
             stockInsurance_insuranceAmount: 0,
             stockInsurance_documentNo: '',
@@ -318,9 +318,10 @@ const StockInsurance = () => {
                                 type="date"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Payment"
+                                placeholder="Due Date"
                                 isRequired={true}
                                 value={selectedItem.expirationDate}
+                                min={formatDateForInput(new Date())}
                                 onChange={e =>
                                     updateField(
                                         e.target.value,
