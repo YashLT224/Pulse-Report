@@ -235,7 +235,7 @@ const StockInsurance = () => {
                                 variation="quiet"
                                 size="small"
                                 isRequired={true}
-                                placeholder="Name"
+                                placeholder="Stock Name"
                                 value={selectedItem.stockInsurance_name}
                                 onChange={e =>
                                     updateField(
@@ -339,7 +339,7 @@ const StockInsurance = () => {
                                 type="text"
                                 variation="quiet"
                                 size="small"
-                                placeholder="Insurance Company"
+                                placeholder="Document No."
                                 isRequired={true}
                                 value={selectedItem.stockInsurance_documentNo}
                                 onChange={e =>

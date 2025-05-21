@@ -13,8 +13,6 @@ const Home = () => {
     const FilteredAccessedForm = allowedForms.map(form => form.split('#')[0]);
     const isAdmin = userProfile?.role === 'admin';
 
-    console.log(allowedForms)
-
     return (
         <div>
             <CardContainer>
