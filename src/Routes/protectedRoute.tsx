@@ -15,8 +15,7 @@ const ProtectedRoute = ({
 
     const formsHaveAccess = userProfile?.allowedForms || [];
     const allowedForms = formsHaveAccess.map(form => form.split('#')[0]);
-
-
+ 
     // Show loading indicator while checking permissions
     if (isLoading) {
         return (

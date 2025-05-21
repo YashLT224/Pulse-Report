@@ -316,6 +316,7 @@ function validEntry(item, formType,isAdmin,userProfile) {
     if (item.completedAt) {
         return false;
     }
+    console.log(formColumns[formName].SpecificUserData)
     if(!isAdmin&&formColumns[formName].SpecificUserData){
         return item.createdBy === userProfile?.userId
     }
@@ -343,8 +344,6 @@ function formatDataByFormType({ data, userRole, allowedForms, isAdmin,
     data.forEach(item => {
         const formType = item.formType.split('#')[0];
 
-
-       
         // If this formType doesn't exist in the result yet, create an empty array
         if (
             !result[formType] &&

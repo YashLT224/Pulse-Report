@@ -208,7 +208,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<StockInsurance />}
-                        requiredFormId="vehicleInsurance"
+                        requiredFormId="stockInsurance"
                         requiredRole="admin"
                     />
                 }
@@ -218,7 +218,7 @@ const AppRoutes = () => {
                 element={
                     <ProtectedRoute
                         element={<Products />}
-                        requiredFormId="vehicleInsurance"
+                        requiredFormId="products"
                         requiredRole="admin"
                     />
                 }

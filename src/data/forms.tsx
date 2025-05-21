@@ -564,7 +564,7 @@ export const stockInsurance_itemsColumns = [
     },
     {
         key: 'stockInsurance_name',
-        header: 'Name'
+        header: 'Stock Name'
     },
     {
         key: 'stockInsurance_insuranceDate',
