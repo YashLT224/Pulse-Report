@@ -11,6 +11,7 @@ import todolist from '../assets/todolist.png';
 import { Schema } from '../../amplify/data/resource';
 import eyeIcon from '../assets/eye.svg';
 import { getUrl } from 'aws-amplify/storage';
+import { render } from 'react-dom';
 
 export const formTypes = [
     {
@@ -172,7 +173,14 @@ export const buildingInsurance_itemsColumns = [
     },
     {
         key: 'buildingInsurance_insuranceDate',
-        header: 'Insurance Date'
+        header: 'Insurance Date',
+        render: (item: Form) =>
+            new Date(item.buildingInsurance_insuranceDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            })
     },
     {
         key: 'buildingInsurance_insureAmount',
@@ -185,7 +193,14 @@ export const buildingInsurance_itemsColumns = [
 
     {
         key: 'expirationDate',
-        header: 'Due Date'
+        header: 'Due Date',
+        render: (item: Form) =>
+            new Date(item.expirationDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            })
     },
     {
         key: 'buildingInsurance_status',
@@ -224,7 +239,14 @@ export const buildingMclTax_itemsColumns = [
     },
     {
         key: 'expirationDate',
-        header: 'Due Date'
+        header: 'Due Date',
+        render: (item: any) =>
+            new Date(item.expirationDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            })
     },
     {
         key: 'buildingMclTax_taxType',
@@ -247,7 +269,14 @@ export const buildingMclTax_itemsColumns = [
 
     {
         key: 'buildingMclTax_paidDate',
-        header: 'Paid On'
+        header: 'Paid On',
+        render: (item: any) =>
+            new Date(item.buildingMclTax_paidDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            })
     },
     {
         key: 'buildingMclTax_documentFileNo',
@@ -293,7 +322,15 @@ export const documentFileStatus_itemsColumns = [
     },
     {
         key: 'documentFileStatus_inDate_outDate',
-        header: 'In Date / Out Date'
+        header: 'In Date / Out Date',
+        render: (item: any) =>
+            new Date(item.documentFileStatus_inDate_outDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            })
+        
     },
     {
         key: 'documentFileStatus_fileName',
@@ -323,7 +360,14 @@ export const documentFileStatus_itemsColumns = [
 
     {
         key: 'expirationDate',
-        header: 'Date Expiry'
+        header: 'Date Expiry',
+        render: (item: any) =>
+            new Date(item.expirationDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            })
     },
     {
         key: 'documentFileStatus_receivedFrom_givenByName',
@@ -359,24 +403,60 @@ export const vehicleReport_itemsColumns = [
     },
     {
         key: 'vehicleReport_roadTaxDue',
-        header: 'Road Tax Due'
+        header: 'Road Tax Due',
+        render: (item: Form) =>
+            item.vehicleReport_roadTaxDue
+                ? new Date(item.vehicleReport_roadTaxDue).toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                })
+                : 'N/A'
     },
     {
         key: 'vehicleReport_stateTaxDue',
-        header: 'State Tax Due'
+        header: 'State Tax Due',
+        render: (item: Form) =>
+            item.vehicleReport_stateTaxDue
+                ? new Date(item.vehicleReport_stateTaxDue).toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                })
+                : 'N/A'
     },
     {
         key: 'vehicleReport_fitnessDue',
-        header: 'Fitness Due'
+        header: 'Fitness Due',
+        render: (item: Form) =>
+            item.vehicleReport_fitnessDue
+                ? new Date(item.vehicleReport_fitnessDue).toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                })
+                : 'N/A'
     },
     {
         key: 'vehicleReport_challan',
-        header: 'Challan'
+        header: 'Challan',
     },
 
     {
         key: 'vehicleReport_challanDate',
-        header: 'Challan Date'
+        header: 'Challan Date',
+        render: (item: Form) =>
+            item.vehicleReport_challanDate
+                ? new Date(item.vehicleReport_challanDate).toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                })
+                : 'N/A'
     },
     {
         key: 'vehicleReport_challanDue',
@@ -390,7 +470,16 @@ export const vehicleReport_itemsColumns = [
 
     {
         key: 'vehicleReport_batteryWarranty',
-        header: 'Battery Warranty'
+        header: 'Battery Warranty',
+        render: (item: Form) =>
+            item.vehicleReport_batteryWarranty
+                ? new Date(item.vehicleReport_batteryWarranty).toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                })
+                : 'N/A'
     },
 
     {
@@ -399,7 +488,16 @@ export const vehicleReport_itemsColumns = [
     },
     {
         key: 'vehicleReport_billDate',
-        header: 'Bill Date'
+        header: 'Bill Date',
+        render: (item: Form) =>
+            item.vehicleReport_billDate
+                ? new Date(item.vehicleReport_billDate).toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                })
+                : 'N/A'
     },
     {
         key: 'vehicleReport_billPhoto',
@@ -475,11 +573,25 @@ export const vehicleInsurance_itemsColumns = [
     },
     {
         key: 'vehicleInsurance_insuranceDate',
-        header: 'Insurance Date'
+        header: 'Insurance Date',
+        render: (item: Form) =>
+            new Date(item.vehicleInsurance_insuranceDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            })
     },
     {
         key: 'expirationDate',
-        header: 'Insurance Expiry'
+        header: 'Insurance Expiry',
+        render: (item: Form) =>
+            new Date(item.expirationDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            })
     },
     {
         key: 'vehicleInsurance_insuranceCompany',
@@ -568,7 +680,14 @@ export const stockInsurance_itemsColumns = [
     },
     {
         key: 'stockInsurance_insuranceDate',
-        header: 'Insurance Date'
+        header: 'Insurance Date',
+        render: (item: Form) =>
+            new Date(item.stockInsurance_insuranceDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            })
     },
     {
         key: 'stockInsurance_insureAmount',
@@ -580,7 +699,14 @@ export const stockInsurance_itemsColumns = [
     },
       {
         key: 'expirationDate',
-        header: 'Due Date'
+        header: 'Due Date',
+        render: (item: Form) =>
+            new Date(item.expirationDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            })
     },
   
     {
@@ -768,7 +894,15 @@ export const requirements_itemsColumns = [
     },
     {
         key: 'expirationDate',
-        header: 'Deadline'
+        header: 'Deadline',
+        render: (item: any) =>
+            new Date(item.expirationDate).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                 
+            })
     }
     // {
     //     key: 'requirements_remarks',
@@ -792,7 +926,13 @@ export const salesManPerformance_itemsColumns = [
     },
     {
         key: 'salesManPerformance_year_month',
-        header: 'Performance Period'
+        header: 'Performance Period',
+        render: (item: Form) =>
+            new Date(item.salesManPerformance_year_month).toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+            })
     },
     {
         key: 'salesManPerformance_salesManName',

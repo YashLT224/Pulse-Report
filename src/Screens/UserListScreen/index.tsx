@@ -127,7 +127,14 @@ const UserList = () => {
             key: 'createdAt',
             header: 'Created At',
             render: (item: any) =>
-                item.createdAt ? new Date(item.createdAt).toLocaleString() : ''
+                new Date(item.createdAt).toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
         }
     ];
 
