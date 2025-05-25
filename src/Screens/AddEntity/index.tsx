@@ -104,7 +104,15 @@ const AddEntity = ({ type = 'PEOPLE' } = {}) => {
         {
             key: 'createdAt',
             header: 'Created At',
-            render: (item: Entity) => new Date(item.createdAt).toLocaleString()
+            render: (item: Entity) =>
+                new Date(item.createdAt).toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
         }
     ];
 
